@@ -1,0 +1,12 @@
+{% extends 'base.html'%} {% block title %} Тезаурус редакторы {% endblock %} 
+
+{% block content %}
+<h3 class="mt-4">Авторлану</h3>
+<div class="col-4">
+    <form id="auth_form" method="POST">
+        {% csrf_token%}
+        {{form}}
+        <button form="auth_form" type="submit" class="btn btn-primary mt-4">Кіру</button>
+    </form>
+</div>
+{% endblock content %}

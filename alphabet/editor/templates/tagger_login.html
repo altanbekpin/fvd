@@ -1,0 +1,18 @@
+{% extends 'basic.html'%} {% block title %} AutoLingTag {% endblock %} 
+{% load i18n %}
+{% block content %}
+<div class="container p-0 mt-3">
+        <div class="card card-shadow border-0">
+            <div class="card-header">
+                <h5><b>{% trans 'Авторлану' %}</b></h5>
+            </div>
+            <div class="card-body">
+                <form id="auth_form" method="POST">
+                    {% csrf_token%}
+                    {{form}}
+                    <button form="auth_form" type="submit" class="btn btn-primary mt-4">{% trans 'Кіру' %}</button>
+                </form>
+            </div>
+        </div>
+</div>
+{% endblock content %}

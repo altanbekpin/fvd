@@ -1,0 +1,693 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/enu/qaztaxexpert#"
+     xml:base="http://www.semanticweb.org/enu/qaztaxexpert"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+     xmlns:swrla="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#"
+     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/enu/qaztaxexpert"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled -->
+
+    <owl:AnnotationProperty rdf:about="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#босатылады -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#босатылады"/>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#ие -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#ие">
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#салынады -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#тиесілі -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#төлейді -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#төлейді">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+        <rdfs:domain>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#ие"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+            </owl:Restriction>
+        </rdfs:domain>
+        <rdfs:domain>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлейді"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+            </owl:Restriction>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#КСРО-медалі-иегері -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#КСРО-медалі-иегері">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#КСРО-ордені-иегері -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#КСРО-ордені-иегері">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#МКБ-кассасы -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#МКБ-кассасы">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлем-жүргізу-түрі"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#алтын-алқа-иегері -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#алтын-алқа-иегері">
+        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#екінші-топтағы-мүгедек"/>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#босатылады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#арнайы-техника-иесі -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#арнайы-техника-иесі">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#заңды-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#банк-кассасы -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#банк-кассасы">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлем-жүргізу-түрі"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#даңқ-орден-иегері -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#даңқ-орден-иегері">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#екінші-топтағы-мүгедек -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#екінші-топтағы-мүгедек">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#босатылады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#жеке-куәлік -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#жеке-куәлік">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#құжат"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#жеке-кәсіпкер -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#жеке-кәсіпкер">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#заңды-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#жеңіл-көлік -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#жеңіл-көлік">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#жылжымайтын-мүлік -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#жылжымайтын-мүлік">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#жылжымалы-мүлік -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#жылжымалы-мүлік">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#заңды-тұлға -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#заңды-тұлға">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#интернет-банкинг -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#интернет-банкинг">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлем-жүргізу-түрі"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#карьерлік-самосвал -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#карьерлік-самосвал">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#күміс-алқа-иегері -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#күміс-алқа-иегері">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#көлік -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#көлік">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жылжымалы-мүлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#көлік-құралын-тіркеу-куәлігі -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#көлік-құралын-тіркеу-куәлігі">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#құжат"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#лизинг-алушы -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#лизинг-алушы">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#заңды-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#медициналық-көлік-құралы -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#медициналық-көлік-құралы">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#мемлекеттік-қызметкер -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#мемлекеттік-қызметкер">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#мотоцикл -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#мотоцикл">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#мүлік -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#мүлік">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#салық -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#сақтандыру-полюсі -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#сақтандыру-полюсі">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#құжат"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#тыл-еңбеккері -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#тыл-еңбеккері">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#тіркелген-теңіз-кемесі -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#тіркелген-теңіз-кемесі">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#тұлға -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#тұлға">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#ие"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлейді"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#төлем-жүргізу-түрі -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#төлем-жүргізу-түрі"/>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#халық-хаһарманы -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#халық-хаһарманы">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#Қазақстан-еңбек-ері -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#Қазақстан-еңбек-ері">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#Қазпошта-кассасы -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#Қазпошта-кассасы">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлем-жүргізу-түрі"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#құжат -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#құжат"/>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#ҰОС-ардагері -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#ҰОС-ардагері">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#ҰОС-қатысушы -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#ҰОС-қатысушы">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#40-тоннадан-астам-жүк-көтеретін-көлік -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#40-тоннадан-астам-жүк-көтеретін-көлік">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#Yamaha -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#Yamaha">
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жылжымалы-мүлік"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мотоцикл"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+            </owl:Restriction>
+        </rdf:type>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#Марат -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#Марат">
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеке-тұлға"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#ие"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлейді"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+            </owl:Restriction>
+        </rdf:type>
+        <ие rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#580HMA09"/>
+        <төлейді rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#негізгі-көлік-салығы"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#негізгі-көлік-салығы -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#негізгі-көлік-салығы">
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/enu/qaztaxexpert#580HMA09 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#580HMA09">
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеңіл-көлік"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жылжымалы-мүлік"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+            </owl:Restriction>
+        </rdf:type>
+        <тиесілі rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#Марат"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#ие"/>
+        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлейді"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салық"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Restriction>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жылжымалы-мүлік"/>
+    </owl:Restriction>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#салынады"/>
+        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік-салығы"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#көлік"/>
+    </owl:Restriction>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тиесілі"/>
+        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#тұлға"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#мүлік"/>
+    </owl:Restriction>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Rules
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#p">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.semanticweb.org/enu/qaztaxexpert#c">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description>
+        <swrla:isRuleEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrla:isRuleEnabled>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"></rdfs:comment>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">S1</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#ие"/>
+                        <swrl:argument1 rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#p"/>
+                        <swrl:argument2 rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#c"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                <swrl:classPredicate rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#жеңіл-көлік"/>
+                                <swrl:argument1 rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#c"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#төлейді"/>
+                        <swrl:argument1 rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#p"/>
+                        <swrl:argument2 rdf:resource="http://www.semanticweb.org/enu/qaztaxexpert#негізгі-көлік-салығы"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

@@ -1,0 +1,47 @@
+
+<p>Comment: салық жүйесі
+1-бөлім: Көлік салығы.</p><p>
+
+Comment: Не Не нәрсе?
+Сұрақ түрі: жылжымайтын мүлік дегеніміз не? .</p><p>
+<span style="color: #D54C4C">әрбір</span> жылжымайтын-мүлік мүлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> жылжымалы-мүлік мүлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> көлік жылжымалы-мүлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> жеңіл-көлік көлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> 40-тоннадан-астам-жүк-көтеретін-көлік көлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> карьерлік-самосвал көлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> медициналық-көлік-құралы көлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> тіркелген-теңіз-кемесі көлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+
+<span style="color: #D54C4C">әрбір</span> көлік-салығы салық <span style="color: #D54C4C">болып табылады</span>.</p><p>
+
+<span style="color: #D54C4C">әрбір</span> жеке-тұлға тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> заңды-тұлға тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> алтын-алқа-иегері жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> күміс-алқа-иегері жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> даңқ-орден-иегері жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> КСРО-медалі-иегері жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> КСРО-ордені-иегері жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> мемлекеттік-қызметкер жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> тыл-еңбеккері жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> халық-хаһарманы жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> Қазақстан-еңбек-ері жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> ҰОС-ардагері жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> ҰОС-қатысушы жеке-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> арнайы-техника-иесі заңды-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> жеке-кәсіпкер заңды-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> лизинг-алушы заңды-тұлға <span style="color: #D54C4C">болып табылады</span>.</p><p>
+
+<span style="color: #D54C4C">әрбір</span> жеке-куәлік құжат <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> көлік-құралын-тіркеу-куәлігі құжат <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> сақтандыру-полюсі құжат <span style="color: #D54C4C">болып табылады</span>.</p><p>
+
+<span style="color: #D54C4C">әрбір</span> банк-кассасы төлем-жүргізу-түрі <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> интернет-банкинг төлем-жүргізу-түрі <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> МКБ-кассасы төлем-жүргізу-түрі <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> Қазпошта-кассасы төлем-жүргізу-түрі <span style="color: #D54C4C">болып табылады</span>.</p><p>
+Comment: <span style="color: #D54C4C">әрбір</span> көлікке көлік-салығы салынады егер тіркелген-теңіз-кемесі болмаса және медициналық-көлік-құралы болмаса және 40-тоннадан-астам-жүк-көтеретін-көлік болмаса және карьерлік-самосвал болмаса.</p><p>
+580HMA09 жеңіл-көлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> мотоцикл көлік <span style="color: #D54C4C">болып табылады</span>.</p><p>
+Yamaha мотоцикл <span style="color: #D54C4C">болып табылады</span>.</p><p>
+<span style="color: #D54C4C">әрбір</span> көлікке көлік-салығы салынады.</p><p>

@@ -1,0 +1,64 @@
+{% extends 'tax_base.html'%} {% block head %}
+<script type="text/javascript">
+    $(function () {
+        $("#tax_search").on("click", function (e) {
+            e.preventDefault();
+            $(".main-logo").hide();
+            var text =  $.ajax({
+            type: "POST",
+            url: "{% url 'search' %}",
+            data: {
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+                qtext: document.getElementById("searchTxt").value,
+            },
+            success: function (data) {
+                $("#answer").html(data);
+
+            }
+        })
+            $("#search_results").show()
+        });
+    });
+</script>
+
+{% endblock %} {% block title %} Тезаурус {% endblock %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"
+    rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"
+    integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% load static i18n %}
+{% block content %}
+
+<div class="container py-3">
+    <div class="card card-shadow border-0">
+        <div class="card-body">
+            <div class="text-center mb-5 main-logo">
+                <img src="{% static 'img/logo.png' %}" width="100" alt="" />
+                <h3 class="m-auto">{% trans 'Салық саласы бойынша сұрақ-жауап жүйесі' %}</h3>
+            </div>
+
+            <div class="input-group my-3">
+                <input type="search" class="form-control" id="searchTxt" placeholder="{% trans 'Іздеу' %}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit" id="tax_search"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4" id="search_results" style="display: none;">
+        <h5>{% trans 'Нәтиже' %}</h5>
+        <div class="card card-shadow border-0 my-2">
+            <div id="answer" class="card-body">
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

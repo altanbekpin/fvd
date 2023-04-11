@@ -1,0 +1,86 @@
+{% extends 'basic.html'%} {% load i18n %} {% block head %}
+<script type="text/javascript">
+    $(function () {
+        labels = []
+        counts = []
+        all = []
+        $.ajax({
+            type: "POST",
+            url: "{% url 'get_tagger_stats' %}",
+            data: {
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            },
+            success: function (data) {
+                data.posCount.forEach(res => {
+                    labels.push(res[0])
+                    counts.push(res[1])
+                })
+
+                // Any of the following formats may be used
+                var ctx = document.getElementById('allChart');
+                var ctx = document.getElementById('allChart').getContext('2d');
+                var ctx = $('#allChart');
+                var ctx = 'allChart';
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '# of Votes',
+                            data: counts,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+                
+            },
+            error: function (request, error) {
+                console.log(error);
+            }
+        });
+
+    });
+</script>
+
+{% endblock %} {% block title %} AutoLingTag | Stats {% endblock %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"
+    rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+{% block content %}
+
+<div class="container py-3">
+    <div class="card-header">
+        <h5>{% trans 'Статистика' %}</h5>
+    </div>
+    <div class="card card-shadow border-0">
+        <div class="card-body">
+            {% csrf_token %}
+            <canvas id="allChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock content %}

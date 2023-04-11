@@ -1,0 +1,223 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-24 16:06+0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%"
+"100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: .\editor\templates\basic.html:156
+msgid "Tagger"
+msgstr "Разметчик"
+
+#: .\editor\templates\basic.html:163 .\editor\templates\basic.html:171
+#: .\editor\templates\expert.html:174 .\editor\templates\expert.html:187
+msgid "Expert"
+msgstr "Эксперт"
+
+#: .\editor\templates\basic.html:178
+msgid "Stats"
+msgstr "Статистика"
+
+#: .\editor\templates\expert.html:177 .\editor\templates\expert.html:229
+msgid "Барлық сөздер"
+msgstr "Все слова"
+
+#: .\editor\templates\expert.html:191 .\editor\templates\expert.html:335
+#: .\editor\templates\tagger.html:367 .\editor\templates\tax_thesaurus.html:34
+#: .\editor\templates\tax_thesaurus.html:80
+msgid "Қосу"
+msgstr "Добавить"
+
+#: .\editor\templates\expert.html:198 .\editor\templates\expert.html:238
+#: .\editor\templates\expert.html:267 .\editor\templates\expert.html:311
+#: .\editor\templates\expert.html:345
+msgid "Түбір сөз"
+msgstr "Корневое слово"
+
+#: .\editor\templates\expert.html:199 .\editor\templates\expert.html:239
+#: .\editor\templates\expert.html:346
+msgid "Тегі"
+msgstr "Тег"
+
+#: .\editor\templates\expert.html:211
+msgid "Дұрыс"
+msgstr "Правильно"
+
+#: .\editor\templates\expert.html:214 .\editor\templates\expert.html:291
+#: .\editor\templates\tax_thesaurus.html:43
+msgid "Өзгерту"
+msgstr "Редактировать"
+
+#: .\editor\templates\expert.html:216
+msgid "Дұрыс емес"
+msgstr "Неправильно"
+
+#: .\editor\templates\expert.html:260
+msgid "Түбір сөзді өзгерту"
+msgstr "Редактировать корневое слово"
+
+#: .\editor\templates\expert.html:288 .\editor\templates\expert.html:332
+#: .\editor\templates\tagger.html:364
+#: .\editor\templates\tax_thesaurus.html:111
+msgid "Жабу"
+msgstr "Закрыть"
+
+#: .\editor\templates\expert.html:304 .\editor\templates\tagger.html:337
+msgid "Түбір сөзді базаға қосу"
+msgstr "Добавить корневое слово в базу"
+
+#: .\editor\templates\expert.html:341
+msgid "Сәтті өшірілді"
+msgstr "Успешно удалено"
+
+#: .\editor\templates\expert.html:342
+msgid "Сәтті"
+msgstr "Успешно"
+
+#: .\editor\templates\expert.html:343
+msgid "DataTableUrl"
+msgstr "//cdn.datatables.net/plug-ins/1.10.25/i18n/Russian.json"
+
+#: .\editor\templates\expert.html:344
+msgid "Өшіру"
+msgstr "Удалить"
+
+#: .\editor\templates\tagger.html:249 .\editor\templates\tagger.html:290
+msgid "Белгілеуге арналған файлды жүктеңіз:"
+msgstr "Загрузите файл для разметки"
+
+#: .\editor\templates\tagger.html:255 .\editor\templates\tagger.html:296
+msgid "Файлды таңдаңыз"
+msgstr "Выберите файл"
+
+#: .\editor\templates\tagger.html:261 .\editor\templates\tagger.html:302
+msgid "Мәтінді енгізіңіз"
+msgstr "Введите текст"
+
+#: .\editor\templates\tagger.html:265
+msgid "Морфологиялық белгілеу"
+msgstr "Морфологическая разметка"
+
+#: .\editor\templates\tagger.html:268 .\editor\templates\tagger.html:309
+msgid "Мәтінді тазалау"
+msgstr "Очистить текст"
+
+#: .\editor\templates\tagger.html:271 .\editor\templates\tagger.html:312
+msgid "Нәтижені тазалау"
+msgstr "Очистить результат"
+
+#: .\editor\templates\tagger.html:275 .\editor\templates\tagger.html:316
+#: .\editor\templates\taxexpert.html:44
+msgid "Нәтиже"
+msgstr "Результат"
+
+#: .\editor\templates\tagger.html:280 .\editor\templates\tagger.html:321
+msgid "Нәтижені жүктеу"
+msgstr "Скачать результат"
+
+#: .\editor\templates\tagger.html:306
+msgid "Синтаксистік белгілеу"
+msgstr "Синтаксическая разметка"
+
+#: .\editor\templates\tagger_login.html:7 .\editor\templates\tax_base.html:191
+#: .\editor\templates\tax_login.html:7
+msgid "Авторлану"
+msgstr "Авторизация"
+
+#: .\editor\templates\tagger_login.html:13
+#: .\editor\templates\tax_login.html:13
+msgid "Кіру"
+msgstr "Войти"
+
+#: .\editor\templates\tagger_stats.html:77
+msgid "Статистика"
+msgstr "Статистика"
+
+#: .\editor\templates\tax_base.html:133
+msgid "Негізгі бет"
+msgstr "Главная"
+
+#: .\editor\templates\tax_base.html:139
+#: .\editor\templates\tax_knowledge.html:201
+msgid "Білім базасы"
+msgstr "База знаний"
+
+#: .\editor\templates\tax_base.html:145
+msgid "Тезаурус"
+msgstr "Тезаурус"
+
+#: .\editor\templates\tax_base.html:150
+msgid "Сілтемелер"
+msgstr "Ссылки"
+
+#: .\editor\templates\tax_base.html:182
+msgid "Шығу"
+msgstr "Выйти"
+
+#: .\editor\templates\tax_knowledge.html:204
+#: .\editor\templates\tax_thesaurus.html:110
+msgid "Сақтау"
+msgstr "Сохранить"
+
+#: .\editor\templates\tax_knowledge.html:217
+msgid "Білім мәтіні сәтті сақталды"
+msgstr "Текст успешно сохранен"
+
+#: .\editor\templates\tax_thesaurus.html:40
+msgid "Топ реті"
+msgstr "#"
+
+#: .\editor\templates\tax_thesaurus.html:41
+msgid "Сөздер"
+msgstr "Слова"
+
+#: .\editor\templates\tax_thesaurus.html:42
+msgid "Байланыс түрі"
+msgstr "Байланыс түрі"
+
+#: .\editor\templates\tax_thesaurus.html:70
+msgid "Синонимдік | антонимдік | омонимдік қатар қосу"
+msgstr "Добавление синонимического | антонимического / омонимического ряда"
+
+#: .\editor\templates\tax_thesaurus.html:77
+#, fuzzy
+#| msgid "Сөздер"
+msgid "Сөз"
+msgstr "Слово"
+
+#: .\editor\templates\tax_thesaurus.html:84
+msgid "Қатар түрі"
+msgstr "Қатар түрі"
+
+#: .\editor\templates\tax_thesaurus.html:92
+msgid "Сөз табы"
+msgstr "Часть речи"
+
+#: .\editor\templates\taxexpert.html:32
+msgid "Салық саласы бойынша сұрақ-жауап жүйесі"
+msgstr "Система вопросов и ответов в налоговой сфере"
+
+#: .\editor\templates\taxexpert.html:36
+msgid "Іздеу"
+msgstr "Поиск"
+
+#~ msgid "Бұл бөлім әзірлену сатысында"
+#~ msgstr "Данный раздел находится в разработке"
+
+#~ msgid "Жүктеу"
+#~ msgstr "Загрузить"

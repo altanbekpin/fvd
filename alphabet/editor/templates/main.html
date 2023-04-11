@@ -1,0 +1,506 @@
+{% extends 'base.html'%} {% block head %}
+<script type="text/javascript">
+
+  const LabelEnum = Object.freeze({ "descriptor": 1, "definition": 2, "question": 3, "gyphonim": 4 })
+  function DoSubmit(question, lang = null) {
+    $('#result').html("<div class='d-flex justify-content-center'><div class='spinner-border text-primary' role='status'> <span class='sr-only'Loading...</span></div></div>");
+    $('#question').val(question);
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'ask-page' %}",
+      data: {
+        question: $('#question').val(),
+        language: lang == null ? $('#lang').val() : lang,
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+      },
+      success: function (data) {
+        $('#result').html(data);
+      }
+    });
+    //$.post('server.php', $('#theForm').serialize())
+
+  }
+
+  function DoSubmitUniturk(question, lang = null) {
+    $('#uniturk_result').html("<div class='d-flex justify-content-center'><div class='spinner-border text-primary' role='status'> <span class='sr-only'Loading...</span></div></div>");
+    $('#uniturk').val(question);
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'uniturk-page' %}",
+      data: {
+        uniturk: question,
+        language: lang == null ? $('#lang').val() : lang,
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+      },
+      success: function (data) {
+        $('#uniturk_result').html(data);
+      }
+    });
+    //$.post('server.php', $('#theForm').serialize())
+
+  }
+
+  function AddLabel(modalform, modal_result, uniturk, label, type) {
+    $(modal_result).html("");
+
+
+    if ((uniturk == "") || (label == "") || (type == "")) {
+      alert("Мәліметтерді толық енгізіңіз");
+      return;
+    }
+    $(modal_result).html("<div class='d-flex justify-content-center'><div class='spinner-border text-primary' role='status'> <span class='sr-only'Loading...</span></div></div>");
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'addlabel-page' %}",
+      data: {
+        uniturk: uniturk,
+        language: $('#lang').val(),
+        label: label,
+        type: type,
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+      },
+      success: function (data) {
+        alert(data);
+        if (data == 'Сәтті қосылды') {
+          $(modal_result).html("");
+          $(modalform + "  .close").click();
+          DoSubmitUniturk(uniturk);
+        }
+
+      }
+    });
+
+  }
+  function EditLabel(modalform, modal_result, uniturk, label, oldlabel, type) {
+
+    $(modal_result).html("");
+    if ((uniturk == "") || (label == "") || (type == "")) {
+      alert("Мәліметтерді толық енгізіңіз");
+      return;
+    }
+    $(modal_result).html("<div class='d-flex justify-content-center'><div class='spinner-border text-primary' role='status'> <span class='sr-only'Loading...</span></div></div>");
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'editlabel-page' %}",
+      data: {
+        uniturk: uniturk,
+        language: $('#lang').val(),
+        label: label,
+        oldlabel: oldlabel,
+        type: type,
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+      },
+      success: function (data) {
+        alert(data);
+        if (data == 'Сәтті өзгертілді') {
+          $(modal_result).html("");
+          $(modalform + "  .close").click();
+          DoSubmitUniturk(uniturk);
+        }
+
+      }
+    });
+
+  }
+  function SelectLanguage() {
+    var x = document.getElementById("lang").value;
+    curl = window.location.href.split('/');
+    curl = window.location.href + 'lang/' + x;
+
+    $.ajax({
+      type: 'POST',
+      url: curl,
+      data: {
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+      },
+      success: function (data) {
+        $('#treeview').html(data);
+      }
+    });
+  }
+
+  function DeleteUniturk(uniturk) {
+    $('#modal_result_remove_gyphonim').html("");
+
+    $('#modal_result_remove_gyphonim').html("<div class='d-flex justify-content-center'><div class='spinner-border text-primary' role='status'> <span class='sr-only'Loading...</span></div></div>");
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'removeunit-page' %}",
+      data: {
+        uniturk: uniturk,
+        language: $('#lang').val(),
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+      },
+      success: function (data) {
+        alert(data);
+        if (data == 'Сәтті өшірілді') {
+          $('#modal_result_remove_gyphonim').html("");
+          $("#removeGyphonim  .close").click();
+          DoSubmitUniturk($('#uniturk').val());
+        }
+
+      }
+    });
+  }
+
+  $(document).on("submit", "#question_form", function (e) {
+    $("#result").html(
+      "<div class='d-flex justify-content-center'><div class='spinner-border text-primary' role='status'> <span class='sr-only'Loading...</span></div></div>"
+    );
+    e.preventDefault();
+    const lang = $("#current_locale").val()
+    $.ajax({
+      type: "POST",
+      url: `{% url 'ask-page' %}`,
+      data: {
+        question: $("#question").val(),
+        language: $("#lang").val(),
+        csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+      },
+      success: function (data) {
+        $("#result").html(data);
+      },
+    });
+  });
+  $(document).on("submit", "#uniturk_form", function (e) {
+    $("#uniturk_result").html(
+      "<div class='d-flex justify-content-center'><div class='spinner-border text-primary' role='status'> <span class='sr-only'Loading...</span></div></div>"
+    );
+    e.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'uniturk-page' %}",
+      data: {
+        uniturk: $("#uniturk").val(),
+        language: $("#lang").val(),
+        csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+      },
+      success: function (data) {
+        $("#uniturk_result").html(data);
+      },
+    });
+  });
+</script>
+
+{% endblock %} {% block title %} Тезаурус редакторы {% endblock %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+  integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"
+  rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+
+{% block content %}
+
+<div class="container-fluid p-0">
+  <ul class="nav nav-pills">
+    <li class="nav-item">
+      <a class="nav-link active" href="#menu1" data-toggle="tab">Онтология ≡</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#menu2" data-toggle="tab">Граф ≡</a>
+    </li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" role="tabpanel" id="menu1">
+      <div class="row w-100 h-75 m-0">
+        <div class="col-sm-4 p-1">
+          <div class="card w-100 h-100">
+            <div class="card-header p-1">Тезаурус</div>
+            <div id="treeview" class="card-body overflow-auto">
+              <div>{% autoescape off %} {{project}}</div>
+              {% endautoescape %}
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 p-1">
+          <div class="card w-100 h-100">
+            <div class="card-header p-1">Іздеу</div>
+            <div class="card-body overflow-auto">
+              <form class="input-group" id="question_form">
+                {% csrf_token %}
+                <input type="text" class="form-control" id="question" placeholder="..." />
+
+                <button type="submit" class="btn btn-primary ml-1">
+                  Іздеу
+                </button>
+              </form>
+              <div class="col" id="result"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4 p-1">
+          {%if request.user.is_authenticated %}
+          <div class="card w-100 h-100">
+            <div class="card-header p-1">Жаңа түсініктер</div>
+            <div class="card-body overflow-auto">
+              <form class="input-group" id="uniturk_form">
+                {% csrf_token %}
+                <label class="form-label m-1" for="uniturk">UniTurk: </label>
+                <input type="text" class="form-control" id="uniturk" placeholder="..." />
+
+                <button type="submit" class="btn btn-primary ml-1">
+                  Іздеу
+                </button>
+              </form>
+              <div class="col" id="uniturk_result"></div>
+            </div>
+          </div>
+          {% endif%}
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane" role="tabpanel" id="menu2">--</div>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="addEntity" tabindex="-1" role="dialog" aria-labelledby="addEntityModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addEntityModalLabel">Дескриптор қосу</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label m-1" for="uniturk">Дескриптор: </label>
+        <input type="text" class="form-control" id="newdescriptor" placeholder="..." />
+        <div class="col" id="modal_result"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Жабу
+        </button>
+        <button type="button" class="btn btn-primary"
+          onclick="AddLabel('#addEntity','#modal_result',$('#uniturk').val(),$('#newdescriptor').val(),LabelEnum.descriptor)">
+          Қосу
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--анықтама қосу-->
+<div class="modal fade" id="addDef" tabindex="-1" role="dialog" aria-labelledby="addDefModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addDefModalLabel">Анықтама қосу</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label m-1" for="uniturk">Анықтама: </label>
+        <input type="text" class="form-control" id="newdef" placeholder="..." />
+        <div class="col" id="modal_result_def"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Жабу
+        </button>
+        <button type="button" class="btn btn-primary"
+          onclick="AddLabel('#addDef','#modal_result_def',$('#uniturk').val(),$('#newdef').val(),LabelEnum.definition)">
+          Қосу
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--анықтама өңдеу-->
+<div class="modal fade" id="editDef" tabindex="-1" role="dialog" aria-labelledby="addDefModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addDefModalLabel">Анықтаманы өзгерту</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label m-1" for="neweditdef">Анықтама: </label>
+        <input type="text" class="form-control" id="neweditdef" placeholder="..." />
+        <input type="hidden" class="form-control" id="oldeditdef" placeholder="..." />
+        <div class="col" id="modal_result_edit_def"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Жабу
+        </button>
+        <button type="button" class="btn btn-primary"
+          onclick="EditLabel('#editDef','#modal_result_edit_def',$('#uniturk').val(),$('#neweditdef').val(),$('#oldeditdef').val(),LabelEnum.definition)">
+          Сақтау
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- дескрптор өңдеу -->
+<div class="modal fade" id="editEntity" tabindex="-1" role="dialog" aria-labelledby="editEntityModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editEntityModalLabel">
+          Дескрипторды өзгерту
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label m-1" for="uniturk">Дескриптор: </label>
+        <input type="text" class="form-control" id="neweditdescriptor" placeholder="..." />
+        <input type="hidden" class="form-control" id="oldeditdescriptor" placeholder="..." />
+        <div class="col" id="modal_result_edit_entity"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Жабу
+        </button>
+        <button type="button" class="btn btn-primary"
+          onclick="EditLabel('#editEntity','#modal_result_edit_entity',$('#uniturk').val(),$('#neweditdescriptor').val(),$('#oldeditdescriptor').val(),LabelEnum.descriptor)">
+          Сақтау
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--cұрақ қосу-->
+<div class="modal fade" id="addQuestion" tabindex="-1" role="dialog" aria-labelledby="addQuestionModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addQuestionModalLabel">Сұрақ қосу</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label m-1" for="uniturk">Сұрақ: </label>
+        <input type="text" class="form-control" id="newquestion" placeholder="..." />
+        <div class="col" id="modal_result_question"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Жабу
+        </button>
+        <button type="button" class="btn btn-primary"
+          onclick="AddLabel('#addQuestion','#modal_result_question',$('#uniturk').val(),$('#newquestion').val(),LabelEnum.question)">
+          Қосу
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--гипоним қосу-->
+<div class="modal fade" id="addGyphonim" tabindex="-1" role="dialog" aria-labelledby="addGyphonimModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addGyphonimModalLabel">Гипоним қосу</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label m-1" for="newuniturk">Uniturk: </label>
+        <input type="text" class="form-control" id="newuniturk" placeholder="..." />
+        <label class="form-label m-1" for="newgyphonim">Дескриптор: </label>
+        <input type="text" class="form-control" id="newgyphonim" placeholder="..." />
+        <div class="col" id="modal_result_gyphonim"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Жабу
+        </button>
+        <button type="button" class="btn btn-primary"
+          onclick="AddLabel('#addGyphonim','#modal_result_gyphonim',$('#uniturk').val(),$('#newuniturk').val() + ';' + $('#newgyphonim').val(),LabelEnum.gyphonim)">
+          Қосу
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--гипоним қосу-->
+<div class="modal fade" id="removeGyphonim" tabindex="-1" role="dialog" aria-labelledby="removeGyphonimModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="removeGyphonimModalLabel">
+          Гипонимді өшіру
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Шынымен өшірмексіз бе?</p>
+        <input type="hidden" class="form-control" id="removeuniturk" placeholder="..." />
+        <div class="col" id="modal_result_remove_gyphonim"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Жоқ
+        </button>
+        <button type="button" class="btn btn-primary" onclick="DeleteUniturk($('#removeuniturk').val())">
+          Иә
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Жоқ сөзді базаға қосу autoPostTag-->
+<div class="modal fade" id="addAutoPostBadWords" tabindex="-1" role="dialog" aria-labelledby="addAutoPostBadWords"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAutoPostBadWords">Сөзді базаға қосу</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="word">Сөз</label>
+          <input type="text" class="form-control" id="autoPostBadWords" />
+        </div>
+        <div>
+          <select class="form-control" id="pos-block">
+            <option selected>...</option>
+            <option value="1">Зат есім</option>
+            <option value="2">Сын есім</option>
+            <option value="3">Сан есім</option>
+            <option value="4">Есімдік</option>
+            <option value="5">Етістік</option>
+            <option value="6">Еліктеуіш</option>
+            <option value="7">Одағай</option>
+            <option value="8">Шылау</option>
+            <option value="9">Үстеу</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Жабу
+        </button>
+        <button type="button" class="btn btn-primary" id="addBadWordToDb">
+          Қосу
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

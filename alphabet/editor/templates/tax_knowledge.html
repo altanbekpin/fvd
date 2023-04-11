@@ -1,0 +1,219 @@
+{% extends 'tax_base.html'%} {% block head %}
+<script type="text/javascript">
+    $(function () {
+        var text =  $.ajax({
+            type: "POST",
+            url: "{% url 'get_onto_text' %}",
+            data: {
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+                type: 0,
+            },
+            success: function (data) {
+                $('#editor').summernote('code', data);
+            }
+        })
+        var isAuth = "{{user.is_authenticated|yesno:'true,false'}}";
+        ExtractOntology(1)
+
+
+
+        var words = [
+            'әрбір ', 'барлық', 'барша', 'емес', 'болып табылады'
+        ]
+
+        var conditions = [
+             'және', 'немесе', 'егер'
+        ]
+
+        var comments = [
+             'түсініктеме:'
+        ]
+        if (isAuth == "false") {
+            console.log("is not auth");
+            $('#editor').summernote('disable');
+            return;
+        }
+
+        // Редактор
+        $('#editor').summernote({
+            toolbar: [
+                // [groupName, [list of button]]
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+            ],
+            tabsize: 2,
+            height: 300,
+            callbacks: {
+                onKeydown: function (e) {
+                    if (e.keyCode === 190) {
+                        alert("dot")
+                        console.log($('#editor').summernote('code'));
+                    }
+                }
+            },
+            hint: [{
+                words: words,
+                match: /\B([^\p{L}]{1,})$/,
+                search: function (keyword, callback) {
+                    callback($.grep(this.words, function (item) {
+                        return item.indexOf(keyword) === 0;
+                    }));
+                },
+                content: function (item) {
+                    return $(`<span><span style="color: #D54C4C">${item}</span>&nbsp;</span>`)[0];
+                }
+            },
+            {
+                words: conditions,
+                match: /\B([^\p{L}]{1,})$/,
+                search: function (keyword, callback) {
+                    callback($.grep(this.words, function (item) {
+                        return item.indexOf(keyword) === 0;
+                    }));
+                },
+                content: function (item) {
+                    return $(`<span><span style="color: blue">${item}</span>&nbsp;</span>`)[0];
+                }
+            },
+            {
+                words: comments,
+                match: /\B([^\p{L}]{1,})$/,
+                search: function (keyword, callback) {
+                    callback($.grep(this.words, function (item) {
+                        return item.indexOf(keyword) === 0;
+                    }));
+                },
+                content: function (item) {
+                    return $(`<span><span style="color: green;font-style:italic;">${item}</span>&nbsp;</span>`)[0];
+                }
+            }]
+        });
+    });
+</script>
+<script type="text/javascript">
+    function GetSummernot()
+    {
+        console.log($('#editor').summernote('code'));
+        alert($($('#editor').summernote('code')).text());
+    }
+    function Save()
+    {
+        var text =  $.ajax({
+            type: "POST",
+            url: "{% url 'save_onto_text' %}",
+            data: {
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+                text: $('#editor').summernote('code'),
+            },
+            success: function (data) {
+                ShowAlert("liveAlertPlaceholder", "saveBtn", $('#tax_save_text').val(), "success")
+            }
+        })
+
+    }
+    function ExtractOntology(type)
+    {
+        var text =  $.ajax({
+            type: "POST",
+            url: "{% url 'get_owl_from_text' %}",
+            data: {
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+                text: $($('#editor').summernote('code')).text(),
+                extype: type
+
+            },
+            success: function (data) {
+                if (type > 0) {
+                    var tree = JSON.parse(data);
+                    $('#tree').remove()
+
+                    console.log(tree)
+                    jQuery('<div>', {
+                        id: 'tree',
+
+                    }).appendTo('#treeParent');
+                    $('#tree').bstreeview({
+                        data: tree,
+                        indent: 0.5,
+                        parentsMarginLeft: '1rem',
+                    });
+                    if (type == 2) {
+                        ShowAlert("liveAlertPlaceholder", "extractBtn", $('#tax_save_text').val(), "success")
+                    }
+                } else
+                {
+                    var element = document.createElement('a');
+                    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
+                    element.setAttribute('download', "taxexpert.owl");
+                    element.style.display = 'none';
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+                }
+            }
+        })
+
+    }
+
+function ShowAlert(alertElement, alertButton, message, alertType) {
+
+    var alertPlaceholder = document.getElementById('liveAlertPlaceholder');
+
+
+    var wrapper = document.createElement('div')
+    wrapper.innerHTML = '<div class="alert alert-' + alertType + ' alert-dismissible" role="alert">' + message + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+    alertPlaceholder.append(wrapper)
+
+    window.setTimeout(function() {
+    $("#liveAlertPlaceholder").fadeTo(1000, 0).slideUp(1000, function(){
+        $("#liveAlertPlaceholder").removeAttr("style");
+        $("#liveAlertPlaceholder").empty()
+
+    });
+}, 5000);
+}
+</script>
+
+{% endblock %} {% block title %} Тезаурус {% endblock %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"
+    rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"
+    integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% load i18n %}
+{% block content %}
+
+<div class="container py-3">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-12" id="liveAlertPlaceholder"></div>
+        <div class="col-md-8">
+
+            <div class="card card-shadow border-0">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% trans 'Білім базасы' %}</h5>
+                </div>
+                <div class="card-body">
+                    <button id="saveBtn" class="btn btn-success btn-sm mb-1" onclick="Save()" type="button">{% trans 'Сақтау' %}</button>
+                    <button id="extractBtn" class="btn btn-secondary btn-sm mb-1" onclick="ExtractOntology(2)" type="button">{% trans 'Білімді екшеп алу' %}</button>
+                    <button id="downloadBtn" class="btn btn-info btn-sm mb-1" onclick="ExtractOntology(0)" type="button">{% trans 'Білімді жүктеп алу' %}</button>
+                    <div id="editor"></div>
+                </div>
+            </div>
+        </div>
+        <div id="treeParent" class="col-md-4">
+
+        </div>
+
+    </div>
+    <div class="d-none" id="messages">
+        <input type="hidden" id="tax_save_text" value="{% trans 'Білім мәтіні сәтті сақталды' %}" />
+        <input type="hidden" id="tax_extract_text" value="{% trans 'Білім сәтті екшеліп алынды' %}" />
+    </div>
+</div>
+{% endblock content %}

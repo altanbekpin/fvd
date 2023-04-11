@@ -1,0 +1,347 @@
+{% extends 'basic.html'%} {% block head %} {% load i18n %}
+<script type="text/javascript">
+    $(document).on("click", "#expert_word_success_btn", function (e) {
+        e.preventDefault();
+        var dataId = $(this).attr('data-id');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'expert' %}",
+            data: {
+                id: dataId,
+                action: 1, // success 
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            },
+            success: function (data) {
+                alert($('#success_text').val())
+                location.reload();
+            },
+        });
+    });
+
+    $(document).on("click", "#expert_word_wrong_btn", function (e) {
+        e.preventDefault();
+        var dataId = $(this).attr('data-id');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'expert' %}",
+            data: {
+                id: dataId,
+                action: 0, // wrong
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            },
+            success: function (data) {
+                alert($('#success_text').val())
+                location.reload();
+            },
+        });
+    });
+
+    $(document).on("click", "#expert_word_edit_btn", function (e) {
+        e.preventDefault();
+        $("#expertEditWordInput").val($(this).attr("data-word"));
+        $("#expertEditWordId").val($(this).attr("data-id"));
+    });
+
+    $(document).on("click", "#expertEditWordBtn", function (e) {
+        e.preventDefault();
+        var word = $("#expertEditWordInput").val();
+        var id = $("#expertEditWordId").val();
+        var pos = $("#expertEditWordPos option:selected").val();
+        $.ajax({
+            type: "POST",
+            url: "{% url 'tagger_expert_update' %}",
+            data: {
+                wordId: id,
+                word: word,
+                pos: pos,
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            },
+            success: function (data) {
+                alert($('#success_text').val())
+                location.reload();
+            },
+        });
+    });
+
+    $(document).on("click", "#expertAddWordBtn", function (e) {
+        e.preventDefault();
+        var word = $("#expertAddWordInput").val();
+        var pos = $("#expertAddWordPos option:selected").val();
+        $.ajax({
+            type: "POST",
+            url: "{% url 'tagger_expert_add' %}",
+            data: {
+                word: word,
+                pos: pos,
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            },
+            success: function (data) {
+                console.log(data);
+                if (data === "True") {
+                    alert($('#success_text').val())
+                    location.reload();
+                } else {
+                    $("#word_exists").show()
+                }
+            },
+        });
+    });
+
+    $(function () {
+        $('a[data-toggle=list]').on('click', function (event) {
+            var tab = $(event.target).text().trim();
+            var tabId = $(this).attr('data-id');
+            if (tabId == 2) {
+                get_all_words();
+            }
+        });
+    });
+
+    $(document).on("click", "#expert_all_remove_btn", function (e) {
+        e.preventDefault();
+        var dataId = $(this).attr('data-id');
+        $.ajax({
+            type: "POST",
+            url: `{% url 'expert' %}`,
+            data: {
+                id: dataId,
+                action: 0, // wrong
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            },
+            success: function (data) {
+                alert($('#success_deleted_text').val())
+                get_all_words();
+            },
+        });
+    });
+
+    function get_all_words() {
+        var dtUrl = $('#data_table_url').val()
+        var removeBtnText = $('#remove_btn_text').val()
+        var rootWord = $('#root_word').val()
+        var tagWord = $('#tag_word').val();
+        $.ajax({
+            type: "GET",
+            url: "{% url 'tagger_expert_all' %}",
+            data: {},
+            success: function (data) {
+                $('#expert_all_table').DataTable({
+                    'aaData': data,
+                    'order': [[ 1, "asc" ]],
+                    'autoWidth': false,
+                    destroy: true,
+                    'columns': [
+                        { title: '#', width: "20%" },
+                        { title: rootWord, width: "60%" },
+                        { title: tagWord, width: "20%" },
+                        {
+                            render: function (data, type, full) {
+                                return `<button type="button" id="expert_all_remove_btn" data-id="${data}" class="btn btn-sm btn-danger">${removeBtnText}</button>`;
+                            }
+                        }
+                    ],
+                    render: function (data, type, full, meta) {
+                        data = data + ""
+                        return data;
+                    },
+                    language: {
+                        url: dtUrl
+                    }
+                }).draw();
+            },
+        });
+    }
+</script>
+
+{% endblock %} {% block title %} AutoLingTag | Expert {% endblock %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"
+    rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+
+{% block content %}
+
+<div class="container py-3">
+    <div class="row">
+        <div class="col-md-4 col-xl-3">
+            <div class="card card-shadow border-0">
+                <div role="tablist" class="list-group list-group-flush">
+                    <a href="#expert" aria-current="page" class="list-group-item list-group-item-action active"
+                        data-toggle="list" data-id="1" role="tab">
+                        {% trans 'Expert' %}
+                    </a>
+                    <a href="#all" class="list-group-item list-group-item-action" data-toggle="list" data-id="2" role="tab">
+                        {% trans 'Барлық сөздер' %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 col-xl-9">
+            <div class="tab-content" id="expert-tabs">
+                <div class="tab-pane fade show active" id="expert" role="tabpanel" aria-labelledby="expert">
+                    <div class="card card-shadow border-0">
+                        <div class="card-header">
+                            <h5 class="m-0">{% trans 'Expert' %}</h5>
+                        </div>
+                        <div class="card-body">
+                            <button type="button" class="btn btn-primary btn-md mb-2" data-toggle="modal"
+                                data-target="#expertAddWord">{% trans 'Қосу' %}</button>
+                            {% if request.user.is_authenticated %}
+                            {% csrf_token %}
+                            <table class="table" id="expert_table">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">{% trans 'Түбір сөз' %}</th>
+                                        <th scope="col">{% trans 'Тегі' %}</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expert_table_body">
+                                    {% for result in data %}
+                                    <tr>
+                                        <td>{{ result.0 }}</td>
+                                        <td>{{ result.1 }}</td>
+                                        <td>{{ result.2 }}</td>
+                                        <td>
+                                            <button type="button" id="expert_word_success_btn" data-id="{{ result.0 }}"
+                                                class="btn btn-success">{% trans 'Дұрыс' %}</button>
+                                            <button type="button" id="expert_word_edit_btn" data-word="{{ result.1 }}"
+                                                data-id="{{ result.0 }}" class="btn btn-warning" data-toggle="modal"
+                                                data-target="#expertEditWord">{% trans 'Өзгерту' %}</button>
+                                            <button type="button" id="expert_word_wrong_btn" data-id="{{ result.0 }}"
+                                                class="btn btn-danger">{% trans 'Дұрыс емес' %}</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="all" role="tabpanel" aria-labelledby="all">
+                    <div class="card card-shadow border-0">
+                        <div class="card-header">
+                            <h5 class="m-0">{% trans 'Барлық сөздер' %}</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if request.user.is_authenticated %}
+                            {% csrf_token %}
+                            <table class="table" id="expert_all_table" style="width:100%">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">{% trans 'Түбір сөз' %}</th>
+                                        <th scope="col">{% trans 'Тегі' %}</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+
+                            </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Түбір сөзді өзгерту -->
+<div class="modal fade" id="expertEditWord" tabindex="-1" role="dialog" aria-labelledby="expertEditWord"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{% trans 'Түбір сөзді өзгерту' %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="word">{% trans 'Түбір сөз' %}</label>
+                    <input type="text" class="form-control" id="expertEditWordInput" />
+                    <input type="hidden" id="expertEditWordId" value="" />
+                </div>
+                <div>
+                    <select class="form-control" id="expertEditWordPos">
+                        <option selected>...</option>
+                        <option value="1">Зат есім</option>
+                        <option value="2">Сын есім</option>
+                        <option value="3">Сан есім</option>
+                        <option value="4">Есімдік</option>
+                        <option value="5">Етістік</option>
+                        <option value="6">Еліктеуіш</option>
+                        <option value="7">Одағай</option>
+                        <option value="8">Шылау</option>
+                        <option value="9">Үстеу</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    {% trans 'Жабу' %}
+                </button>
+                <button type="button" class="btn btn-primary" id="expertEditWordBtn">
+                    {% trans 'Өзгерту' %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Түбір сөзді қосу -->
+<div class="modal fade" id="expertAddWord" tabindex="-1" role="dialog" aria-labelledby="expertAddWord"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{% trans 'Түбір сөзді базаға қосу' %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="word">{% trans 'Түбір сөз' %}</label>
+                    <input type="text" class="form-control" id="expertAddWordInput" />
+                </div>
+                <div>
+                    <select class="form-control" id="expertAddWordPos">
+                        <option selected>...</option>
+                        <option value="1">Зат есім</option>
+                        <option value="2">Сын есім</option>
+                        <option value="3">Сан есім</option>
+                        <option value="4">Есімдік</option>
+                        <option value="5">Етістік</option>
+                        <option value="6">Еліктеуіш</option>
+                        <option value="7">Одағай</option>
+                        <option value="8">Шылау</option>
+                        <option value="9">Үстеу</option>
+                    </select>
+                </div>
+                <div class="alert alert-danger mt-3" id="word_exists" style="display: none;">Бұл сөз базада бар</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    {% trans 'Жабу' %}
+                </button>
+                <button type="button" class="btn btn-primary" id="expertAddWordBtn">
+                    {% trans 'Қосу' %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="success_deleted_text" value="{% trans 'Сәтті өшірілді' %}" />
+<input type="hidden" id="success_text" value="{% trans 'Сәтті' %}" />
+<input type="hidden" id="data_table_url" value="{% trans 'DataTableUrl' %}" />
+<input type="hidden" id="remove_btn_text" value="{% trans 'Өшіру' %}" />
+<input type="hidden" id="root_word" value="{% trans 'Түбір сөз' %}" />
+<input type="hidden" id="tag_word" value="{% trans 'Тегі' %}" />
+{% endblock content %}

@@ -1,0 +1,296 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE Ontology [
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.semanticweb.org/enu/qaztaxexpert"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     ontologyIRI="http://www.semanticweb.org/enu/qaztaxexpert">
+    <Prefix name="" IRI="http://www.semanticweb.org/enu/qaztaxexpert#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Declaration>
+        <Class IRI="#40-тоннадан-астам-жүк-көтеретін-көлік"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#КСРО-медалі-иегері"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#КСРО-ордені-иегері"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#МКБ-кассасы"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#алтын-алқа-иегері"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#арнайы-техника-иесі"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#банк-кассасы"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#даңқ-орден-иегері"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#жеке-куәлік"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#жеке-кәсіпкер"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#жеке-тұлға"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#жеңіл-көлік"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#жылжымайтын-мүлік"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#жылжымалы-мүлік"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#заңды-тұлға"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#интернет-банкинг"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#карьерлік-самосвал"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#күміс-алқа-иегері"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#көлік"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#көлік-салығы"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#көлік-құралын-тіркеу-куәлігі"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#лизинг-алушы"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#медициналық-көлік-құралы"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#мемлекеттік-қызметкер"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#мотоцикл"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#мүлік"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#салық"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#сақтандыру-полюсі"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#тыл-еңбеккері"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#тіркелген-теңіз-кемесі"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#тұлға"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#төлем-жүргізу-түрі"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#халық-хаһарманы"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Қазақстан-еңбек-ері"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Қазпошта-кассасы"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#құжат"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ҰОС-ардагері"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ҰОС-қатысушы"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#580HMA09"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Yamaha"/>
+    </Declaration>
+    <EquivalentClasses>
+        <Class IRI="#көлік"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#салынады"/>
+            <Class IRI="#көлік-салығы"/>
+        </ObjectSomeValuesFrom>
+    </EquivalentClasses>
+    <SubClassOf>
+        <Class IRI="#40-тоннадан-астам-жүк-көтеретін-көлік"/>
+        <Class IRI="#көлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#КСРО-медалі-иегері"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#КСРО-ордені-иегері"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#МКБ-кассасы"/>
+        <Class IRI="#төлем-жүргізу-түрі"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#алтын-алқа-иегері"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#арнайы-техника-иесі"/>
+        <Class IRI="#заңды-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#банк-кассасы"/>
+        <Class IRI="#төлем-жүргізу-түрі"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#даңқ-орден-иегері"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#жеке-куәлік"/>
+        <Class IRI="#құжат"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#жеке-кәсіпкер"/>
+        <Class IRI="#заңды-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#жеке-тұлға"/>
+        <Class IRI="#тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#жеңіл-көлік"/>
+        <Class IRI="#көлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#жылжымайтын-мүлік"/>
+        <Class IRI="#мүлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#жылжымалы-мүлік"/>
+        <Class IRI="#мүлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#заңды-тұлға"/>
+        <Class IRI="#тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#интернет-банкинг"/>
+        <Class IRI="#төлем-жүргізу-түрі"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#карьерлік-самосвал"/>
+        <Class IRI="#көлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#күміс-алқа-иегері"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#көлік"/>
+        <Class IRI="#жылжымалы-мүлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#көлік-салығы"/>
+        <Class IRI="#салық"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#көлік-құралын-тіркеу-куәлігі"/>
+        <Class IRI="#құжат"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#лизинг-алушы"/>
+        <Class IRI="#заңды-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#медициналық-көлік-құралы"/>
+        <Class IRI="#көлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#мемлекеттік-қызметкер"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#мотоцикл"/>
+        <Class IRI="#көлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#сақтандыру-полюсі"/>
+        <Class IRI="#құжат"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#тыл-еңбеккері"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#тіркелген-теңіз-кемесі"/>
+        <Class IRI="#көлік"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#халық-хаһарманы"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Қазақстан-еңбек-ері"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Қазпошта-кассасы"/>
+        <Class IRI="#төлем-жүргізу-түрі"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ҰОС-ардагері"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ҰОС-қатысушы"/>
+        <Class IRI="#жеке-тұлға"/>
+    </SubClassOf>
+    <ClassAssertion>
+        <Class IRI="#жеңіл-көлік"/>
+        <NamedIndividual IRI="#580HMA09"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#мотоцикл"/>
+        <NamedIndividual IRI="#Yamaha"/>
+    </ClassAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+

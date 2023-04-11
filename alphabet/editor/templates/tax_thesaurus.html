@@ -1,0 +1,116 @@
+{% extends 'tax_base.html'%} {% block head %}
+<script type="text/javascript">
+    $(function () {
+        $('#add_syn_word').on("click", function (e) {
+            var word = $('#synWord').val();
+            $("#synList").append("<li>" + word + "</li>");
+            $('#synWord').val("");
+        });
+    });
+</script>
+
+{% endblock %} {% block title %} Тезаурус {% endblock %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"
+    rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"
+    integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% load i18n %}
+{% block content %}
+
+<div class="container py-3">
+    <div class="card card-shadow border-0">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Thesaurus</h5>
+        </div>
+        <div class="card-body">
+            {% if request.user.is_authenticated %}
+            <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#addModal">
+                {% trans 'Қосу' %}
+            </button>
+            {% endif %}
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">{% trans 'Топ реті' %}</th>
+                        <th scope="col">{% trans 'Сөздер' %}</th>
+                        <th scope="col">{% trans 'Байланыс түрі' %}</th>
+                        <th scope="col">{% trans 'Өзгерту' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{% trans 'Синонимдік | антонимдік | омонимдік қатар қосу' %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="wordLabel">{% trans 'Сөз' %}</label>
+                    <input type="text" class="form-control" id="synWord">
+                    <button type="button" class="btn btn-sm btn-primary mt-1" id="add_syn_word">
+                        {% trans 'Қосу' %}
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label for="typeLabel">{% trans 'Қатар түрі' %}</label>
+                    <select id="typeId" class="form-control" aria-labelledby="typeLabel">
+                        <option value="1">Синоним</option>
+                        <option value="2">Антоним</option>
+                        <option value="3">Омоним</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="partOfSpeechLabel">{% trans 'Сөз табы' %}</label>
+                    <select class="form-control" id="partOfSpeechLabel" id="partOfSpeech">
+                        <option value="1">Зат есім</option>
+                        <option value="2">Сын есім</option>
+                        <option value="3">Сан есім</option>
+                        <option value="4">Есімдік</option>
+                        <option value="5">Етістік</option>
+                        <option value="6">Еліктеуіш</option>
+                        <option value="7">Одағай</option>
+                        <option value="8">Шылау</option>
+                        <option value="9">Үстеу</option>
+                    </select>
+                </div>
+                <div class="my-3">
+                    <ul id="synList"></ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">{% trans 'Сақтау' %}</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Жабу' %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

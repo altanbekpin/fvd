@@ -1,0 +1,155 @@
+{% load static %}
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  <script src="{% static 'js/jquery-3.5.1.slim.min.js' %}"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+  <script src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+  <script src="{% static 'js/popper.min.js' %}"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  {% block head %}{% endblock %}
+  <title>
+    {% block title %}{% endblock %}
+  </title>
+
+
+</head>
+
+<body>
+  <div class="d-flex flex-column flex-md-row align-items-center p-0 px-md-1 bg-white border-bottom shadow-sm m-0 p-1">
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <a href="/">
+      <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+
+        <path
+          d="M 29.714285,3.9999995 V 30 H 5.7142853 c -1.8937855,0 -3.4285712,-1.34313 -3.4285712,-3 0,-1.65687 1.5347857,-3 3.4285712,-3 H 27.428573 V -5e-7 H 4.5714283 C 2.0572144,-5e-7 0,1.7999995 0,3.9999995 V 28 c 0,2.2 2.0572144,4 4.5714283,4 H 32 V 3.9999995 Z"
+          id="path5" style="fill:#0066ff;fill-opacity:1;stroke-width:0.06681531" inkscape:connector-curvature="0" />
+        <path
+          d="m 5.7162853,26 v 0 c -6.59e-4,6e-5 -0.0014,0 -0.002,0 -0.631142,0 -1.142857,0.44769 -1.142857,1 0,0.55231 0.511715,1 1.142857,1 6.6e-4,0 0.0014,-6e-5 0.002,-6e-5 V 28 H 27.426643 v -2 z"
+          id="path7" style="fill:#0066ff;stroke-width:0.06681531" inkscape:connector-curvature="0" />
+        <g aria-label="Th" transform="matrix(0.0670004,0,0,0.06663073,-1.5108959,0.1355895)"
+          style="font-style:normal;font-weight:normal;font-size:52.58651352px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.31466281"
+          id="text827">
+          <path
+            d="m 101.16689,106.99259 h 155.6643 v 20.95244 H 191.50888 V 291.0043 H 166.4892 V 127.94503 h -65.32231 z"
+            style="font-size:252.41526794px;fill:#ffffff;stroke-width:1.31466281" id="path829"
+            inkscape:connector-curvature="0" />
+          <path
+            d="M 394.74753,207.68754 V 291.0043 H 372.0696 v -82.57726 q 0,-19.59669 -7.64148,-29.33341 -7.64148,-9.73672 -22.92443,-9.73672 -18.3642,0 -28.96367,11.70871 -10.59947,11.70872 -10.59947,31.92166 V 291.0043 H 279.13937 V 99.227859 h 22.80118 v 75.182281 q 8.13448,-12.44821 19.1037,-18.61069 11.09247,-6.16249 25.51267,-6.16249 23.78718,0 35.9889,14.78996 12.20171,14.66671 12.20171,43.26062 z"
+            style="font-size:252.41526794px;fill:#ffffff;stroke-width:1.31466281" id="path831"
+            inkscape:connector-curvature="0" />
+        </g>
+      </svg>
+    </a>
+    <h5 class="my-0 mr-md-auto font-weight-normal">TurkLang Thesaurus</h5>
+    <a href="http://e-zerde.kz/">"Қазақстан жасанды интеллект академиясы" қоғамдық бірлестігі</a>
+
+
+    <div class="col-auto my-1">
+      <select onchange="SelectLanguage()" class="custom-select mr-sm-2" id="lang">
+        <option value="kz" {% if not request.user.is_authenticated  or request.user.username == 'qazaq'  %} selected
+          {%endif%}>қазақ</option>
+        <option value="uz" {% if request.user.is_authenticated  and request.user.username == 'uzbek'  %} selected
+          {%endif%}>өзбек</option>
+        <option value="kg" {% if request.user.is_authenticated  and request.user.username == 'qyrgyz'  %} selected
+          {%endif%}>қырғыз</option>
+        <option value="tatar" {% if request.user.is_authenticated  and request.user.username == 'tatar'  %} selected
+          {%endif%}>татар</option>
+        <option value="tr" {% if request.user.is_authenticated  and request.user.username == 'turik'  %} selected
+          {%endif%}>түрік</option>
+      </select>
+    </div>
+    {% if request.user.is_authenticated %}
+    {% url 'logout_page' as url_logout_page %}
+
+    <div class="dropdown">
+      <a class="btn dropdown-toggle btn-sm " href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        {{request.user}}
+      </a>
+
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <a class="dropdown-item" href="{{url_logout_page}}">Шығу</a>
+
+      </div>
+    </div>
+
+
+    {% else %}
+    {% url 'login_page' as url_login_page %}
+    <a class="btn btn-outline-primary {% if url_login_page == request.path %} active {% endif %}"
+      href="{{url_login_page}}">Авторлану</a>
+    {% endif %}
+
+
+  </div>
+  {% block content %} {% endblock content%}
+  {% comment %} <div class="footer">
+    <div id="button"></div>
+    <div id="container">
+      <div id="cont">
+        <div class="footer_center ">
+          <div class="row">
+            <div class="col order-md-1" style="min-width: 300px;">
+              <h6 class="text-uppercase font-weight-bold">Л.Н.Гумилев атындағы Еуразия ұлттық университеті </h6>
+              <p>Көптілді іздеу және білімдерді шығару жүйелерін құруға арналған түркі тілдерінің электрондық
+                тезаурустары
+              </p>
+              <p> Turkic languages electronic thesauri for creation of multilingual search and knowledge extraction systems </p>
+              <p>Жоба Қазақстан Республикасының Білім және ғылым министрілігімен 2018 жылдың 12 наурызында жасалған №132
+                келісім-шарт негізінде ғылыми-зерттеу жұмыстарын орындау міндеттері аясында мемлекеттік тапсырыс бойынша
+                жасалған</p>
+            </div>
+            <div class="col  order-md-2">
+              <h6 class="text-uppercase font-weight-bold">Қазақстан</h6>
+              <p></p>Шәріпбай Алтынбек Әмірұлы</p>
+              <p>Разахова Бибигуль Шамшановна</p>
+              <p>Муканова Асель Сериковна </p>
+              <p>Ергеш Бану Жантуғанқызы </p>
+              <p> Елибаева Газиза Казбековна </p>
+              <p>Жеткенбай Лена</p>
+              <p>Қажымұқан Дина</p>
+              <p>Каманур Үнзила</p>
+              <p>Ниязова Розамгуль</p>
+            </div>
+            <!-- Links -->
+            <div class="col order-md-3">
+              <h6 class="text-uppercase font-weight-bold">Қырғызстан</h6>
+              <p>Исраилова Нелла</p>
+              <p>Бакасова Пери</p>
+            
+              <h6 class="text-uppercase font-weight-bold">Өзбекстан</h6>
+              <p>Арипов Мирсаид</p>
+              <p> Абдурахмонова Нилуфар</p>
+              <h6 class="text-uppercase font-weight-bold">Татарстан</h6>
+              <p>Сулейманов Джавдет </p>
+              <p>Гатиатуллин Айрат </p>
+              <h6 class="text-uppercase font-weight-bold">Түркия</h6>
+              <p>Eşref Adali</p>
+            </div>
+            <!-- Copyright -->
+
+            <!-- Copyright -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> {% endcomment %}
+
+  <!-- Footer -->
+
+</body>
+
+<!-- Footer -->
+
+</html>

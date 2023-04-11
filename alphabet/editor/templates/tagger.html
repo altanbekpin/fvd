@@ -1,0 +1,373 @@
+{% extends 'basic.html'%} {% block head %}
+<script type="text/javascript">
+
+    $(document).on("change", "#autopost_upload_form", function (e) {
+        e.preventDefault();
+        const lang = $("#current_locale").val()
+        var form_data = new FormData();
+        let postFiles = $("#autopost_upload_input")[0].files;
+        $.each(postFiles, (index, res) => {
+            form_data.append("file", res);
+        });
+
+        form_data.append(
+            "csrfmiddlewaretoken",
+            $("input[name=csrfmiddlewaretoken]").val()
+        );
+
+        $.ajax({
+            type: "POST",
+            url: `{% url 'readfile' %}`,
+            data: form_data,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $("#autoposttextarea").val(data);
+            },
+        });
+    });
+
+    $(document).on("click", "#autoPostClearBtn", function (e) {
+        e.preventDefault();
+        $("#autopost_upload_form").trigger("reset");
+        $("#autoposttextarea").val("");
+
+    });
+
+    $(document).on("click", "#autoPostClearResult", function (e) {
+        e.preventDefault();
+        $(".autoPostDiv").hide();
+    });
+
+    $(document).on("click", "#autoPostOkBtn", function (e) {
+        e.preventDefault();
+        const lang = $("#current_locale").val()
+        $.ajax({
+            type: "POST",
+            url: "{% url 'autoPostTag' %}",
+            data: {
+                text: $("#autoposttextarea").val(),
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
+            },
+            success: function (data) {
+                //console.log(data);
+                $(".autoPostDiv").show();
+                let html = "";
+                var resultText = "";
+                data.forEach((res) => {
+                    res.forEach((r) => {
+                        resultText += r[0] + " ";
+                        if (r[1] === -1) {
+                            html += `
+                      <div class='d-inline-block mb-1'><b>${r[0]}</b> <button class="btn btn-sm btn-outline-secondary" data-word="${r[0]}" id="badWordBtn" type="button" data-toggle="modal" data-target="#addAutoPostBadWords">+</button></div>
+                      `;
+                        } else {
+                            //console.log(r);
+                            var p = "";
+                            p += `<b>${r[0]} </b>`;
+                            var suf = "";
+                            if (r[2].length > 0) {
+                                suf += `${r[3] + '#' + r[1]}.`;
+                            } else {
+                                suf += `${r[3] + '#' + r[1]}`;
+                            }
+
+                            suf += `${r[4]}`;
+                            p += `(${suf}) `
+                            resultText += `(${suf}) `
+                            html += `<div class='d-inline-block mb-1'>${p}</div>`;
+                        }
+                    });
+                });
+                $('#result_text').val(resultText);
+                $("#autoPostTagResult").html(
+                    '<div class="alert alert-success">' + html + "</div>"
+                );
+            },
+        });
+    });
+
+    $(document).on("click", "#badWordBtn", function (e) {
+        e.preventDefault();
+        $("#autoPostBadWords").val($(this).attr("data-word"));
+    });
+
+    $(document).on("click", "#addBadWordToDb", function (e) {
+        e.preventDefault();
+        const lang = $("#current_locale").val()
+        var pos = $("#pos-block option:selected").val();
+        $.ajax({
+            type: "POST",
+            url: `{% url 'addAutoPostWord' %}`,
+            data: {
+                word: $("#autoPostBadWords").val(),
+                position: pos,
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            },
+            success: function (data) {
+                $('#addAutoPostBadWords').modal('hide')
+                $("#autoPostOkBtn").trigger("click");
+            },
+        });
+    });
+    // $(function () {
+    //     $('a[data-toggle=tab]').on('click', function (event) {
+    //         var tab = $(event.target).text();
+    //         if (tab === 'Expert') {
+    //             $.ajax({
+    //                 type: "GET",
+    //                 url: "../expert/",
+    //                 data: {},
+    //                 success: function (data) {
+    //                     html = ""
+    //                     data.forEach(resp => {
+    //                         $('#expert_table').append(`<tr><td>${resp[0]}</td><td>${resp[1]}</td><td>${resp[2]}</td>
+    //                             <td>
+    //                                 <button type="button" id="expert_word_success_btn" data-id="${resp[0]}" class="btn btn-success">Дұрыс</button>
+    //                                 <button type="button" id="expert_word_wrong_btn" data-id="${resp[0]}" class="btn btn-danger">Дұрыс емес</button>
+    //                                 </td>
+    //                             </tr>`)
+    //                     });
+    //                 },
+    //             });
+    //         }
+    //     });
+    // });
+
+    // $(document).on("click", "#auto_post_get_result", function (e) {
+    //     const lang = $("#current_locale").val()
+    //     var text = $("#autoPostTagResult").val();
+    //     $('#result_text').val(text);
+    //     $('#auto_post_get_result').trigger('click');
+    //     // $.ajax({
+    //     //     type: "POST",
+    //     //     url: `../${lang}/tagger/file/generate`,
+    //     //     data: {
+    //     //         text: text,
+    //     //         csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+    //     //     },
+    //     //     success: function (data) {
+    //     //         console.log(data);
+    //     //     },
+    //     // });
+    // });
+
+    $(document).on("change", "#syntag_upload_form", function (e) {
+        e.preventDefault();
+        const lang = $("#current_locale").val()
+        var form_data = new FormData();
+        let postFiles = $("#syntag_upload_input")[0].files;
+        $.each(postFiles, (index, res) => {
+            form_data.append("file", res);
+        });
+
+        form_data.append(
+            "csrfmiddlewaretoken",
+            $("input[name=csrfmiddlewaretoken]").val()
+        );
+
+        $.ajax({
+            type: "POST",
+            url: `{% url 'readfile' %}`,
+            data: form_data,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $("#syntagtextarea").val(data);
+            },
+        });
+    });
+
+    $(document).on("click", "#syntagClearBtn", function (e) {
+        e.preventDefault();
+        $("#syntag_upload_form").trigger("reset");
+        $("#syntagtextarea").val("");
+
+    });
+
+    $(document).on("click", "#syntagClearResult", function (e) {
+        e.preventDefault();
+        $(".syntagDiv").hide();
+    });
+
+    $(document).on("click", "#syntagOkBtn", function (e) {
+        e.preventDefault();
+        const lang = $("#current_locale").val()
+        $.ajax({
+            type: "POST",
+            url: "{% url 'syntagger' %}",
+            data: {
+                text: $("#syntagtextarea").val(),
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
+            },
+            success: function (data) {
+                //console.log(data);
+                $(".syntagDiv").show();
+                $('#syntag_result_text').val(data);
+                $("#syntagResult").html(
+                    '<div class="alert alert-success">' + data + "</div>"
+                );
+            },
+        });
+    });
+
+</script>
+
+{% endblock %} {% block title %} AutoLingTag | Tagger {% endblock %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css"
+    rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"
+    integrity="sha512-VCHVc5miKoln972iJPvkQrUYYq7XpxXzvqNfiul1H4aZDwGBGC0lq373KNleaB2LpnC2a/iNfE5zoRYmB4TRDQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% load i18n %}
+{% block content %}
+
+<div class="container py-3">
+    <div class="card card-shadow border-0">
+        <div class="card-header">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link text-black-50 active" href="#menu3" data-toggle="tab">AutoPOSTagger</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-black-50" href="#menu4" data-toggle="tab">AutoSynTagger</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <div class="tab-pane active" role="tabpanel" id="menu3">
+                    <div class="m-3">
+                        <form method="post" enctype="multipart/form-data" id="autopost_upload_form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="autopost_upload_input">{% trans "Белгілеуге арналған файлды жүктеңіз:" %}
+                                    (*.txt, *.docx)</label>
+                                <div class="input-group mb-3">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" accept="txt,docx"
+                                            id="autopost_upload_input">
+                                        <label class="custom-file-label" for="inputGroupFile01">{% trans 'Файлды таңдаңыз' %}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <label for="">{% trans 'Мәтінді енгізіңіз' %}:</label>
+                        <textarea id="autoposttextarea" class="form-control" rows="6"></textarea>
+
+                        <button class="btn btn-primary mt-2" id="autoPostOkBtn">
+                            {% trans 'Морфологиялық белгілеу' %}
+                        </button>
+                        <button class="btn btn-danger mt-2" id="autoPostClearBtn">
+                            {% trans 'Мәтінді тазалау' %}
+                        </button>
+                        <button class="btn btn-danger mt-2" id="autoPostClearResult">
+                            {% trans 'Нәтижені тазалау' %}
+                        </button>
+                    </div>
+                    <div class="m-3 autoPostDiv" style="display: none">
+                        <label><strong>{% trans 'Нәтиже' %}:</strong></label>
+                        <form action="{% url 'generate_file' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="text" id="result_text" value="" />
+                            <input type="submit" class="btn btn-success btn-sm" id="auto_post_get_result"
+                                value="{% trans 'Нәтижені жүктеу' %}" />
+                        </form>
+                        <div id="autoPostTagResult"></div>
+                    </div>
+                </div>
+                <div class="tab-pane" role="tabpanel" id="menu4">
+                    <div class="m-3">
+                        <form method="post" enctype="multipart/form-data" id="syntag_upload_form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="syntag_upload_input">{% trans "Белгілеуге арналған файлды жүктеңіз:" %}
+                                    (*.txt, *.docx)</label>
+                                <div class="input-group mb-3">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" accept="txt,docx"
+                                            id="syntag_upload_input">
+                                        <label class="custom-file-label">{% trans 'Файлды таңдаңыз' %}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <label for="">{% trans 'Мәтінді енгізіңіз' %}:</label>
+                        <textarea id="syntagtextarea" class="form-control" rows="6"></textarea>
+
+                        <button class="btn btn-primary mt-2" id="syntagOkBtn">
+                            {% trans 'Синтаксистік белгілеу' %}
+                        </button>
+                        <button class="btn btn-danger mt-2" id="syntagClearBtn">
+                            {% trans 'Мәтінді тазалау' %}
+                        </button>
+                        <button class="btn btn-danger mt-2" id="syntagClearResult">
+                            {% trans 'Нәтижені тазалау' %}
+                        </button>
+                    </div>
+                    <div class="m-3 syntagDiv" style="display: none">
+                        <label><strong>{% trans 'Нәтиже' %}:</strong></label>
+                        <form action="{% url 'generate_file' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="text" id="syntag_result_text" value="" />
+                            <input type="submit" class="btn btn-success btn-sm" id="syntag_get_result"
+                                value="{% trans 'Нәтижені жүктеу' %}" />
+                        </form>
+                        <div id="syntagResult"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Жоқ сөзді базаға қосу autoPostTag-->
+<div class="modal fade" id="addAutoPostBadWords" tabindex="-1" role="dialog" aria-labelledby="addAutoPostBadWords"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAutoPostBadWords">{% trans 'Түбір сөзді базаға қосу' %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="word">Түбір сөз</label>
+                    <input type="text" class="form-control" id="autoPostBadWords" />
+                </div>
+                <div>
+                    <select class="form-control" id="pos-block">
+                        <option selected>...</option>
+                        <option value="1">Зат есім</option>
+                        <option value="2">Сын есім</option>
+                        <option value="3">Сан есім</option>
+                        <option value="4">Есімдік</option>
+                        <option value="5">Етістік</option>
+                        <option value="6">Еліктеуіш</option>
+                        <option value="7">Одағай</option>
+                        <option value="8">Шылау</option>
+                        <option value="9">Үстеу</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    {% trans 'Жабу' %}
+                </button>
+                <button type="button" class="btn btn-primary" id="addBadWordToDb">
+                    {% trans 'Қосу' %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

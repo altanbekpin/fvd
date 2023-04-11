@@ -1,0 +1,75 @@
+{% extends 'base.html'%} {% block title %} Тезаурус редакторы {% endblock %} 
+{% block content %}
+
+
+<div class="container-fluid">
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Жоба қосу</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="add_project_form" method="post">
+            {% csrf_token %}
+            {{project_form}}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Жабу</button>
+        <button form="add_project_form" type="submit" class="btn btn-primary">Қосу</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul class="nav">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="modal" data-target="#staticBackdrop" href="#">Жаңа жоба қосу</a>
+  </li>
+ 
+</ul>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Жоба атауы</th>
+      <th scope="col">Авторы</th>
+      <th scope="col">Тілі</th>
+      <th scope="col">Құрылған күні</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for project in list_projects%}
+    <tr>
+      <td>{{project.name}}</td>
+      <td>{{project.author}}</td>
+      <td>{{project.language}}</td>
+      <td>{{project.create_date}}</td>
+      <td>
+
+        
+
+          <div class="dropdown">
+            <a class="btn dropdown-toggle btn-sm " href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              ≡
+            </a>
+          
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <a  class="dropdown-item" href="/editor/{{project.id}}/kz">өңдеу</a>
+              <a  class="dropdown-item" href="#">жүктеу</a>
+            </div>
+          </div>
+      </td>
+    </tr>
+    
+    {% endfor %} 
+  </tbody>
+</table>
+</div>
+{% endblock content %}
