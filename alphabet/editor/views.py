@@ -180,6 +180,7 @@ def remove_uniturk(request):
     project.savetofile()
     return HttpResponse('Сәтті өшірілді')
 def send_question(request):
+    print('send_question')
     nation_to_lang = {
         'qazaq': 'kz',
         'qyrgyz': 'kg',
@@ -289,7 +290,7 @@ def send_question(request):
             def_qres = g.query(quest)
             for row in def_qres:
                 s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
-
+    print(s)
     return HttpResponse(s)
 
 def home(request,lang):
@@ -313,9 +314,12 @@ def projects(request):
         'uzbek': 'uz'
     }
 
-    if request.user.is_authenticated:
-        lang = nation_to_lang[request.user.username]
-    else:
+    try:
+            if request.user.is_authenticated:
+                lang = nation_to_lang[request.user.username]
+            else:
+                lang = 'kz'
+    except:
         lang = 'kz'
     project = MyOntology.objects.get(id = 6)
     json = project.GetJson(lang)

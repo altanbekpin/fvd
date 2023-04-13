@@ -56,7 +56,7 @@ export default {
                         {label: "Мұрасы", icon: 'pi pi-fw pi-briefcase', to: "/legacy"},
                         {label: "Тіл құрал", icon: 'pi pi-fw pi-file'},
                         // {label: "Оқулық, оқу құралдары", icon: 'pi pi-fw pi-book'},
-                        {label: "Интеллектуалды жүйе", icon: 'pi pi-fw pi-star'},
+                        {label: "Интеллектуалды жүйе", icon: 'pi pi-fw pi-star', to: '/intelect'},
                         {label: "Терминдері мен анықтамалары", icon: 'pi pi-fw pi-list'},
                     ]
                 },

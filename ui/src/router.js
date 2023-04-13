@@ -14,6 +14,11 @@ const routes = [
 
             },
             {
+                path: 'intelect',
+                name: 'intelect',
+                component: ()=> import('./pages/Intelect.vue')
+            },
+            {
                 path: '',
                 name: 'asr',
                 component: () => import('./components/AudioSpeechRecgnition.vue')

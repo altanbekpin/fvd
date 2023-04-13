@@ -1,5 +1,5 @@
 <template>
-   <div class="grid">
+    <div class="grid">
     <Card>
 		<template #title>
         Ахметтану интеллектуалды жүйесі
@@ -24,7 +24,7 @@
         </ul>
         </template>
     </Card>
-    </div>
+    </div> 
         
     
 </template>
@@ -55,13 +55,14 @@ export default {
         stopEnable:false, 
         filename: this.$t('common.select'), 
         audioFile: null,
+        OntNames: [],
+        selectedOnto: ''
     }
   },
-  mounted() {
-    
-    
-  },
   methods: {
+    getJson(){
+        axios.get('http://127.0.0.1:5001/getontology/').then(response => (this.OntNames =response.data))
+    },
     uploadAudioFile() {
         if (this.$refs.audioFile.files.length >0) {
             this.audioFile = this.$refs.audioFile.files[0];
