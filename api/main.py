@@ -2,9 +2,7 @@
 import pymysql
 from app import app
 # from config import mysql
-from flask import jsonify, send_file
-from bs4 import BeautifulSoup
-import re
+from flask import jsonify
 from flask import request
 import json
 # @app.route('/getlegacies/', defaults={'parent_id': None}, methods=['GET'])
@@ -180,126 +178,6 @@ def send_question():
     #     result = [descriptor, uniturk, hyperonym[0], hyperonym[:1], individ]
     # print(result)
     return jsonify(s)
-
-# @app.route('/getontology/ask/', methods=['POST'])
-# def send_question():
-#     nation_to_lang = {
-#         'qazaq': 'kz',
-#         'qyrgyz': 'kg',
-#         'tatar': 'tatar',
-#         'turik': 'tr',
-#         'uzbek': 'uz'
-#     }
-#     descriptor_to_lang =  {
-#         'kz': 'Дескриптор',
-#         'kg': 'Дескриптор',
-#         'tatar': 'Дескриптор',
-#         'tr': 'Descriptor',
-#         'uz': 'Deskriptor'
-#     }
-#     descriptor_to_def =  {
-#         'kz': 'Анықтамасы',
-#         'kg': 'Аныктамасы',
-#         'tatar': 'Билгеләмә',
-#         'tr': 'Açıklaması',
-#         'uz': 'Ta’rif'
-#     }
-#     descriptor_to_question =  {
-#         'kz': 'Сұрағы',
-#         'kg': 'Суроо',
-#         'tatar': 'Сорау',
-#         'tr': 'Soru',
-#         'uz': 'Savoli'
-#     }
-#     descriptor_to_gyperonim =  {
-#         'kz': 'Гипероним',
-#         'kg': 'Гипероним',
-#         'tatar': 'Гипероним',
-#         'tr': 'Hiperonim',
-#         'uz': 'Giperonim'
-#     }
-#     descriptor_to_gyponim =  {
-#         'kz': 'Гипоним',
-#         'kg': 'Гипоним',
-#         'tatar': 'Гипоним',
-#         'tr': 'Hiponim',
-#         'uz': 'Giponim'
-#     }
-#     question = '1 жақ жекеше  тәуелділік'#request.POST['question']
-#     # lang = request.POST['language']
-#     lang = 'kz'
-
-#     g = rdflib.Graph()#MyOwlReady.TurkOnto
-#     #g.parse ('ontology.owl')
-#     temp_list = []
-
-#     s= ''
-#     quest = '''
-#         PREFIX kazont: <http://www.semanticweb.org/kazontolgy#>
-#         SELECT ?subject ?label WHERE {{ ?subject rdfs:label "''' + question + '"@' + lang + ''' . ?subject rdfs:label  ?label
-#         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))} union { ?subject rdfs:label "''' + question.capitalize() + '"@' + lang + ''' . ?subject rdfs:label  ?label
-#         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))}}'
-#     qres = g.query(quest)
-#     for row in qres:
-#         words = row[0].split('#')
-#         s = '<b>' + descriptor_to_lang[lang]+': </b>' + row[1]
-#         word = words[len(words)-1]
-#         s = s + "<br/><b>UniTurk: </b>" + word
-#         print(row[0])
-#         print('SUCCESS')
-#         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#> Select * WHERE { kazont:' + word+ ''' kazont:definition ?def
-#                 FILTER(LANG(?def) = "" || LANGMATCHES(LANG(?def), " ''' + lang + '")) }'
-#         defres = g.query(quest)
-#         for def_row in defres:
-#             s = s + '<br/> <b>' + descriptor_to_def[lang]+': </b>' + def_row[0]
-#         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#> Select * WHERE { kazont:' + word+ ''' kazont:question ?def
-#                 FILTER(LANG(?def) = "" || LANGMATCHES(LANG(?def), "''' + lang + '")) }'
-#         defres = g.query(quest)
-#         for def_row in defres:
-#             s = s + '<br/> <b>' + descriptor_to_question[lang]+': </b>' + def_row[0]
-
-#         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#> Select ?label WHERE {kazont:' + word+ ''' rdfs:subClassOf  ?s . ?s rdfs:label ?label
-#                 FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '")) }'
-#         defres = g.query(quest)
-#         s = s + '<br/> <b>' + descriptor_to_gyperonim[lang]+': </b>'
-#         for def_row in defres:
-#             s = s + "<br/>&emsp; <a href=\"javascript:DoSubmit('" + def_row[0] +"','"+ lang +"');\">" + def_row[0] + "</a>"
-
-#         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#> Select ?label WHERE {?s rdfs:subClassOf kazont:' + word+ '''  . ?s rdfs:label ?label
-#                 FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '")) }'
-#         defres = g.query(quest)
-#         s = s + '<br/> <b>' + descriptor_to_gyponim[lang]+': </b>'
-#         for def_row in defres:
-#             s = s + "<br/>&emsp; <a href=\"javascript:DoSubmit('" + def_row[0] +"','"+ lang +"');\">" + def_row[0] +  "</a>"
-#         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#> SELECT ?subject ?label WHERE { ?subject rdf:type kazont:'+word+' . ?subject rdfs:label ?label FILTER(LANG(?label) = "' + lang + '" )}'
-#         defres = g.query(quest)
-#         s = s + "<br/><b>Индивид: </b>"
-#         instance_count = 0
-#         for def_row in defres:
-#             instance_count = instance_count + 1
-#             s = s + '<p style="color:red; margin-bottom:0">&emsp;' + def_row[1] +'</p>'
-#         if instance_count == 0 and lang == 'kz':
-#             quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#> SELECT ?subject WHERE { ?subject rdf:type kazont:'+word+'}'
-#             defres = g.query(quest)
-#             instance_count = 0
-#             s = s +'<p style="color:red; padding-left:15" class="m-0">'
-#             for def_row in defres:
-#                 instance_count = instance_count + 1
-#                 s = s + def_row[0].split('#')[1] +', '
-#             s = s + '</p>'
-#         s = s + '<br/><p style="color:red; margin-bottom:0">In other language:</p>'
-#         for key, value in nation_to_lang.items():
-#             if (value==lang):
-#                 continue
-#             quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#>  SELECT ?label WHERE { kazont:' + word + ' rdfs:label ?label FILTER(LANG(?label) = "'+value+'")}'
-#             def_qres = g.query(quest)
-#             for row in def_qres:
-#                 s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
-#     print('data: ',s)
-#     temp_list.append(s)
-#     # print(temp_list)
-#     print('data printed')
-#     return jsonify(temp_list)
 
 if __name__ == "__main__":
     from models import MyOwlReady
