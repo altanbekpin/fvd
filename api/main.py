@@ -36,10 +36,10 @@ import json
 #   response.headers.add('Access-Control-Allow-Origin', '*')
 
 
-@app.route('/getontology/', methods=['GET'])
-def getontology():
+@app.route('/getontology/<lang>/', methods=['GET'])
+def getontology(lang):
     s = MyOwlReady()
-    owls = s.GetJson()
+    owls = s.GetJson(lang=lang)
     return jsonify(owls)
 
 @app.route('/getontology/ask/', methods=['POST'])

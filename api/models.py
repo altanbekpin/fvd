@@ -69,8 +69,8 @@ class MyOwlReady:
 
         return cls._onto
     @classmethod
-    def GetJson(cls):
-        lang = "kz"
+    def GetJson(cls, lang):
+        #lang = "kg"
         res= ""
         g = rdflib.Graph()
         g.parse('ontology.owl')

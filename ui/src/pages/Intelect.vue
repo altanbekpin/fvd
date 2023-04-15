@@ -2,9 +2,9 @@
     <div class="flex justify-center">
     <div class="card items-start mainbox">
       <div class="card-header">
-    <p1>Іздеу</p1>
+    <p1>Тезарус</p1>
   </div>
-        <Listbox v-model="selectedOnto" :options="OntNames" optionLabel="name" class="w-full md:w-18rem listbox-scrollable" />
+        <Listbox v-model="selectedOnto" :options="OntNames" optionLabel="name" class="w-full  listbox-scrollable" />
          
     
     </div>
@@ -25,7 +25,7 @@
             <Button label="Іздеу"   class="md:w-5rem search-button" @click="searchFunc"/>
         </div>
             </div>
-      <div v-html="this.OntoInner" ></div>
+      <div v-html="this.OntoInner" ref="myElement"></div>
       </div>
     </div>
       
@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     getJson(){
-        axios.get('http://127.0.0.1:5001/getontology/').then(response => (this.OntNames =response.data))
+        axios.get('http://127.0.0.1:5001/getontology/kz/').then(response => (this.OntNames =response.data))
     },
     async searchFunc(){
       var reqbody = {
@@ -129,9 +129,12 @@ export default {
   
 }
 .listbox-scrollable {
-    max-height: 600px; /* set the maximum height of the ListBox */
+    max-height: 600px; /*set the maximum height of the ListBox*/
     overflow: auto; /* set the overflow property to auto to enable scrolling */
-    margin-left: 25px;
+    /* margin-left: 25px; */
+    box-sizing: border-box;
+    height: 100%;
+    border-color: white;
   }
   .card-header:first-child {
     border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
