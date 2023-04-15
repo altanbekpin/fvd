@@ -62,8 +62,9 @@ export default {
     // async DoSubmit(text){
     // }
   },
-   mounted() {
-    this.getJson();
+   async mounted() {
+
+    this.getJson('http://127.0.0.1:5001/getontology/ask/');
     const self = this;
      window.DoSubmit = async function(text) {
       

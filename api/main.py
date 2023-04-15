@@ -5,42 +5,87 @@ from app import app
 from flask import jsonify
 from flask import request
 import json
-# @app.route('/getlegacies/', defaults={'parent_id': None}, methods=['GET'])
-# @app.route('/getlegacies/<int:parent_id>', methods=['GET'])
-# def get_legacy_records(parent_id):
-#     try:
-#         cur = mysql.get_db().cursor(pymysql.cursors.DictCursor)
-#         if parent_id == None:  # Если parent_id равно 0, выбираем корневые записи
-#             cur.execute("SELECT id as `key`, name as label, path as data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN  is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id IS NULL")
-#         else:  # В противном случае выбираем записи с указанным parent_id
-#             cur.execute("SELECT  id as `key`, name as label, path as data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN  is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id=%s", [parent_id])
+import config
+print('runned')
+import psycopg2
+from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import create_access_token, JWTManager, current_user, jwt_required
 
-#         results = cur.fetchall()
-#         legacies = jsonify(results)
-#         return legacies
 
-#     except Exception as e:
-#         return jsonify(str(e)), 500
 
-# @app.route('/legacy/download/<int:file_id>', methods=['GET'])
-# def download_file(file_id):
-#     cur = mysql.get_db().cursor()
-#     cur.execute("SELECT path from legacy WHERE id = %s",[file_id])
-#     results = cur.fetchall()
-#     for row in results:
-#         path = row[0]
-#     print(path)
-#     return send_file(path, as_attachment=True)
-# @app.after_request
-# def after_request(response):
-#   response.headers.add('Access-Control-Allow-Origin', '*')
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@localhost/userdb'
+jwt = JWTManager(app)
+db = SQLAlchemy(app)
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user.id
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return User.query.filter_by(id=identity).one_or_none()
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    fullname = db.Column(db.String(120), nullable=False)
+
+def get_db_connection():
+    conn = psycopg2.connect(
+            host="localhost",
+            database="userdb",
+            user='postgres',
+            password='magzhan2005')
+    return conn
 
 @app.route('/getontology/<lang>/', methods=['GET'])
 def getontology(lang):
     s = MyOwlReady()
     owls = s.GetJson(lang=lang)
     return jsonify(owls)
+
+@app.route('/login/', methods=['POST'])
+def login():
+    # Get the user and password from the request body
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    user = User.query.filter_by(email=email, password=password).one_or_none()
+    if not user:
+        return jsonify("Wrong username or password"), 401
+    access_token = create_access_token(identity=user)
+    return jsonify(access_token=access_token)
+
+    # Connect to the PostgreSQL database
+    # conn = get_db_connection()
+    # cursor = conn.cursor()
+
+    # # Execute a SQL query to find the user and password combination
+    # cursor.execute("SELECT * FROM your_table_name WHERE email = %s AND password = %s", (email, password))
+    # rows = cursor.fetchall()
+
+    # # Close the cursor and connection
+    # cursor.close()
+    # conn.close()
+
+    # # Check if the user and password were found
+    # if len(rows) == 1:
+    #     # User and password combination was found
+    #     return jsonify({'message': 'Login successful'})
+    # else:
+    #     # User and password combination was not found
+    #     return jsonify({'message': 'Invalid username or password'}), 401
+
+@app.route("/who_am_i/", methods=["GET"])
+@jwt_required()
+def protected():
+    # We can now access our sqlalchemy User object via `current_user`.
+    return jsonify(
+        id=current_user.id,
+        fullname=current_user.fullname,
+    )
+
 
 @app.route('/getontology/ask/', methods=['POST'])
 def send_question():
@@ -183,5 +228,42 @@ if __name__ == "__main__":
     from models import MyOwlReady
     s = MyOwlReady() ## class initialized, but object not created
     #print("Object created", MyOwlReady.getInstance()) # Object gets created here
-    app.config['JSON_AS_ASCII'] = False
+    config.init_conf()
     app.run(port=5001, debug=True)    
+
+
+
+
+
+
+
+
+# @app.route('/getlegacies/', defaults={'parent_id': None}, methods=['GET'])
+# @app.route('/getlegacies/<int:parent_id>', methods=['GET'])
+# def get_legacy_records(parent_id):
+#     try:
+#         cur = mysql.get_db().cursor(pymysql.cursors.DictCursor)
+#         if parent_id == None:  # Если parent_id равно 0, выбираем корневые записи
+#             cur.execute("SELECT id as `key`, name as label, path as data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN  is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id IS NULL")
+#         else:  # В противном случае выбираем записи с указанным parent_id
+#             cur.execute("SELECT  id as `key`, name as label, path as data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN  is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id=%s", [parent_id])
+
+#         results = cur.fetchall()
+#         legacies = jsonify(results)
+#         return legacies
+
+#     except Exception as e:
+#         return jsonify(str(e)), 500
+
+# @app.route('/legacy/download/<int:file_id>', methods=['GET'])
+# def download_file(file_id):
+#     cur = mysql.get_db().cursor()
+#     cur.execute("SELECT path from legacy WHERE id = %s",[file_id])
+#     results = cur.fetchall()
+#     for row in results:
+#         path = row[0]
+#     print(path)
+#     return send_file(path, as_attachment=True)
+# @app.after_request
+# def after_request(response):
+#   response.headers.add('Access-Control-Allow-Origin', '*')

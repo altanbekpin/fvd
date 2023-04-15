@@ -26,7 +26,7 @@
                             </div>
                             <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Пароль ұмыттыңыз?</a>
                         </div>
-                        <Button label="Кіру" class="w-full p-3 text-xl"></button>
+                        <Button label="Кіру" class="w-full p-3 text-xl" @click="postLogin"></button>
                     </div>
                 </div>
             </div>
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
     data() {
         return {
@@ -48,7 +49,18 @@ export default {
             if (this.$appState.darkTheme) return 'white';
             return 'dark';
         }
+    },
+    methods: {
+    async postLogin(){
+        var temp = '';
+        await axios.post('http://127.0.0.1:5001/login/', {
+        'email':this.email,
+        'password':this.password}).then(response=>{ temp = response.data['access_token']})
+        //const token = logged_as.data['access_token']
+        console.log(temp)
+        console.log(axios.get('http://127.0.0.1:5001/who_am_i/', { headers: { Authorization: `Bearer ${temp}` } }), )
     }
+    },
 }
 </script>
 
