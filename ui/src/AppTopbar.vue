@@ -8,18 +8,20 @@
 		</button>
 		<span>{{$t("common.title")}}</span>
 
-
 		<button class="p-link layout-topbar-menu-button layout-topbar-button"
 			v-styleclass="{ selector: '@next', enterClass: 'hidden', enterActiveClass: 'scalein', 
 			leaveToClass: 'hidden', leaveActiveClass: 'fadeout', hideOnOutsideClick: true}">
 			<i class="pi pi-ellipsis-v"></i>
 		</button>
+
 		<ul class="layout-topbar-menu hidden lg:flex origin-top">
 			<li>
 				<Dropdown class="p-link" v-model="language" :options="languages" optionLabel="name" @change="changeLanguage" />
 			</li>
 			
 		</ul>
+		<button class="p-link layout-topbar-button" @click="$router.push('/auth')"><i class="pi pi-user"></i><span>Profile</span></button>
+
 	</div>
 </template>
 
@@ -198,3 +200,30 @@ export default {
 	}
 }
 </script>
+<style scoped>
+.pi-usericon{
+	margin-right: 20px;
+	margin-left: 20px;
+}
+.layout-topbar .layout-topbar-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: var(--text-color-secondary);
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+    transition: background-color .2s
+}
+.p-link {
+    text-align: left;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    user-select: none
+}
+</style>

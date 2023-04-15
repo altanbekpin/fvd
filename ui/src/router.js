@@ -182,7 +182,12 @@ const routes = [
         path: '/access',
         name: 'access',
         component: () => import('./pages/Access.vue')
-    }
+    },
+    {
+        path: '/auth',
+        name: 'auth',
+        component: ()=>import('./pages/AuthPage.vue')
+    },
 ];
 
 const router = createRouter({

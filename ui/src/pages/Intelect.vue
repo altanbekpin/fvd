@@ -59,22 +59,26 @@ export default {
 
       this.OntoInner = temp.data
     },
-    async DoSubmit(text){
+    // async DoSubmit(text){
+    // }
+  },
+   mounted() {
+    this.getJson();
+    const self = this;
+     window.DoSubmit = async function(text) {
+      
       console.log(text)
-        this.textController = text
+        self.textController = text
         var reqbody = {
             'question': text
         }
 
         console.log(reqbody)
-        var temp = await axios.post('http://127.0.0.1:5001/getontology/ask/', reqbody)
+        var temp =  await axios.post('http://127.0.0.1:5001/getontology/ask/', reqbody)
         console.log(temp.data)
-        this.OntoInner = temp.data
-        this.textController = text
+        self.OntoInner = temp.data
+        self.textController = text
     }
-  },
-  mounted() {
-    this.getJson();
     console.log(this.OntNames.length)
   },
   watch:{
