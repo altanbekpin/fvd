@@ -36,12 +36,14 @@
 
 <script>
 import axios from 'axios';
+import { store } from './store.js';
 export default {
     data() {
         return {
             email: '',
             password: '',
-            checked: false
+            checked: false,
+            store
         }
     },
     computed: {
@@ -60,8 +62,12 @@ export default {
         //const token = logged_as.data['access_token']
         temp = response.data['access_token']
         //console.log(temp)
-        console.log(axios.get('http://127.0.0.1:5001/who_am_i/', { headers: { Authorization: `Bearer ${temp}` } }), )
+        await axios.get('http://127.0.0.1:5001/who_am_i/', { headers: { Authorization: `Bearer ${temp}` } }).then(response=>store.roles=response.data['roles'])
+        console.log('who am i returns:')
+        console.log(store.roles)
         if(response.status == 200){
+            store.email = this.email,
+            store.password = this.password,
             this.$router.push('/')
         }
     }

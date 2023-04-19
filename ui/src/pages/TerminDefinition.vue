@@ -1,11 +1,14 @@
 <template>
     <div class="card" v-if="products">
-        <Toolbar class="mb-4" style="border-color: white; background-color: white;">
-    <template #start>
-        <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" @click="openNew" />
-        <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
-    </template>
-</Toolbar>
+        <div v-if="store.roles.includes('admin')">
+            <Toolbar class="mb-4" style="border-color: white; background-color: white;">
+                <template #start>
+                    <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" @click="openNew" />
+                    <div>{{ store.email }}</div>
+                    <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
+                </template>
+            </Toolbar>
+        </div>
         <DataTable :value="products" lazy v-model:filters="filters"  :rows="10" ref="dt" :loading="loading" dataKey="id"
         :totalRecords="totalRecords"  filterDisplay="row"
         @page="onPage($event)" @sort="onSort($event)" @filter="onFilter($event)"
@@ -31,7 +34,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
+import { store } from './store.js';
 import axios from 'axios'
+
+// console.log(store.email)
+// console.log(store.password)
 
 onMounted(() => {
     loading.value = true;
@@ -41,7 +48,7 @@ onMounted(() => {
         rows: 10,
         sortField: null,
         sortOrder: null,
-        filters: filters.value
+        filters: filters.value,
     };
 
     loadLazyData();

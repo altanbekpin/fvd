@@ -32,6 +32,19 @@ class User(db.Model):
     password_salt = db.Column(db.String(120), nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
 
+class UserRole(db.Model):
+    __tablename__ = 'user_role'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    role_id = db.Column(db.Integer)
+
+class Role(db.Model):
+    __tablename__ = 'role'
+    role_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    description = db.Column(db.String(100), unique=True, nullable=False)
+    
+
 def get_db_connection():
     conn = psycopg2.connect(
             host="localhost",
@@ -81,7 +94,16 @@ def login():
 @jwt_required()
 def protected():
     # We can now access our sqlalchemy User object via `current_user`.
+    results = UserRole.query.filter_by(user_id=current_user.id).with_entities(UserRole.role_id).all()
+    role_ids = [result[0] for result in results]
+    roles = []
+    for i in role_ids:
+        roles.append(Role.query.filter_by(role_id=i).one_or_none().name)
+    #role_names = [role for role in roles]
+    print(roles)
+    print(role_ids)
     return jsonify(
+        roles = roles,
         id=current_user.id,
         email=current_user.email,
     )
