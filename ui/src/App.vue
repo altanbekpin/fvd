@@ -54,10 +54,10 @@ export default {
                     label: 'Ахметтану',
                     items: [
                         {label: "Мұрасы", icon: 'pi pi-fw pi-briefcase', to: "/legacy"},
-                        {label: "Тіл құрал", icon: 'pi pi-fw pi-file'},
+                        {label: "Тіл құрал", icon: 'pi pi-fw pi-file', to: '/intelect'},
                         // {label: "Оқулық, оқу құралдары", icon: 'pi pi-fw pi-book'},
-                        {label: "Интеллектуалды жүйе", icon: 'pi pi-fw pi-star', to: '/intelect'},
-                        {label: "Терминдері мен анықтамалары", icon: 'pi pi-fw pi-list'},
+                        {label: "Интеллектуалды жүйе", icon: 'pi pi-fw pi-star'},
+                        {label: "Терминдері мен анықтамалары", icon: 'pi pi-fw pi-list', to: '/terminology'},
                     ]
                 },
                 {

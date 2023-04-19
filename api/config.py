@@ -9,7 +9,6 @@ from app import app
 # app.config['MYSQL_DATABASE_DB'] = 'quotes_db'
 # app.config['MYSQL_DATABASE_PORT'] = 33066
 def init_conf():
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@localhost/userdb'
     app.config['JSON_AS_ASCII'] = False
     app.config["JWT_SECRET_KEY"] = "@Remote2022"  
 #mysql.init_app(app)

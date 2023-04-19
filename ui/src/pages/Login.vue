@@ -53,12 +53,17 @@ export default {
     methods: {
     async postLogin(){
         var temp = '';
+        var response;
         await axios.post('http://127.0.0.1:5001/login/', {
         'email':this.email,
-        'password':this.password}).then(response=>{ temp = response.data['access_token']})
+        'password':this.password}).then(_response=>{ response = _response})//temp = response.data['access_token']})
         //const token = logged_as.data['access_token']
-        console.log(temp)
+        temp = response.data['access_token']
+        //console.log(temp)
         console.log(axios.get('http://127.0.0.1:5001/who_am_i/', { headers: { Authorization: `Bearer ${temp}` } }), )
+        if(response.status == 200){
+            this.$router.push('/')
+        }
     }
     },
 }

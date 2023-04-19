@@ -18,6 +18,12 @@ const routes = [
                 name: 'intelect',
                 component: ()=> import('./pages/Intelect.vue')
             },
+
+            {
+                path: '/terminology',
+                name: 'terminology',
+                component: ()=>import('./pages/TerminDefinition.vue')
+            },
             {
                 path: '',
                 name: 'asr',

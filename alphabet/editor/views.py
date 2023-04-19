@@ -39,7 +39,7 @@ def add_label(request):
         project.text= parts[0] + cl + rdflabel +parts[1]
     if (ltype == '4'):
         g = rdflib.Graph()
-        g.parse ('ontology.owl')
+        g.parse ('Ахметтану')
         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#>  SELECT * WHERE { kazont:' + label.split(';')[0] + ' rdfs:subClassOf ?object }'
         qres = g.query(quest)
         s = ''
@@ -94,7 +94,7 @@ def edit_label(request):
         project.text = project.text.replace(oldlabel,rdflabel)
     #     if (ltype == '4'):
     #         g = rdflib.Graph()
-    #         g.parse ('ontology.owl')
+    #         g.parse ('Ахметтану')
     #         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#>  SELECT * WHERE { kazont:' + label.split(';')[0] + ' rdfs:subClassOf ?object }'
     #         qres = g.query(quest)
     #         s = ''
@@ -126,7 +126,7 @@ def get_uniturk(request):
     lang = request.POST['language']
 
     g = rdflib.Graph()
-    g.parse ('ontology.owl')
+    g.parse ('Ахметтану')
 
     s= 'Мұндай тезаурус табылмады'
     quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#>  SELECT * WHERE { kazont:' + uni_turk + ' rdfs:subClassOf ?object }'
@@ -228,7 +228,7 @@ def send_question(request):
     lang = request.POST['language']
 
     g = MyOwlReady.TurkOnto
-    #g.parse ('ontology.owl')
+    #g.parse ('Ахметтану')
 
     s= ''
     quest = '''

@@ -2,15 +2,15 @@
 import pymysql
 from app import app
 # from config import mysql
-from flask import jsonify
+from flask import jsonify, send_file
 from flask import request
 import json
 import config
-print('runned')
 import psycopg2
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import create_access_token, JWTManager, current_user, jwt_required
-
+import psycopg2.extras
+import pandas as pd
 
 
 
@@ -29,8 +29,8 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-    fullname = db.Column(db.String(120), nullable=False)
+    password_salt = db.Column(db.String(120), nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
 
 def get_db_connection():
     conn = psycopg2.connect(
@@ -50,8 +50,8 @@ def getontology(lang):
 def login():
     # Get the user and password from the request body
     email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    user = User.query.filter_by(email=email, password=password).one_or_none()
+    password_salt = request.json.get("password", None)
+    user = User.query.filter_by(email=email, password_salt=password_salt).one_or_none()
     if not user:
         return jsonify("Wrong username or password"), 401
     access_token = create_access_token(identity=user)
@@ -83,7 +83,7 @@ def protected():
     # We can now access our sqlalchemy User object via `current_user`.
     return jsonify(
         id=current_user.id,
-        fullname=current_user.fullname,
+        email=current_user.email,
     )
 
 
@@ -209,20 +209,71 @@ def send_question():
             for row in def_qres:
                 s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
     print(s)
-    # descriptor = re.search('<b>Дескриптор: </b>(.*?)<br/>', s).group(1)
-    # uniturk = re.search('<b>UniTurk: </b>(.*?)<br/>', s).group(1)
-    # hyperonym = re.findall('<a href="javascript:DoSubmit\(\'(.*?)\',\'kz\'\);">.*?</a>', s)
-    # print(hyperonym)
-    # try:
-    #     individ = re.search('<b>Индивид: </b><p.*?>(.*?)</p>', s).group(1)
-    # except:
-    #     individ = ''
-    # if len(hyperonym) >= 2:
-    #     result = [descriptor, uniturk, hyperonym[0], hyperonym[1:], individ]
-    # else:
-    #     result = [descriptor, uniturk, hyperonym[0], hyperonym[:1], individ]
-    # print(result)
     return jsonify(s)
+@app.route('/getlegacies/', defaults={'parent_id': None}, methods=['GET'])
+@app.route('/getlegacies/<int:parent_id>', methods=['GET'])
+def get_legacy_records(parent_id):
+    print('get_legacy_records')
+    try:
+        cur = get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)#mysql.get_db().cursor(pymysql.cursors.DictCursor)#cur = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+        if parent_id == None:  # Если parent_id равно 0, выбираем корневые записи
+            cur.execute("SELECT id AS key, name AS label, path AS data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id IS NULL;")
+        else:  # В противном случае выбираем записи с указанным parent_id
+            cur.execute("SELECT id as key, name as label, path as data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id=%s", [parent_id])
+
+
+        results = cur.fetchall()
+        legacies = jsonify(results)
+        return legacies
+
+    except Exception as e:
+        print('exeption')
+        return jsonify(str(e)), 500
+
+@app.route('/legacy/download/<int:file_id>', methods=['GET'])
+def download_file(file_id):
+    print('download_file')
+    cur = get_db_connection().cursor()
+    cur.execute("SELECT path from legacy WHERE id = %s",[file_id])
+    results = cur.fetchall()
+    for row in results:
+        path = row[0]
+    print(path)
+    return send_file(path, as_attachment=True)
+# @app.after_request
+# def after_request(response):
+#   response.headers.add('Access-Control-Allow-Origin', '*')
+@app.route('/classification/', methods=['POST'])
+def get_classification():
+    conn = get_db_connection()
+    data = request.json
+
+    first = data.get("first")
+    if data.get("page") != None:
+        first = data.get("page")
+    rows = data.get("rows")
+    print(data)
+    cursor = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+    offset = first * rows  # вычисляем смещение
+    print(first)
+    print(rows)
+    print(offset)
+    if data.get('filters').get("global").get("value") != None:
+    
+        search_text = data.get('filters').get("global").get("value") 
+        print(search_text)
+        cursor.execute("SELECT * FROM termin WHERE name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
+            ('%' + search_text + '%','%' + search_text + '%','%' + search_text + '%',rows,offset))
+    else:
+        cursor.execute("SELECT * FROM termin LIMIT %s OFFSET %s",(rows,offset,))        
+    # Execute a SQL query to find the user and password combination
+
+    
+    rows = cursor.fetchall()
+
+
+    return rows
+
 
 if __name__ == "__main__":
     from models import MyOwlReady
@@ -238,32 +289,3 @@ if __name__ == "__main__":
 
 
 
-# @app.route('/getlegacies/', defaults={'parent_id': None}, methods=['GET'])
-# @app.route('/getlegacies/<int:parent_id>', methods=['GET'])
-# def get_legacy_records(parent_id):
-#     try:
-#         cur = mysql.get_db().cursor(pymysql.cursors.DictCursor)
-#         if parent_id == None:  # Если parent_id равно 0, выбираем корневые записи
-#             cur.execute("SELECT id as `key`, name as label, path as data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN  is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id IS NULL")
-#         else:  # В противном случае выбираем записи с указанным parent_id
-#             cur.execute("SELECT  id as `key`, name as label, path as data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN  is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id=%s", [parent_id])
-
-#         results = cur.fetchall()
-#         legacies = jsonify(results)
-#         return legacies
-
-#     except Exception as e:
-#         return jsonify(str(e)), 500
-
-# @app.route('/legacy/download/<int:file_id>', methods=['GET'])
-# def download_file(file_id):
-#     cur = mysql.get_db().cursor()
-#     cur.execute("SELECT path from legacy WHERE id = %s",[file_id])
-#     results = cur.fetchall()
-#     for row in results:
-#         path = row[0]
-#     print(path)
-#     return send_file(path, as_attachment=True)
-# @app.after_request
-# def after_request(response):
-#   response.headers.add('Access-Control-Allow-Origin', '*')

@@ -37,6 +37,7 @@ const loading = ref(false);
 onMounted(() => {
     loading.value =true
     AhmetService.getTreeTableNodes().then((data) => {
+        console.log(data)
         loading.value = false
         let legacies = data.data;
         for (var i=0;legacies.length; i++) {
@@ -47,6 +48,7 @@ onMounted(() => {
             nodes.value = legacies
         }
     });
+    console.log(nodes.value)
 });
 const onNodeExpand = (node) => {
     loading.value = true
