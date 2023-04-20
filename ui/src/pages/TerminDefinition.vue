@@ -1,7 +1,6 @@
 <template>
     <div class="card" v-if="products">
-        <!-- v-if="  " -->
-            <div v-if="(store.roles || []).includes('admin')">
+            <div v-if="store.getters.getRoles.includes('admin')">
                 <Toolbar class="mb-4" style="border-color: white; background-color: white;" >
                 <template #start>
                         <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" @click="openNew" />
@@ -32,21 +31,40 @@
             <Column field="examples" header="Мысал"></Column>
         </DataTable>
     </div>
+    <div class="rounded-dialog">
+        <Dialog v-model:visible="productDialog" :style="{width: '450px'}" header="Жаңадан қосу" :modal="true" class="p-fluid">
+            
+            <div class="field">
+                <label for="name">Ұғым</label>
+                <InputText id="name"  required="true" autofocus :class="{'p-invalid': submitted && !product.name}" />
+                <!-- <small class="p-error" v-if="submitted && !product.name">Name is required.</small> -->
+            </div>
+            <div class="field">
+                <label for="description">Анықтама</label>
+                <Textarea id="description" required="true" rows="3" cols="20" />
+            </div>
+            <div class="field">
+                <label for="description">Мысал</label>
+                <Textarea id="description" required="true" rows="3" cols="20" />
+            </div>
+           
+            <template #footer>
+                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog"/>
+                <Button label="Save" icon="pi pi-check" text @click="saveProduct" />
+            </template>
+        </Dialog>
+    </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
+import store from '../store.js';
 import axios from 'axios'
-import store from '@/store.js';
-
-// console.log(store.roles)
-
 onMounted(() => {
     loading.value = true;
-    console.log('type of:')
-    console.log(typeof store.roles)
-    console.log('value: ')
+    console.log('roles:')
+    console.log(store.getters.getRoles)
 
     lazyParams.value = {
         first: 0,
@@ -58,6 +76,10 @@ onMounted(() => {
 
     loadLazyData();
 });
+const productDialog = ref(false);
+const openNew = () => {
+    productDialog.value = true;
+};
 
 const dt = ref();
 const loading = ref(false);
@@ -99,42 +121,8 @@ const clearFilter = () => {
     initFilters();
 };
 </script>
-
-
-<!-- <template>
-    <div class="card">
-        <DataTable :value="products" tableStyle="min-width: 50rem">
-            <Column field="first_column" header="Ұғым"></Column>
-            <Column field="second_column" header="Анықтама"></Column>
-            <Column field="third_column" header="Мысал"></Column>
-        </DataTable>
-    </div>
-</template>
-
-<script>
-import axios from 'axios'
-import { ref } from 'vue';
-const products = ref();
-export default{
-    data() {
-        return  {
-         response:[],
-//          columns : [
-//     { field: 'first_column', header: 'Ұғым' },
-//     { field: 'second_column', header: 'Анықтама' },
-//     { field: 'third_column', header: 'Мысал' },
-// ]
-    }
-  },
-  
-    async mounted() {
-        var temp
-        temp = await axios.get('http://127.0.0.1:5001//classification/10')
-        this.response = temp.data
-        console.log('result of request: ')
-        console.log(this.response)
-        products.value=this.response
-    },
-    
-}
-</script> -->
+<style setup>
+  .rounded-dialog {
+    border-radius: 10px;
+  }
+</style>

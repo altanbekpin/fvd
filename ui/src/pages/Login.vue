@@ -37,8 +37,7 @@
 <script>
 import axios from 'axios';
 //import { store } from './store.js';
-import store from '@/store.js';
-
+import store from '../store.js';
 export default {
     data() {
         return {
@@ -68,12 +67,17 @@ export default {
         await axios.get('http://127.0.0.1:5001/who_am_i/', { headers: { Authorization: `Bearer ${temp}` } }).then(response=>console.log(roles = response.data['roles']))
         console.log('who am i returns:')
         if(response.status == 200){
-            store.roles = roles
+
             console.log('after asssigning response:')
-            console.log(store.roles)
-            store.email = this.email,
-            store.password = this.password,
-            
+            console.log(store.state.roles)
+            const temp = {
+                email: this.email,
+                password: this.password,
+                roles: roles
+            };
+            store.commit('updateUser', temp);
+            console.log('outside of updateUser:')
+            console.log(store.state.user)
             this.$router.push('/')
         }
         //console.log(store.roles)

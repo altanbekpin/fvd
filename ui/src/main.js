@@ -120,6 +120,12 @@ library.add(faUserSecret, faMicrophone, faFileAudio, faStop)
 
 
 const app = createApp(AppWrapper);
+const data = localStorage.getItem('myData');
+console.log('local storage: ')
+console.log(data)
+if (data) {
+  store.commit('updateData', JSON.parse(data));
+}
 app.use(store)
 
 app.config.globalProperties.$appState = reactive({ theme: 'lara-light-indigo', darkTheme: false });

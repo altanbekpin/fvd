@@ -100,8 +100,8 @@ def protected():
     for i in role_ids:
         roles.append(Role.query.filter_by(role_id=i).one_or_none().name)
     #role_names = [role for role in roles]
-    print(roles)
-    print(role_ids)
+    # print(roles)
+    # print(role_ids)
     return jsonify(
         roles = roles,
         id=current_user.id,
