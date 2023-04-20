@@ -7,8 +7,8 @@
             <div class="col-12 xl:col-6" style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color), rgba(33, 150, 243, 0) 30%);">
                 <div class="h-full w-full m-0 py-7 px-4" style="border-radius:53px; background: linear-gradient(180deg, var(--surface-50) 38.9%, var(--surface-0));">
                     <div class="text-center mb-5">
-                        <img src="layout/images/avatar.png" alt="Image" height="50" class="mb-3">
-                        <div class="text-900 text-3xl font-medium mb-3">Қощ келдіңіз</div>
+                        <!-- <img src="layout/images/avatar.png" alt="Image" height="50" class="mb-3"> -->
+                        <div class="text-900 text-3xl font-medium mb-3">Қош келдіңіз</div>
                         <span class="text-600 font-medium">Жалғастыру үшін аккаунтқа кіріңіз</span>
                     </div>
                 
@@ -36,14 +36,16 @@
 
 <script>
 import axios from 'axios';
-import { store } from './store.js';
+//import { store } from './store.js';
+import store from '@/store.js';
+
 export default {
     data() {
         return {
             email: '',
             password: '',
             checked: false,
-            store
+            //store
         }
     },
     computed: {
@@ -56,20 +58,25 @@ export default {
     async postLogin(){
         var temp = '';
         var response;
+        var roles = []
         await axios.post('http://127.0.0.1:5001/login/', {
         'email':this.email,
         'password':this.password}).then(_response=>{ response = _response})//temp = response.data['access_token']})
         //const token = logged_as.data['access_token']
         temp = response.data['access_token']
         //console.log(temp)
-        await axios.get('http://127.0.0.1:5001/who_am_i/', { headers: { Authorization: `Bearer ${temp}` } }).then(response=>store.roles=response.data['roles'])
+        await axios.get('http://127.0.0.1:5001/who_am_i/', { headers: { Authorization: `Bearer ${temp}` } }).then(response=>console.log(roles = response.data['roles']))
         console.log('who am i returns:')
-        console.log(store.roles)
         if(response.status == 200){
+            store.roles = roles
+            console.log('after asssigning response:')
+            console.log(store.roles)
             store.email = this.email,
             store.password = this.password,
+            
             this.$router.push('/')
         }
+        //console.log(store.roles)
     }
     },
 }

@@ -1,19 +1,22 @@
 <template>
     <div class="card" v-if="products">
-        <div v-if="store.roles.includes('admin')">
-            <Toolbar class="mb-4" style="border-color: white; background-color: white;">
+        <!-- v-if="  " -->
+            <div v-if="(store.roles || []).includes('admin')">
+                <Toolbar class="mb-4" style="border-color: white; background-color: white;" >
                 <template #start>
-                    <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" @click="openNew" />
-                    <div>{{ store.email }}</div>
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
+                        <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" @click="openNew" />
+                        <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />   
+                    
                 </template>
             </Toolbar>
-        </div>
+            </div>
+        
         <DataTable :value="products" lazy v-model:filters="filters"  :rows="10" ref="dt" :loading="loading" dataKey="id"
         :totalRecords="totalRecords"  filterDisplay="row"
         @page="onPage($event)" @sort="onSort($event)" @filter="onFilter($event)"
         :globalFilterFields="['first_column', 'second_column', 'third_column']" showGridlines paginator  tableStyle="min-width: 50rem">
             <template #header>
+                <!-- <div>{{ typeof store.roles  }}</div> -->
                 <div class="flex justify-content-between">
                     <Button type="button" icon="pi pi-filter-slash" label="Тазалау" outlined @click="clearFilter()" />
                     <span class="p-input-icon-left">
@@ -34,14 +37,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
-import { store } from './store.js';
 import axios from 'axios'
+import store from '@/store.js';
 
-// console.log(store.email)
-// console.log(store.password)
+// console.log(store.roles)
 
 onMounted(() => {
     loading.value = true;
+    console.log('type of:')
+    console.log(typeof store.roles)
+    console.log('value: ')
 
     lazyParams.value = {
         first: 0,
@@ -62,17 +67,8 @@ const lazyParams = ref({});
 const filters = ref({
     'global': {value: '', matchMode: 'contains'},
 });
-
-// const columns = ref([
-//     {field: 'first_column', header: 'Ұғым'},
-//     {field: 'second_column', header: 'Анықтама'},
-//     {field: 'third_column', header: 'Мысал'},
-// ]);
 const loadLazyData = async() => {
     var temp = await axios.post('http://127.0.0.1:5001/classification/', lazyParams.value)
-        console.log('result of request: ')
-        //const data = JSON.parse(temp.data)
-        //console.log(temp)
         products.value = temp.data
         loading.value = false;
         totalRecords.value = 9999;
@@ -102,7 +98,6 @@ initFilters();
 const clearFilter = () => {
     initFilters();
 };
-
 </script>
 
 

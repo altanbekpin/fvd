@@ -106,6 +106,9 @@ import BlockViewer from './BlockViewer';
 
 import i18n from './locales/index'
 
+import store from './store'
+
+
 router.beforeEach(function(to, from, next) {
     window.scrollTo(0, 0);
     next();
@@ -115,7 +118,9 @@ router.beforeEach(function(to, from, next) {
 library.add(faUserSecret, faMicrophone, faFileAudio, faStop)
 
 
+
 const app = createApp(AppWrapper);
+app.use(store)
 
 app.config.globalProperties.$appState = reactive({ theme: 'lara-light-indigo', darkTheme: false });
 app.config.globalProperties.$media = reactive ({
@@ -226,5 +231,6 @@ app.component('TreeTable', TreeTable);
 app.component('TriStateCheckbox', TriStateCheckbox);
 
 app.component('BlockViewer', BlockViewer);
-
+// import * as Vue from 'vue'
+// console.log(Vue)
 app.mount('#app');

@@ -21,7 +21,7 @@
 			
 		</ul>
 		<button class="p-link layout-topbar-button" @click="$router.push('/auth')"><i class="pi pi-user"></i><span>Profile</span></button>
-
+		
 	</div>
 </template>
 
