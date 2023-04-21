@@ -63,6 +63,7 @@ export default {
         'password':this.password}).then(_response=>{ response = _response})//temp = response.data['access_token']})
         //const token = logged_as.data['access_token']
         temp = response.data['access_token']
+        
         //console.log(temp)
         await axios.get('http://127.0.0.1:5001/who_am_i/', { headers: { Authorization: `Bearer ${temp}` } }).then(response=>console.log(roles = response.data['roles']))
         console.log('who am i returns:')
@@ -70,12 +71,13 @@ export default {
 
             console.log('after asssigning response:')
             console.log(store.state.roles)
-            const temp = {
+            const data = {
                 email: this.email,
                 password: this.password,
-                roles: roles
+                roles: roles,
+                access_token: temp,
             };
-            store.commit('updateUser', temp);
+            store.commit('updateUser', data);
             console.log('outside of updateUser:')
             console.log(store.state.user)
             this.$router.push('/')

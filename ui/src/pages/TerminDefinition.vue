@@ -4,13 +4,13 @@
                 <Toolbar class="mb-4" style="border-color: white; background-color: white;" >
                 <template #start>
                         <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" @click="openNew" />
-                        <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />   
+                        <Button label="Delete" icon="pi pi-trash" severity="danger" @click="confirmDeleteSelected('delete')" :disabled="!selectedProducts || !selectedProducts.length" />   
                     
                 </template>
             </Toolbar>
             </div>
         
-        <DataTable :value="products" lazy v-model:filters="filters"  :rows="10" ref="dt" :loading="loading" dataKey="id"
+        <DataTable :value="products" lazy v-model:selection="selectedProducts"  :filters="filters"  :rows="10" ref="dt" :loading="loading" dataKey="id"
         :totalRecords="totalRecords"  filterDisplay="row"
         @page="onPage($event)" @sort="onSort($event)" @filter="onFilter($event)"
         :globalFilterFields="['first_column', 'second_column', 'third_column']" showGridlines paginator  tableStyle="min-width: 50rem">
@@ -26,6 +26,9 @@
             </template>
             <template #empty> Ешнәрсе табылмады. </template>
             <template #loading> Күте тұрыңыз. </template>
+            <div v-if="store.getters.getRoles.includes('admin')">
+                <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
+            </div>
             <Column field="name" header="Ұғым"></Column>
             <Column field="description" header="Анықтама"></Column>
             <Column field="examples" header="Мысал"></Column>
@@ -36,21 +39,21 @@
             
             <div class="field">
                 <label for="name">Ұғым</label>
-                <InputText id="name"  required="true" autofocus :class="{'p-invalid': submitted && !product.name}" />
-                <!-- <small class="p-error" v-if="submitted && !product.name">Name is required.</small> -->
+                <InputText id="name"  required="true" v-model="request.name.value" autofocus :class="{'p-invalid': submitted}" />
+                <small class="p-error" v-if="submitted.valueOf()">Толтыру маңызды.</small>
             </div>
             <div class="field">
                 <label for="description">Анықтама</label>
-                <Textarea id="description" required="true" rows="3" cols="20" />
+                <Textarea id="description" required="true" rows="3" cols="20" v-model="request.description.value" />
             </div>
             <div class="field">
                 <label for="description">Мысал</label>
-                <Textarea id="description" required="true" rows="3" cols="20" />
+                <Textarea id="description" required="true" rows="3" cols="20" v-model="request.example.value"/>
             </div>
            
             <template #footer>
-                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog"/>
-                <Button label="Save" icon="pi pi-check" text @click="saveProduct" />
+                <Button label="Бас тарту" icon="pi pi-times" text @click="hideDialog"/>
+                <Button label="Сақтау" icon="pi pi-check" text @click="saveProduct('create')" />
             </template>
         </Dialog>
     </div>
@@ -60,7 +63,10 @@
 import { ref, onMounted } from 'vue';
 import { FilterMatchMode } from 'primevue/api';
 import store from '../store.js';
+import { useToast } from 'primevue/usetoast';
 import axios from 'axios'
+//import { reactive } from 'vue';
+const toast = useToast();
 onMounted(() => {
     loading.value = true;
     console.log('roles:')
@@ -80,7 +86,37 @@ const productDialog = ref(false);
 const openNew = () => {
     productDialog.value = true;
 };
-
+const request = {
+  name: ref(''),
+  example: ref(''),
+  description: ref(''),
+  method: ref('')
+}
+const selectedProducts = ref();
+const saveProduct = async(method) => {
+    request.method.value = method
+    if(request.name.value === ''){
+        submitted.value = true;
+    }else{
+        await axios.post('http://127.0.0.1:5001/editPost/', request, { headers: { Authorization: `Bearer ${store.state.user.access_token}` } })
+        submitted.value = false;
+        productDialog.value = false
+        request.name.value = ''
+        request.description.value = ''
+        request.example.value = ''
+        toast.add({severity:'success', summary: 'Successful', detail: 'Product Created', life: 3000});
+    }
+}
+const confirmDeleteSelected = async(method) =>{
+    console.log(method)
+    const id = selectedProducts.value[0]['id']
+    const request = {
+        method: {_value: method},
+        id: id
+    }
+    console.log(request)
+    await axios.post('http://127.0.0.1:5001/editPost/', request, { headers: { Authorization: `Bearer ${store.state.user.access_token}` } })
+}
 const dt = ref();
 const loading = ref(false);
 const totalRecords = ref(0);
@@ -89,6 +125,7 @@ const lazyParams = ref({});
 const filters = ref({
     'global': {value: '', matchMode: 'contains'},
 });
+const submitted = ref(false);
 const loadLazyData = async() => {
     var temp = await axios.post('http://127.0.0.1:5001/classification/', lazyParams.value)
         products.value = temp.data
@@ -102,6 +139,9 @@ const onPage = (event) => {
 const onSort = (event) => {
     lazyParams.value = event;
     loadLazyData();
+};
+const hideDialog = () => {
+    productDialog.value = false;
 };
 const onFilter = () => {
     lazyParams.value.filters = filters.value ;

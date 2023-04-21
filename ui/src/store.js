@@ -10,7 +10,8 @@ const store = createStore({
     user: {
       email: '',
       password: '',
-      roles: []
+      roles: [],
+      access_token: ''
     }
   },
   mutations: {

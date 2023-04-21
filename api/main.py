@@ -158,12 +158,12 @@ def send_question():
 
     # question = request.POST['question']
     # lang = request.POST['language']
-    print(request.data.decode('utf-8'))
+    #print(request.data.decode('utf-8'))
     temp = json.loads(request.data.decode('utf-8'))
     
     question = temp['question']
-    print('#####################')
-    print(question)
+    #print('#####################')
+    #print(question)
     # lang = request.POST['language']
     lang = 'kz'
 
@@ -274,16 +274,11 @@ def get_classification():
     if data.get("page") != None:
         first = data.get("page")
     rows = data.get("rows")
-    print(data)
     cursor = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
     offset = first * rows  # вычисляем смещение
-    print(first)
-    print(rows)
-    print(offset)
     if data.get('filters').get("global").get("value") != None:
     
         search_text = data.get('filters').get("global").get("value") 
-        print(search_text)
         cursor.execute("SELECT * FROM termin WHERE name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
             ('%' + search_text + '%','%' + search_text + '%','%' + search_text + '%',rows,offset))
     else:
@@ -295,6 +290,38 @@ def get_classification():
 
 
     return rows
+
+@app.route('/editPost/', methods = ['POST'])
+@jwt_required()
+def edit_post():
+    print('edit_post')
+    results = UserRole.query.filter_by(user_id=current_user.id).with_entities(UserRole.role_id).all()
+    role_ids = [result[0] for result in results]
+    roles = []
+    for i in role_ids:
+        roles.append(Role.query.filter_by(role_id=i).one_or_none().name)
+    if not 'admin' in roles:
+        return jsonify("you don't have enough permission"), 500
+    data = request.json
+    print('PRINTING DATA')
+    print(data)
+
+    conn = get_db_connection()
+    method = data.get('method').get('_value')
+    cursor = conn.cursor()
+    if method == 'delete':
+        id = str(data.get('id'))
+        cursor.execute("DELETE FROM termin WHERE id = %s", (id,))
+    elif method == 'create':
+        name = data.get('name').get('_value')
+        descrpition = data.get('description').get('_value')
+        example = data.get('example').get('_value')
+        cursor.execute("INSERT INTO termin (name, description, examples) VALUES (%s, %s, %s)", (name, descrpition, example))
+    try:
+        conn.commit()
+    except Exception as e:
+        return jsonify(e), 500
+    return jsonify('successful'), 200
 
 
 if __name__ == "__main__":
