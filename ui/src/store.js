@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
+import Cookies from 'js-cookie'
 //import VuexPersistence from 'vuex-persist'
 // const vuexLocal = new VuexPersistence({
 //   storage: window.localStorage,
@@ -12,6 +13,10 @@ const store = createStore({
       password: '',
       roles: [],
       access_token: ''
+    },
+    ChosenTheme: {
+      theme: 'bootstrap4-light-blue',
+      dark: false
     }
   },
   mutations: {
@@ -22,6 +27,12 @@ const store = createStore({
       console.log('state after updating:')
       console.log(state.user)
       localStorage.setItem('user', JSON.stringify(data));
+    },
+    changeTheme(state, Theme){
+      Cookies.set('Theme', Theme, { expires: 7 })
+      state.ChosenTheme.theme = Theme.theme
+      state.ChosenTheme.dark = Theme.dark
+      console.log(state.ChosenTheme)
     }
     // Define your state mutations here
   },

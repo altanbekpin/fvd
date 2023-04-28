@@ -5,6 +5,7 @@ from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 CORS(app)
+
 # from models import LegacySchema
 # from flask import request
 # from flask import Flask, abort, jsonify

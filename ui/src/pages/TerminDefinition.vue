@@ -114,8 +114,8 @@ const confirmDeleteSelected = async(method) =>{
         method: {_value: method},
         id: id
     }
-    console.log(request)
     await axios.post('http://127.0.0.1:5001/editPost/', request, { headers: { Authorization: `Bearer ${store.state.user.access_token}` } })
+    console.log(request)
 }
 const dt = ref();
 const loading = ref(false);

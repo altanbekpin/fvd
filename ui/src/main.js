@@ -8,6 +8,7 @@ import './assets/demo/flags/flags.css';
 import { library } from '@fortawesome/fontawesome-svg-core'
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+//import Cookies from 'js-cookie'
 
 /* import specific icons */
 import { faUserSecret, faMicrophone, faFileAudio, faStop } from '@fortawesome/free-solid-svg-icons'
@@ -121,13 +122,17 @@ library.add(faUserSecret, faMicrophone, faFileAudio, faStop)
 
 const app = createApp(AppWrapper);
 const data = localStorage.getItem('myData');
+
 console.log('local storage: ')
 console.log(data)
 if (data) {
   store.commit('updateData', JSON.parse(data));
 }
 app.use(store)
-
+// if(false){
+//     console.log(Cookies.get('Theme'))
+//     store.commit('changeTheme', Cookies.get('Theme'))
+// }
 app.config.globalProperties.$appState = reactive({ theme: 'lara-light-indigo', darkTheme: false });
 app.config.globalProperties.$media = reactive ({
         recorder: null,

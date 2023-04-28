@@ -244,7 +244,7 @@
 
 <script>
 import EventBus from './AppEventBus';
-
+import store from './store'
 	export default {
 		props: {
 			layoutMode: {
@@ -282,7 +282,9 @@ import EventBus from './AppEventBus';
 			};
 
 			EventBus.on('theme-change', this.themeChangeListener);
-			EventBus.emit('theme-change', { theme: 'fluent-light', dark: false });
+			// EventBus.emit('theme-change', { theme: 'bootstrap4-light-blue', dark: false });
+			console.log(store.state.ChosenTheme.theme)
+			EventBus.emit('theme-change', store.state.ChosenTheme);
 		},
 		methods: {
 			toggleConfigurator(event) {
@@ -342,6 +344,8 @@ import EventBus from './AppEventBus';
 			changeTheme(event, theme, dark) {
 				EventBus.emit('theme-change', { theme: theme, dark: dark });
 				event.preventDefault();
+				console.log({ theme: theme, dark: dark })
+				store.commit('changeTheme', { theme: theme, dark: dark })
 			}
 		},
 		computed: {

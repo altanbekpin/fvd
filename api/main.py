@@ -11,10 +11,15 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import create_access_token, JWTManager, current_user, jwt_required
 import psycopg2.extras
 import pandas as pd
+from flask_cors import CORS
+
 
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@localhost/userdb'
+CORS(app)
+CORS(app, origins=['http://localhost:8080'])
+
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
 @jwt.user_identity_loader
@@ -69,26 +74,6 @@ def login():
         return jsonify("Wrong username or password"), 401
     access_token = create_access_token(identity=user)
     return jsonify(access_token=access_token)
-
-    # Connect to the PostgreSQL database
-    # conn = get_db_connection()
-    # cursor = conn.cursor()
-
-    # # Execute a SQL query to find the user and password combination
-    # cursor.execute("SELECT * FROM your_table_name WHERE email = %s AND password = %s", (email, password))
-    # rows = cursor.fetchall()
-
-    # # Close the cursor and connection
-    # cursor.close()
-    # conn.close()
-
-    # # Check if the user and password were found
-    # if len(rows) == 1:
-    #     # User and password combination was found
-    #     return jsonify({'message': 'Login successful'})
-    # else:
-    #     # User and password combination was not found
-    #     return jsonify({'message': 'Invalid username or password'}), 401
 
 @app.route("/who_am_i/", methods=["GET"])
 @jwt_required()
@@ -257,40 +242,17 @@ def download_file(file_id):
     print('download_file')
     cur = get_db_connection().cursor()
     cur.execute("SELECT path from legacy WHERE id = %s",[file_id])
+    print('SELECTING')
     results = cur.fetchall()
     for row in results:
         path = row[0]
     print(path)
     return send_file(path, as_attachment=True)
+# Мұрасы/Тіл ғылымы/Әліппелер/Сауат ашқыш. Ересектерге арналған әліппе. Семей. 1926.pdf
+# Мұрасы/Тіл ғылымы/Әліппелер
 # @app.after_request
 # def after_request(response):
 #   response.headers.add('Access-Control-Allow-Origin', '*')
-@app.route('/classification/', methods=['POST'])
-def get_classification():
-    conn = get_db_connection()
-    data = request.json
-
-    first = data.get("first")
-    if data.get("page") != None:
-        first = data.get("page")
-    rows = data.get("rows")
-    cursor = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
-    offset = first * rows  # вычисляем смещение
-    if data.get('filters').get("global").get("value") != None:
-    
-        search_text = data.get('filters').get("global").get("value") 
-        cursor.execute("SELECT * FROM termin WHERE name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
-            ('%' + search_text + '%','%' + search_text + '%','%' + search_text + '%',rows,offset))
-    else:
-        cursor.execute("SELECT * FROM termin LIMIT %s OFFSET %s",(rows,offset,))        
-    # Execute a SQL query to find the user and password combination
-
-    
-    rows = cursor.fetchall()
-
-
-    return rows
-
 @app.route('/editPost/', methods = ['POST'])
 @jwt_required()
 def edit_post():
@@ -322,6 +284,78 @@ def edit_post():
     except Exception as e:
         return jsonify(e), 500
     return jsonify('successful'), 200
+
+@app.route('/upload', methods=['POST', 'OPTIONS'])
+def upload_file():
+    if request.method == 'OPTIONS' or len(request.form.keys()) == 0:
+        headers = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        }
+        return ('', 204, headers)
+    data = request.files
+    print('###########################################')
+    print('formData: ', request.form.keys())
+    path_to_save = request.form.get('path_to_save')
+    parent_id = request.form.get('parent_id')
+    
+
+    for key in data.keys():
+        file_storage = data.get(key)
+        #filename = file_storage.filename
+        content_type = file_storage.content_type
+        print('File object', data)
+        print('path to save: ', path_to_save)
+        print('parent_id: ', parent_id)
+        path_to_save = path_to_save
+        content_type = content_type.split("/")[1]
+        try:
+            #data[key].save(f'./{path_to_save}/' + filename)
+            file_storage.filename = key
+            file_storage.save(f'./{path_to_save}/' + key + '.' + content_type) 
+            db = get_db_connection()
+            cur = db.cursor()
+            cur.execute("INSERT INTO legacy (id, name, path, parent_id, is_file) VALUES (%s, %s, %s, %s, %s);", (101, key, path_to_save + "/" + file_storage.filename + '.' + content_type, parent_id, 1))
+            print(cur.rowcount)
+            db.commit()
+            cur.close()
+            db.close()
+        except Exception as e:
+            print(e)
+            return 'File uploading failed', 400
+        print(f"File {file_storage.filename} with content type {content_type} uploaded with key '{key}'")
+    print('###########################################')
+    return 'File uploaded successfully'
+# @app.route('/justPost', methods = ['POST'])
+# def justPost():
+#     return 'success'
+@app.route('/classification/', methods=['POST'])
+def get_classification():
+    conn = get_db_connection()
+    data = request.json
+
+    first = data.get("first")
+    if data.get("page") != None:
+        first = data.get("page")
+    rows = data.get("rows")
+    cursor = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+    offset = first * rows  # вычисляем смещение
+    if data.get('filters').get("global").get("value") != None:
+    
+        search_text = data.get('filters').get("global").get("value") 
+        cursor.execute("SELECT * FROM termin WHERE name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
+            ('%' + search_text + '%','%' + search_text + '%','%' + search_text + '%',rows,offset))
+    else:
+        cursor.execute("SELECT * FROM termin LIMIT %s OFFSET %s",(rows,offset,))        
+    # Execute a SQL query to find the user and password combination
+
+    
+    rows = cursor.fetchall()
+
+
+    return rows
+
 
 
 if __name__ == "__main__":

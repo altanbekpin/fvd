@@ -14,6 +14,11 @@ const routes = [
 
             },
             {
+                path: 'synomizer',
+                name: 'synomizer',
+                component: () => import('./pages/Synomizer.vue')
+            },
+            {
                 path: 'intelect',
                 name: 'intelect',
                 component: ()=> import('./pages/Intelect.vue')

@@ -9,6 +9,6 @@ export const  AhmetService = {
     },
     getFile(fileID) {
         window.location.href = AHMET_API + "legacy/download/" + fileID
-
+        console.log(fileID)
     }
 }

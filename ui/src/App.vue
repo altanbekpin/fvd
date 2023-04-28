@@ -36,7 +36,10 @@ export default {
             mobileMenuActive: false,
             menu : [
                 {
-                    label: 'Синонимайзер', icon: 'pi pi-fw pi-home'
+                    label: 'Синонимайзер', icon: 'pi pi-fw pi-home',
+                    items: [
+                        {label: "Синомайзинг", icon: 'pi pi-cloud', to: "/synomizer"},
+                    ]
                 },
                 {
                     label: 'Анықтамалық'
@@ -214,6 +217,8 @@ export default {
         },
         onMenuItemClick(event) {
             if (event.item && !event.item.items) {
+                console.log('Menu Item clicked:')
+                console.log(event)
                 this.overlayMenuActive = false;
                 this.mobileMenuActive = false;
             }
