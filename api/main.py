@@ -12,6 +12,7 @@ from flask_jwt_extended import create_access_token, JWTManager, current_user, jw
 import psycopg2.extras
 import pandas as pd
 from flask_cors import CORS
+import os
 
 
 
@@ -284,6 +285,45 @@ def edit_post():
     except Exception as e:
         return jsonify(e), 500
     return jsonify('successful'), 200
+
+# @app.route(', methods=['DELETE'])
+# def delete(row_id):
+#     cur = conn.cursor()
+#     cur.execute('DELETE FROM your_table_name WHERE id = %s RETURNING *', (row_id,))
+#     deleted_row = cur.fetchone()
+#     conn.commit()
+#     cur.close()
+#     return jsonify(deleted_row)
+
+@app.route('/delete/file', methods=['POST'])
+def delete():
+    fileID = request.form.get('fileID')
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+        cur.execute('DELETE FROM legacy WHERE id = %s RETURNING *;', (fileID,))
+        deleted_row = cur.fetchone()
+        path = deleted_row['path']
+        print('deleted row:', deleted_row)
+        print('path: ',path)
+        print(fileID)
+        if os.path.exists(path):
+            print('file is found')
+            os.remove(path)
+            conn.commit()
+            return 'successfully deleted', 200
+        else:
+            print('file is not found')
+            return 'failed', 404
+    except Exception as e:
+        print(e)
+        return 'error', 400
+    # path_to_delete = request.form.get('path_to_delete')
+    # if os.path.exists('api/' + path_to_delete):
+    #     return 'exist', 200
+    # else:
+    #     return 'not found', 404
+
 
 @app.route('/upload', methods=['POST', 'OPTIONS'])
 def upload_file():

@@ -13,19 +13,29 @@
     </template>
             <Column  headerStyle="width:3rem" :expander="true" >
             </Column>
-            <Column :field="label" >
+            <Column :field="label">
                 <template #body="slotProps">
                     <i :class="slotProps.node.icon"/>
                     <span class="pl-2">{{slotProps.node.label}}</span>
                 </template>
             </Column>
-            <Column  headerStyle="width:4rem">
+            <Column  headerStyle="width:10rem">
                 <template #body="slotProps">
-                    <Button v-if="slotProps.node.is_file" type="button" icon="pi pi-download" @click="getFile(slotProps.node.key)" rounded/>
+                    <div v-if="slotProps.node.is_file && store.state.user.roles.includes('admin')" class="flex flex-wrap gap-2" >
+                        <!-- style="margin-right: 300px;" -->
+                        <!-- :style="{width: '10vw', marginRight: '10px'}"  -->
+                        <Button  type="button" icon="pi pi-download" @click="getFile(slotProps.node.key)"  rounded/>
+                        <div v-if="store.state.user.roles.includes('admin')">
+                            <Button  type="button" icon="pi pi-trash" @click="setTrue(slotProps.node.key)" rounded/>
+                        </div>
+                    </div>
+                   <div v-else-if="slotProps.node.is_file" :style="{marginLeft: '6vw'}">
+                     <Button  type="button" icon="pi pi-download" @click="getFile(slotProps.node.key)" rounded/>
+                   </div>
                     <Button v-else-if="store.state.user.roles.includes('admin')" type="button" icon="pi pi-plus" @click="getFolder(slotProps.node)"></Button>
                 </template>
             </Column>
-
+            
             
         </TreeTable>
         <Dialog v-model:visible="visible" modal header="Файл қосу" :style="{ width: '60vw' }">
@@ -43,6 +53,12 @@
                     </form>
                 </div>
         </Dialog>
+        <Dialog v-model:visible="showDialog" modal header="Өшіруге сенімдісіз бе?" :style="{ width: '30vw' }">
+            <div class="row">
+                <Button style="margin-right: 20px;" @click="setFalse">Артқа қайту</Button>
+                <Button @click="deleteFile()">Өшіру</Button>
+            </div>
+        </Dialog>
     </div>
 </template>
 
@@ -54,9 +70,11 @@ import store from '../store.js';
 const nodes = ref(null);
 const loading = ref(false);
 const visible = ref(false);
+const showDialog = ref(false);
 const FileName = ref('');
 const path_to_save = ref('')
 const form_Data = ref(new FormData());
+const fileID = ref('');
 const parent_id = ref('');
 const handleFileUpload = (event) =>{
   console.log(event)
@@ -77,6 +95,7 @@ const handleFileUpload = (event) =>{
   .catch(error => {
     console.log('There"s a issue:',error)
   });
+  FileName.value = ''
 }
 
 onMounted(() => {
@@ -121,6 +140,17 @@ const onNodeExpand = (node) => {
 const getFile = (fileID) => {
   AhmetService.getFile(fileID)
 };
+const deleteFile = ()=>{
+    const formData = new FormData()
+    console.log(fileID.value)
+    formData.append('fileID', fileID.value)
+    fetch('http://127.0.0.1:5001/delete/file', {
+    method: 'POST',
+    //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
+    body: formData
+  })
+  setFalse()
+}
 const getFolder = (slotProps) => {
     visible.value = true
     path_to_save.value = slotProps.data
@@ -128,6 +158,13 @@ const getFolder = (slotProps) => {
     form_Data.value.append('path_to_save', path_to_save.value)
     console.log(path_to_save.value)
     console.log(slotProps)
+}
+const setTrue = (fileID_)=>{
+    fileID.value = fileID_;
+    showDialog.value = true;
+}
+const setFalse = ()=>{
+    showDialog.value = false;
 }
 
 </script>
