@@ -231,6 +231,7 @@ def get_legacy_records(parent_id):
 
 
         results = cur.fetchall()
+        print(results)
         legacies = jsonify(results)
         return legacies
 
@@ -413,6 +414,21 @@ def get_classification():
 
     return rows
 
+@app.route('/search/book/', methods=['POST'])
+def searchBook():
+    cur = get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+    data = request.json['_rawValue']['global']
+    print(data)
+    cur.execute("SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file FROM tag t JOIN tag_legacy tl ON t.id = tl.tag_id JOIN legacy l ON l.id = tl.legacy_id WHERE t.name LIKE %s;", ('%' + data + '%',))
+    results = cur.fetchall()
+    print(results)
+    legacies = jsonify(results)
+    return legacies, 200
+# SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file
+# FROM tag t
+# JOIN tag_legacy tl ON t.id = tl.tag_id
+# JOIN legacy l ON l.id = tl.legacy_id
+# WHERE t.name = 'Magzhan';
 
 
 if __name__ == "__main__":

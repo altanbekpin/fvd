@@ -6,9 +6,15 @@
             <div class="text-left">
             Атауы
         </div>
-        <div style="margin-left: 900px;">
+        <!-- <div style="margin-left: 900px;">
             <Button v-if="store.state.user.roles.includes('admin')" type="button" icon="pi pi-pencil"></Button>
-        </div>
+        </div> -->
+        <div class="text-right" style="margin-left: 700px;">
+                    <div class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <InputText v-model=filters.global placeholder="Іздеу" @keyup="onFilter()" />
+                    </div>
+                </div>
         </div>
     </template>
             <Column  headerStyle="width:3rem" :expander="true" >
@@ -75,6 +81,7 @@
 import { ref, onMounted } from 'vue';
 import { AhmetService } from '@/service/AhmetService';
 import store from '../store.js';
+import axios from 'axios'
 const nodes = ref(null);
 const loading = ref(false);
 const visible = ref(false);
@@ -85,6 +92,43 @@ const form_Data = ref(new FormData());
 const fileID = ref('');
 const parent_id = ref('');
 const changeDialog = ref(false);
+const globalSearch = ref('')
+const filters = ref({
+    'global' : globalSearch.value
+});
+// const lazyParams = ref({})
+
+const onFilter = async()=>{
+    if(filters.value['global'] == ""){
+        loading.value =true
+    AhmetService.getTreeTableNodes().then((data) => {
+        console.log(data)
+        loading.value = false
+        let legacies = data.data;
+        for (var i=0;legacies.length; i++) {
+            legacies[i].key = String(legacies[i].key)
+            if(legacies[i].is_file  === 0) {
+                legacies[i].leaf = false
+            }
+            nodes.value = legacies
+        }
+    });
+    }
+    console.log('global value: ', filters.value['global'])
+    loading.value = true
+    const temp = await axios.post('http://127.0.0.1:5001/search/book/', filters);
+    console.log('temp: ',temp)
+        loading.value = false
+        let legacies = temp.data;
+        for (var i=0;legacies.length; i++) {
+            legacies[i].key = String(legacies[i].key)
+            if(legacies[i].is_file  === 0) {
+                legacies[i].leaf = false
+            }
+            nodes.value = legacies
+    }
+    console.log('nodes.value: ', nodes.value)
+}
 
 const handleFileUpload = (event) =>{
   console.log(event)
@@ -129,6 +173,7 @@ onMounted(() => {
 //       console.log('Uploaded file:', file);
 //       // Do something with the file here
 // };
+
 const onNodeExpand = (node) => {
     loading.value = true
     AhmetService.getTreeTableNodes(node.key).then(data => {
