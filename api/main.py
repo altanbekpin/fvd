@@ -324,6 +324,22 @@ def delete():
     # else:
     #     return 'not found', 404
 
+@app.route('/change/file/name', methods=['POST'])
+def changeFileName():
+    fileID = request.form.get('fileID')
+    fileName = request.form.get('FileName')
+    print(fileID)
+    print(fileName)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('UPDATE legacy SET name = %s WHERE id = %s', (fileName, fileID))
+        conn.commit()
+    except Exception as e:
+        print(e)
+        return 'failed', 404
+    return 'success', 200
+
 
 @app.route('/upload', methods=['POST', 'OPTIONS'])
 def upload_file():

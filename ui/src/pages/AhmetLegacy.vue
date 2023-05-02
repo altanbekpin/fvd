@@ -26,7 +26,8 @@
                         <!-- :style="{width: '10vw', marginRight: '10px'}"  -->
                         <Button  type="button" icon="pi pi-download" @click="getFile(slotProps.node.key)"  rounded/>
                         <div v-if="store.state.user.roles.includes('admin')">
-                            <Button  type="button" icon="pi pi-trash" @click="setTrue(slotProps.node.key)" rounded/>
+                            <Button  type="button" icon="pi pi-trash" @click="setTrue(slotProps.node.key)" style="margin-right: 5px;" rounded/>
+                            <Button  type="button" icon="pi pi-pencil" @click="setChangeDialog(slotProps.node.key)" rounded/>
                         </div>
                     </div>
                    <div v-else-if="slotProps.node.is_file" :style="{marginLeft: '6vw'}">
@@ -59,6 +60,13 @@
                 <Button @click="deleteFile()">Өшіру</Button>
             </div>
         </Dialog>
+        <Dialog v-model:visible="changeDialog" modal header="Файлдың атын өзгерту?" :style="{ width: '30vw' }">
+            <InputText v-model="FileName" placeholder="Файлдың атын енгізіңіз" style="width: 220px; margin-bottom: 10px;" ></InputText>
+            <div class="row">
+                <Button style="margin-right: 20px;" @click="setChangeDialog">Артқа қайту</Button>
+                <Button @click="changeFileName">Өзгерту</Button>
+            </div>
+        </Dialog>
     </div>
 </template>
 
@@ -76,6 +84,8 @@ const path_to_save = ref('')
 const form_Data = ref(new FormData());
 const fileID = ref('');
 const parent_id = ref('');
+const changeDialog = ref(false);
+
 const handleFileUpload = (event) =>{
   console.log(event)
   const file = event.files[0];
@@ -151,6 +161,19 @@ const deleteFile = ()=>{
   })
   setFalse()
 }
+const changeFileName = ()=>{
+    const formData = new FormData()
+    console.log(fileID.value)
+    formData.append('fileID', fileID.value)
+    formData.append('FileName', FileName.value)
+    fetch('http://127.0.0.1:5001/change/file/name', {
+    method: 'POST',
+    //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
+    body: formData
+  })
+  FileName.value = ''
+  changeDialog.value = !changeDialog.value
+}
 const getFolder = (slotProps) => {
     visible.value = true
     path_to_save.value = slotProps.data
@@ -166,7 +189,10 @@ const setTrue = (fileID_)=>{
 const setFalse = ()=>{
     showDialog.value = false;
 }
-
+const setChangeDialog = (fileID_) =>{
+    fileID.value = fileID_
+    changeDialog.value = !changeDialog.value
+}
 </script>
 <style setup>
 .row{
