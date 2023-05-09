@@ -56,6 +56,7 @@ export default {
                 {
                     label: 'Ахметтану',
                     items: [
+                        {label: "Тұлғасы", icon: 'pi pi-fw pi-align-justify', to: "/"},
                         {label: "Мұрасы", icon: 'pi pi-fw pi-briefcase', to: "/legacy"},
                         {label: "Тіл құрал", icon: 'pi pi-fw pi-file', to: '/intelect'},
                         // {label: "Оқулық, оқу құралдары", icon: 'pi pi-fw pi-book'},

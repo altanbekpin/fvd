@@ -14,19 +14,31 @@
         </template>
         <template #content>
             <ul>
-            <li>АҒАРТУШЫ, ҰЛТ ҰСТАЗЫ, ҚОҒАМ ҚАЙРАТКЕРІ</li>
-            <li>ТІЛТАНУШЫ, ТҮРКІТАНУШЫ, ТЕРМИНТАНУШЫ</li>
-            <li>ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ</li>
-            <li>ӘДЕБИЕТТАНУШЫ, ФОЛЬКЛОРТАНУШЫ, ӨНЕРТАНУШЫ</li>
-            <li>АҚЫН, ЖАЗУШЫ, ПУБЛИЦИСТ, АУДАРМАШЫ</li>
-            <li>ӘДІСКЕР, ПЕДАГОГ, ПСИХОЛОГ</li>
-            <li>ЗАҢГЕР, САЯСАТКЕР, ДЕМОГРАФ, ТАРИХШЫ</li>
-        </ul>
+                <li><span class="button">АҒАРТУШЫ</span>, <span class="button">ҰЛТ ҰСТАЗЫ</span>, <span class="button">ҚОҒАМ ҚАЙРАТКЕРІ</span></li>
+                <li><span class="button">ТІЛТАНУШЫ</span>, <span class="button">ТҮРКІТАНУШЫ</span>, <span class="button">ТЕРМИНТАНУШЫ</span></li>
+                <li><span class="button">ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ</span></li>
+                <li><span class="button">ӘДЕБИЕТТАНУШЫ</span>, <span class="button">ФОЛЬКЛОРТАНУШЫ</span>, <span class="button">ӨНЕРТАНУШЫ</span></li>
+                <li><span class="button">АҚЫН</span>, <span class="button">ЖАЗУШЫ</span>, <span class="button">ПУБЛИЦИСТ</span>, <span class="button">АУДАРМАШЫ</span></li>
+                <li><span class="button">ӘДІСКЕР</span>, <span class="button">ПЕДАГОГ</span>, <span class="button">ПСИХОЛОГ</span></li>
+                <li><span class="button">ЗАҢГЕР</span>, <span class="button">САЯСАТКЕР</span>, <span class="button">ДЕМОГРАФ</span>, <span class="button">ТАРИХШЫ</span></li>
+            </ul>
+    <div class="card">
+        <div class="row" style="justify-content: space-between;">
+            <!-- <Button  type="button" icon="pi pi-file" @click="searchBook" rounded/> -->
+            <div class="row">
+                <i class="pi pi-file" ></i>
+            <div style="margin-left: 15px;">
+                {{ this.label }}
+            </div>
+            </div>
+            <Button  type="button" icon="pi pi-download" @click="searchBook" rounded/>
+        </div>
+    </div>
+            
         </template>
     </Card>
     </div> 
-        
-    
+    <!-- #optiongroup="slotProps" -->
 </template>
 
 
@@ -35,9 +47,27 @@ import vad from "voice-activity-detection";
 import axios from 'axios'
 import { getWaveBlob } from "./webm-to-wav-converter"
 import { faWindowRestore } from "@fortawesome/free-solid-svg-icons";
-
+import { AhmetService } from '@/service/AhmetService';
 export default {
   name: 'AudioSpeechRecognition',
+  mounted() {
+    //AhmetService.getFile(4)
+    console.log('mounted')
+    // Select the buttons and add event listeners
+    const buttons = document.querySelectorAll('.button');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        this.selectedWord = button.innerText
+        console.log(`${this.selectedWord} button clicked`);
+        axios.post('http://127.0.0.1:5001/search/book/file/', {'global':this.selectedWord}).then(resp =>  {
+            console.log(`response ${resp.data[0].label} `)
+            this.label = resp.data[0].label
+            this.key = resp.data[0].key
+        })
+       
+      });
+    });
+  },
   data() {
         return  {
         vad: vad,
@@ -56,10 +86,18 @@ export default {
         filename: this.$t('common.select'), 
         audioFile: null,
         OntNames: [],
-        selectedOnto: ''
+        selectedOnto: '',
+        selectedWord: '',
+        response: null,
+        label: 'Баталар.pdf',
+        data: '',
+        key: 4
     }
   },
   methods: {
+    searchBook(){
+        AhmetService.getFile(this.key)
+    },
     getJson(){
         axios.get('http://127.0.0.1:5001/getontology/').then(response => (this.OntNames =response.data))
     },
@@ -219,6 +257,13 @@ export default {
 }
 </script>
 <style scoped>
+.row{
+  display: flex;
+  align-items: center;
+}
+.row div{
+  margin-right: 10px;
+}
  .custom-file-upload {
     border: 1px solid #ccc;
     display: inline-block;
@@ -226,4 +271,26 @@ export default {
     cursor: pointer;
     width: inherit;
 }
+.button {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+    background-color: #fff;
+    text-decoration: none;
+  }
+  /* Style the links when hovered */
+  .button:hover {
+    background-color: #f5f5f5;
+    border-color: #adadad;
+  }
 </style>

@@ -424,6 +424,38 @@ def searchBook():
     print(results)
     legacies = jsonify(results)
     return legacies, 200
+
+@app.route('/search/book/file/', methods=['POST'])
+def searchFile():
+    cur = get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+    data = request.json['global']
+    print(data)
+    cur.execute("SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file FROM tag t JOIN tag_legacy tl ON t.id = tl.tag_id JOIN legacy l ON l.id = tl.legacy_id WHERE t.name ILIKE %s;", ('%' + data + '%',))
+    results = cur.fetchall()
+    print(results)
+    legacies = jsonify(results)
+    return legacies, 200
+
+@app.route('/word/synomize/', methods=['POST'])
+def synomizing():
+    cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    data = request.json['value']
+    print(data)
+    cur.execute("SELECT s.synonym, z.meaning, z.words_family, z.words FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE REPLACE(z.words, ' ', '') LIKE %s;", ('%' + data + '%',))
+    found_data = cur.fetchone()
+    print(found_data)
+    print(found_data.get('words'))
+    word = found_data.get('words')
+    cur.execute("SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
+    # cur.execute("")
+    synonyms = cur.fetchall()
+    print('synonym that was found: ',synonyms)
+    cur.execute("SELECT s.paraphrase FROM paraphrases s INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
+    paraphrase = cur.fetchall()
+    print('paraphrase: ', paraphrase)
+    return jsonify([found_data, synonyms, paraphrase]), 200
+
+
 # SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file
 # FROM tag t
 # JOIN tag_legacy tl ON t.id = tl.tag_id
