@@ -441,7 +441,7 @@ def synomizing():
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     data = request.json['value']
     print(data)
-    cur.execute("SELECT s.synonym, z.meaning, z.words_family, z.words FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE REPLACE(z.words, ' ', '') LIKE %s;", ('%' + data + '%',))
+    cur.execute("SELECT s.synonym, z.meaning, z.words_family,z.id, z.words FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE REPLACE(z.words, ' ', '') LIKE %s;", ('%' + data + '%',))
     found_data = cur.fetchone()
     print(found_data)
     print(found_data.get('words'))
@@ -455,6 +455,21 @@ def synomizing():
     print('paraphrase: ', paraphrase)
     return jsonify([found_data, synonyms, paraphrase]), 200
 
+@app.route('/add/synonym/', methods=['POST'])
+def addSynonym():
+    new_synonym= request.json['synonym']
+    word_id = request.json['word_id']
+    try:
+        cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id;", (new_synonym,))
+        new_synonym_id = cur.fetchone().get('id')
+        print('new synonym id is', new_synonym_id)
+        print('word_id is ', word_id)
+        cur.execute('INSERT INTO synonym_word (word_id, synonym_id) VALUES (%s, %s);', (word_id, new_synonym_id))
+    except Exception as e:
+        print(e)
+        return 'failed in inserting into database', 400
+    return 'success', 200
 
 # SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file
 # FROM tag t

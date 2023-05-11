@@ -38,19 +38,26 @@
                         <div>
                             Сөз табы:
                         </div>
-                        <Listbox v-model="family" :options="families" optionLabel="family" class="w-full md:w-14rem" style="margin-left: 26.5px;"/>
+                        <Listbox v-model="family" :options="families" optionLabel="family" class="w-full md:w-14rem" style="margin-left: 26.5px;" listStyle="max-height:100px"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
                             Синонимдері: 
                         </div>
-                        <Listbox v-model="j" :options="synonyms" optionLabel="synonym" class="w-full md:w-14rem" />
+                        <Listbox v-model="j" :options="synonyms" optionLabel="synonym" class="w-full md:w-14rem" listStyle="max-height:100px"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
                             Перифраза: 
                         </div>
-                        <Listbox v-model="j" :options="paraphrases" optionLabel="paraphrase" class="w-full md:w-14rem" style="margin-left: 10px;"/>
+                        <Listbox v-model="j" :options="paraphrases" optionLabel="paraphrase" class="w-full md:w-14rem" style="margin-left: 10px;" listStyle="max-height:100px"/>
+                    </div>
+                    <div class="card" style="height: 70px; margin-top: 10px;">
+                        <div class="row">
+                            <InputText type="text" v-model="synonymInput" style="margin-bottom: 100px; width:200px;" placeholder="Жаңа синоним қосу"/>
+                            <Button label="Қосу" style="margin-bottom: 100px; margin-left: 10px;" @click="addSynonym"></Button>
+                            <Button label="Жабу" style="margin-bottom: 100px; margin-left: 10px;"></Button>
+                        </div>
                     </div>
                     </div>
                 </div>
@@ -73,19 +80,19 @@
                         <div>
                             Сөз табы:
                         </div>
-                        <Listbox v-model="family" :options="families" optionLabel="family" class="w-full md:w-14rem" style="margin-left: 26.5px;"/>
+                        <Listbox v-model="family" :options="families" optionLabel="family" class="w-full md:w-14rem" style="margin-left: 26.5px;" listStyle="max-height:100px"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
                             синонимдері: 
                         </div>
-                        <Listbox v-model="j" :options="synonyms" optionLabel="synonym" class="w-full md:w-14rem" />
+                        <Listbox v-model="j" :options="synonyms" optionLabel="synonym" class="w-full md:w-14rem" listStyle="max-height:100px"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
                             Перифраза: 
                         </div>
-                        <Listbox v-model="j" :options="paraphrases" optionLabel="paraphrase" class="w-full md:w-14rem" style="margin-left: 10px;"/>
+                        <Listbox v-model="j" :options="paraphrases" optionLabel="paraphrase" class="w-full md:w-14rem" style="margin-left: 10px;" listStyle="max-height:100px"/>
                     </div>
                     </div>
                 </div>
@@ -103,16 +110,20 @@ const families = ref([
     {family: 'сын есім'},
     {family: 'сан есім'}
 ])
+const synonymInput = ref('')
 const words = ref('')
 const family = ref({family: 'зат есім'})
 const synonyms = ref([{synonym: 'Табылмады'}])
 const paraphrases = ref([{paraphrase: 'Табылмады'}])
+const word_id = ref('')
 const onChange = async(event)=>{
     var response = {};
     await axios.post('http://127.0.0.1:5001/word/synomize/', {'value': event.target.value}).then(_ => console.log(response = _.data))
     console.log(event.target.value)
+    console.log('response word in console: ',response[0])
     if(response != null){
         meaning.value = response[0]['meaning']
+        word_id.value = response[0]['id']
         family.value = {family: response[0]['words_family']}
         words.value = response[0]['words']
         synonyms.value = response[1]
@@ -122,6 +133,12 @@ const onChange = async(event)=>{
         console.log("NULL")
         meaning.value = ''
     }
+}
+const addSynonym = ()=>{
+    if(synonymInput.value == ''){
+        return;
+    }
+    axios.post('http://127.0.0.1:5001/add/synonym/', {'synonym': synonymInput.value, 'word_id':word_id.value})
 }
 </script>
 <style setup>
