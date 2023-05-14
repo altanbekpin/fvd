@@ -362,6 +362,7 @@ def autoPostTag(request):
     #     print("IS NOT POST")
     sentences = st(text) # тексттен сөйлемдерді бөліп аламыз
     stcs = Lemms.get_kaz_lemms(Lemms,sentences)
+    print(stcs)
     return HttpResponse(json.dumps(stcs), content_type="application/json")
 
 def addAutoPostWord(request):

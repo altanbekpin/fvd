@@ -13,10 +13,10 @@
                         <Textarea rows="15" cols="55" v-model="inputWords"/>
                         <div class="row texts" style="margin-top: 30px;">
                             <div>Символдар саны = {{ inputWords.length }}</div>
-                            <div>Ауыстырылған сөздер саны = 0</div>
-                            <Button label="Өңдеу" style="margin-left: 80px;"/>
+                            <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
+                            <Button label="Өңдеу" style="margin-left: 80px;" @click="send_to_synomize"/>
                     </div>
-                    <Textarea style="width: 446px; height: 112px; margin-top: 20px;" readonly="true"/>
+                    <Textarea v-model="synomized_words" style="width: 446px; height: 112px; margin-top: 20px;" readonly="true"/>
                 </div>
 
                 </div>
@@ -94,6 +94,13 @@
                         </div>
                         <Listbox v-model="j" :options="paraphrases" optionLabel="paraphrase" class="w-full md:w-14rem" style="margin-left: 10px;" listStyle="max-height:100px"/>
                     </div>
+                    <div class="card" style="height: 70px; margin-top: 10px;">
+                        <div class="row">
+                            <InputText type="text" v-model="synonymInput" style="margin-bottom: 100px; width:200px;" placeholder="Жаңа синоним қосу"/>
+                            <Button label="Қосу" style="margin-bottom: 100px; margin-left: 10px;" @click="addSynonym"></Button>
+                            <Button label="Жабу" style="margin-bottom: 100px; margin-left: 10px;"></Button>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -103,14 +110,20 @@ import { ref, } from 'vue';
 import axios from 'axios'
 const word = ref('');
 const inputWords = ref('');
-const meaning = ref('')
+const meaning = ref('');
+const synomized_words = ref('')
 const families = ref([
     {family: 'етістік'},
     {family: 'зат есім'},
     {family: 'сын есім'},
     {family: 'сан есім'}
 ])
+const send_to_synomize = async()=>{
+    await axios.post('http://127.0.0.1:5001/search/word/', {'value' : inputWords.value}).then(response =>{console.log(response);  synomized_words.value=response.data[0]; synomized_counter.value = response.data[1]})
+   
+}
 const synonymInput = ref('')
+const synomized_counter = ref('0')
 const words = ref('')
 const family = ref({family: 'зат есім'})
 const synonyms = ref([{synonym: 'Табылмады'}])

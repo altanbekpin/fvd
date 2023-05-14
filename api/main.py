@@ -13,6 +13,9 @@ import psycopg2.extras
 import pandas as pd
 from flask_cors import CORS
 import os
+import re
+from morphology_api.morphology import Lemms
+from nltk.tokenize import sent_tokenize as st
 
 
 
@@ -436,6 +439,8 @@ def searchFile():
     legacies = jsonify(results)
     return legacies, 200
 
+
+
 @app.route('/word/synomize/', methods=['POST'])
 def synomizing():
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -476,19 +481,105 @@ def addSynonym():
 # JOIN tag_legacy tl ON t.id = tl.tag_id
 # JOIN legacy l ON l.id = tl.legacy_id
 # WHERE t.name = 'Magzhan';
+def findsyn(word, synomized_count):
+    print('word that gives ', word)
+    cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE REPLACE(z.words, ' ', '') = %s;", (word,))#LOWER(z.words)
+    print("#################################################")
+    synonym = cur.fetchone()
+    if synonym == None:
+        return [word, synomized_count]
+    print(synonym)
+    print("#################################################")
+    synomized_count += 1
+    return [synonym.get('synonym'), synomized_count]
+
+@app.route('/search/word/', methods=['POST'])
+def searchWord():
+    synomized_count = 0
+    data = request.json['value']
+    sentences = st(data) # тексттен сөйлемдерді бөліп аламыз
+    stcs = Lemms.get_kaz_lemms(Lemms,sentences)
+    print('stcs are: ', stcs)
+    words = re.findall(r"[\w']+|[.,!?; ]", data)
+    print(words)
+    output_words = []
+    for word in words:
+        if word not in [",", ".", "!", "?", ";"]:
+            translated_word, synomized_count = findsyn(word, synomized_count)
+            sentences = st(translated_word) # тексттен сөйлемдерді бөліп аламыз
+            stcs = Lemms.get_kaz_lemms(Lemms,sentences)
+            print('stcs are: ', stcs)
+            # if isinstance(stcs[0][0][1], str) or not stcs == []:
+            if (not (len(stcs) == 0)) and (len(stcs[0][0]) > 2):
+                print('stcs are: ', stcs[0][0][2])
+                if len(stcs[0][0][2]) == 0:
+                    translated_word = translated_word + "(" + stcs[0][0][3] +  ")"#"," + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +
+                else:
+                    translated_word = translated_word + "(" + stcs[0][0][3] + ", " + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +")"
+            output_words.append(translated_word) 
+            # if word != " ":
+            #     output_words.append(word[len(word)-1])
+        else:
+            output_words.append(word)
+    print('output_words: ', output_words)
+    output_string = "".join(output_words)
+    print(output_string)
+    return jsonify([output_string, synomized_count]), 200
+
+# @app.route('/autoPostTag/', methods=['POST'])
+# def autoPostTag():
+#     response = {}
+#     res = ""
+#     text = request
+#     # if (request.method == 'POST'):
+#     #     print("POST")
+#     # else:
+#     #     print("IS NOT POST")
+#     sentences = st(text) # тексттен сөйлемдерді бөліп аламыз
+#     stcs = Lemms.get_kaz_lemms(Lemms,sentences)
+#     return 'sucess', 200
+#     # return HttpResponse(json.dumps(stcs), content_type="application/json")
 
 
+
+#!/usr/bin/env python
+# """Django's command-line utility for administrative tasks."""
+# import nltk
+# # import os
+# import sys
+# import ssl
+# #from editor.models import Singleton
+
+# def main():
+#     try:
+#         _create_unverified_https_context = ssl._create_unverified_context
+#     except AttributeError:
+#         pass
+#     else:
+#         ssl._create_default_https_context = _create_unverified_https_context
+
+#     nltk.download()
+#     nltk.download('punkt')
+#     nltk.download('wordnet')
+#     nltk.download('omw')
+#     # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'thesaurus.settings')
+#     try:
+#         from django.core.management import execute_from_command_line
+#     except ImportError as exc:
+#         raise ImportError(
+#             "Hey From Altosh Couldn't import Django. Are you sure it's installed and "
+#             "available on your PYTHONPATH environment variable? Did you "
+#             "forget to activate a virtual environment?"
+#         ) from exc
+
+#     execute_from_command_line(sys.argv)
 if __name__ == "__main__":
+    # main()
     from models import MyOwlReady
     s = MyOwlReady() ## class initialized, but object not created
     #print("Object created", MyOwlReady.getInstance()) # Object gets created here
     config.init_conf()
     app.run(port=5001, debug=True)    
-
-
-
-
-
-
 
 
