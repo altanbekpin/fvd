@@ -19,6 +19,16 @@ import json
 import re
 import sqlite3
 from .word import Word
+import psycopg2
+
+def get_db_connection():
+    conn = psycopg2.connect(
+            host="localhost",
+            database="userdb",
+            user='postgres',
+            password='magzhan2005')
+    return conn
+
 
 def is_soft(word) : 
     for s in word:
@@ -206,7 +216,7 @@ class Lemms:
         return PosName
 
     def get_kaz_lemms(self, sentences):
-        con = sqlite3.connect("kasdict.db")
+        con = get_db_connection()
         cur = con.cursor()
         token_list = []
         lemms_list = []
@@ -216,6 +226,7 @@ class Lemms:
             tok = []
             words = []
             tokens = word_tokenize(sentence)
+            print('word_tokenize:', tokens)
             for token in tokens:
                 #print(token)
                 token = token.lower()
@@ -236,13 +247,14 @@ class Lemms:
                 token = token.lower()
                 while len(token) > 0:
                     token = token[:-1] + self.change_syngor(self, token[-1:])
-
-                    for result in cur.execute("Select morphem, pos from morphemes where morphem = ?", (token,)):
-
+                    cur.execute("SELECT words, pos FROM synamizer WHERE words = %s", (token,))
+                    for result in cur.fetchall():
                         if (not(token in kaz_stop_words)):
                             tok.append(u"".join(result[0]))
                             app = Septik
                             appendix = sttoken[len(token):]
+                            # print(';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;')
+                            # print('result, ' + str(result[1]))
                             words.append(Word(result[0], int(result[1]), appendix, False))
                             words[-1].GetAppendixes()
                             endings = []
@@ -265,9 +277,10 @@ class Lemms:
             token_list.append(copy.copy(tok))
             lemms_list.append(copy.copy(lemms))
         con.close()
+        print('lemms_list: ', lemms_list)
         return lemms_list
     def solve_math_task(self, sentences):
-        con = sqlite3.connect("kasdict.db")
+        con = get_db_connection()
         cur = con.cursor()
         token_list = []
         lemms_list = []
@@ -301,8 +314,8 @@ class Lemms:
                 token = token.lower()
                 while len(token) > 0:
                     token = token[:-1] + self.change_syngor(self, token[-1:])
-
-                    for result in cur.execute("Select morphem, pos from morphemes where morphem = ?", (token,)):
+                    cur.execute("Select morphem, pos from morphemes where morphem = %s", (token,))
+                    for result in cur.fetchall():
 
                         if (not(token in kaz_stop_words)):
                             tok.append(u"".join(result[0]))
@@ -336,10 +349,11 @@ class Lemms:
         return lemms_list
     def get_expert_words(self):
         list = []
-        con = sqlite3.connect("kasdict.db")
+        con = get_db_connection()
         cursor = con.cursor()
         query = 'SELECT id, morphem, pos FROM morphemes WHERE isModerated = 0'
-        for result in cursor.execute(query):
+        cursor.execute(query)
+        for result in cursor.fetchall():
             pos = self.get_pos_names(self, result[2])
             list.append([result[0], result[1], pos])
 
@@ -349,10 +363,11 @@ class Lemms:
         arr = {}
         list = []
         posCountList = []
-        con = sqlite3.connect("kasdict.db")
+        con = get_db_connection()
         cursor = con.cursor()
         query = 'SELECT * FROM morphemes'
-        for result in cursor.execute(query):
+        cursor.execute(query)
+        for result in cursor.fetchall():
             pos = ""
             if (result[2]):
                 pos = self.get_pos_tag_names(self, result[2])
@@ -362,7 +377,8 @@ class Lemms:
         for x in range(1, 9):
             query3 = 'SELECT count(*) FROM morphemes WHERE pos = ' + str(x)
             posName = self.get_pos_tag_names(self, x)
-            for res in cursor.execute(query3):
+            cursor.execute(query3)
+            for res in cursor.fetchall():
                 posCountList.append([posName, res[0]])
 
         arr['all'] = list
@@ -372,10 +388,11 @@ class Lemms:
     def get_all_morphemes(self):
         arr = {}
         list = []
-        con = sqlite3.connect("kasdict.db")
+        con = get_db_connection()
         cursor = con.cursor()
         query = 'SELECT * FROM morphemes ORDER BY morphem DESC'
-        for result in cursor.execute(query):
+        cursor.execute(query)
+        for result in cursor.fetchall():
             pos = self.get_pos_names(self, result[2])
             list.append([result[0], result[1], pos, result[0]])
 

@@ -445,19 +445,22 @@ def searchFile():
 def synomizing():
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     data = request.json['value']
-    print(data)
-    cur.execute("SELECT s.synonym, z.meaning, z.words_family,z.id, z.words FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE REPLACE(z.words, ' ', '') LIKE %s;", ('%' + data + '%',))
+    cur.execute("SELECT DISTINCT CASE WHEN LOWER(TRIM(s.synonym)) LIKE LOWER(%s) THEN s.synonym ELSE z.words END as word, z.meaning, z.words_family,z.id, z.words FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) LIKE LOWER(%s) OR LOWER(TRIM(s.synonym)) = LOWER(%s);", ('%' + data + '%','%' + data + '%', '%' + data + '%'))
     found_data = cur.fetchone()
-    print(found_data)
-    print(found_data.get('words'))
-    word = found_data.get('words')
-    cur.execute("SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
-    # cur.execute("")
+    try:
+        word = found_data.get('words')
+        syn = found_data.get('word')
+    except:
+        return 'not found', 404
+    print(syn)
+    cur.execute("SELECT replace(s.synonym, %s, %s) as synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (syn,word,word,))
     synonyms = cur.fetchall()
     print('synonym that was found: ',synonyms)
     cur.execute("SELECT s.paraphrase FROM paraphrases s INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
     paraphrase = cur.fetchall()
     print('paraphrase: ', paraphrase)
+   
+
     return jsonify([found_data, synonyms, paraphrase]), 200
 
 @app.route('/add/synonym/', methods=['POST'])
@@ -484,7 +487,7 @@ def addSynonym():
 def findsyn(word, synomized_count):
     print('word that gives ', word)
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE REPLACE(z.words, ' ', '') = %s;", (word,))#LOWER(z.words)
+    cur.execute("SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s);", (word,))#LOWER(z.words)
     print("#################################################")
     synonym = cur.fetchone()
     if synonym == None:
@@ -493,6 +496,17 @@ def findsyn(word, synomized_count):
     print("#################################################")
     synomized_count += 1
     return [synonym.get('synonym'), synomized_count]
+
+
+def split_string(first_string, second_string):
+    index = second_string.find(first_string)
+    if index != -1:
+        first_part = second_string[:index]
+        second_part = second_string[index + len(first_string):]
+        return first_part, second_part
+    else:
+        return None
+    
 
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
@@ -508,6 +522,8 @@ def searchWord():
         if word not in [",", ".", "!", "?", ";"]:
             translated_word, synomized_count = findsyn(word, synomized_count)
             sentences = st(translated_word) # тексттен сөйлемдерді бөліп аламыз
+            if not word == translated_word:
+                translated_word = word + "(синонимі: " + translated_word + ")"
             stcs = Lemms.get_kaz_lemms(Lemms,sentences)
             print('stcs are: ', stcs)
             # if isinstance(stcs[0][0][1], str) or not stcs == []:
@@ -518,6 +534,14 @@ def searchWord():
                 else:
                     translated_word = translated_word + "(" + stcs[0][0][3] + ", " + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +")"
             output_words.append(translated_word) 
+            # if len(stcs[0][0][2]) == 0:
+            #         #translated_word = translated_word + "(" + stcs[0][0][3] +  ")"#"," + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +
+            #         temp_word, synomized_count = findsyn(stcs[0][0][3], synomized_count)
+            #         translated_word = temp_word
+            #     else:
+            #         #translated_word = translated_word + "(" + stcs[0][0][3] + ", " + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +")"
+            #         temp_word, synomized_count = findsyn(stcs[0][0][3], synomized_count)
+            #         translated_word = temp_word + stcs[0][0][2][0][0]
             # if word != " ":
             #     output_words.append(word[len(word)-1])
         else:
