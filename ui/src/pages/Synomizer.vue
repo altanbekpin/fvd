@@ -16,7 +16,12 @@
                             <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
                             <Button label="Өңдеу" style="margin-left: 80px;" @click="send_to_synomize"/>
                     </div>
-                    <Textarea v-model="synomized_words" style="width: 446px; height: 112px; margin-top: 20px;" readonly="true"/>
+                    <!-- <Textarea v-model="synomized_words" style="width: 446px; height: 112px; margin-top: 20px;" readonly="true"/> -->
+                    <div class="card-container">
+                        <div class="card">
+                            <div v-html="synomized_words" style="width: 446px; height: 112px; margin-top: 20px;"></div>
+                        </div>
+                    </div>
                 </div>
 
                 </div>
@@ -121,6 +126,7 @@
 <script setup>
 import { ref, } from 'vue';
 import axios from 'axios'
+
 const word = ref('');
 const inputWords = ref('');
 const meaning = ref('');
@@ -154,6 +160,19 @@ const family = ref({family: 'зат есім'})
 const synonyms = ref([{synonym: 'Табылмады'}])
 const paraphrases = ref([{paraphrase: 'Табылмады'}])
 const word_id = ref('')
+// const highlightMatchingWords = (synomizedWords)=> {
+//     const matchingWords = synomized.value; // Replace with your list of matching words
+//     const words = synomizedWords.split(" ");
+    
+//     const highlightedWords = words.map((word) => {
+//       if (matchingWords.includes(word)) {
+//         return `<span style="color: green;">${word}</span>`;
+//       }
+//       return word;
+//     });
+    
+//     return highlightedWords.join(" ");
+//   }
 const onChange = async(event)=>{
     var response = {};
     await axios.post('http://127.0.0.1:5001/word/synomize/', {'value': event.target.value}).then(_ => console.log(response = _.data))
@@ -184,6 +203,10 @@ const addSynonym = ()=>{
 }
 </script>
 <style setup>
+.card-container {
+  height: 300px; /* Set the desired height for the container */
+   /* Enable vertical scrolling */
+}
 .row{
   display: flex;
   align-items: center;
@@ -228,6 +251,9 @@ const addSynonym = ()=>{
   }
   .temp-mobile{
     display: block;
+  }
+  .highlight {
+    color: green;
   }
 }
 </style>

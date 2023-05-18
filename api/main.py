@@ -484,17 +484,18 @@ def addSynonym():
 # JOIN tag_legacy tl ON t.id = tl.tag_id
 # JOIN legacy l ON l.id = tl.legacy_id
 # WHERE t.name = 'Magzhan';
-def findsyn(word, synomized_count):
+def findsyn(word, synomized_count, synomized_words):
     print('word that gives ', word)
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s);", (word,))#LOWER(z.words)
-    print("#################################################")
+    #print("#################################################")
     synonym = cur.fetchone()
     if synonym == None:
         return [word, synomized_count]
     print(synonym)
-    print("#################################################")
+    #print("#################################################")
     synomized_count += 1
+    synomized_words.append(synonym.get('synonym'))
     return [synonym.get('synonym'), synomized_count]
 
 
@@ -505,51 +506,64 @@ def split_string(first_string, second_string):
         second_part = second_string[index + len(first_string):]
         return first_part, second_part
     else:
-        return None
+        print("#######################")
+        print(first_string)
+        print(second_string)
+        return "", ""
     
 
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
     synomized_count = 0
     data = request.json['value']
+    synpmized_words = []
     sentences = st(data) # тексттен сөйлемдерді бөліп аламыз
     stcs = Lemms.get_kaz_lemms(Lemms,sentences)
+    print("$$$$$$$$$$$$$$$$$$")
     print('stcs are: ', stcs)
+    print("$$$$$$$$$$$$$$$$$$")
     words = re.findall(r"[\w']+|[.,!?; ]", data)
     print(words)
     output_words = []
     for word in words:
         if word not in [",", ".", "!", "?", ";"]:
-            translated_word, synomized_count = findsyn(word, synomized_count)
+            translated_word, synomized_count = findsyn(word, synomized_count, synpmized_words)
             sentences = st(translated_word) # тексттен сөйлемдерді бөліп аламыз
-            if not word == translated_word:
-                translated_word = word + "(синонимі: " + translated_word + ")"
+            # if not word == translated_word:
+            #     translated_word = word + "(синонимі: " + translated_word + ")"
             stcs = Lemms.get_kaz_lemms(Lemms,sentences)
             print('stcs are: ', stcs)
             # if isinstance(stcs[0][0][1], str) or not stcs == []:
-            if (not (len(stcs) == 0)) and (len(stcs[0][0]) > 2):
-                print('stcs are: ', stcs[0][0][2])
+            if (not (len(stcs) == 0)) and (len(stcs[0][0]) > 2) and not(" " in translated_word.strip()):
+                print("stcs[0][0][3].strip(): ", stcs[0][0][3])
                 if len(stcs[0][0][2]) == 0:
-                    translated_word = translated_word + "(" + stcs[0][0][3] +  ")"#"," + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +
+                    #translated_word = translated_word + "(" + stcs[0][0][3] +  ")"#"," + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +
+                    print("translated_word: ", translated_word)
+                    print("stcs[0][0][3]: ",  stcs[0][0][3])
+                    _, second_part = split_string(translated_word, stcs[0][0][3])
+                    translated_word, synomized_count = findsyn(stcs[0][0][3], synomized_count, synpmized_words)
+                    translated_word =   translated_word +second_part 
+                    # translated_word, additional = split_string(translated_word, stcs[0][0][3])
+                    # translated_word, synomized_count = findsyn(translated_word, synomized_count)
+                    # translated_word = translated_word +additional
                 else:
-                    translated_word = translated_word + "(" + stcs[0][0][3] + ", " + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +")"
+                    #translated_word = translated_word + "(" + findsyn(stcs[0][0][3], 0)[0] + ", " + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +")"
+                    print("************************")
+                    _, second_part = split_string(stcs[0][0][3], translated_word)
+                    translated_word, synomized_count = findsyn(stcs[0][0][3], synomized_count, synpmized_words)
+                    translated_word =  translated_word +second_part + "(" + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +")"
+                    # translated_word, additional = split_string(translated_word, stcs[0][0][3])
+                    # translated_word, synomized_count = findsyn(translated_word, synomized_count)
+                    # translated_word = translated_word +additional
+            if word != translated_word:
+                translated_word = '<span style="color: green;">' + translated_word + "</span>"
             output_words.append(translated_word) 
-            # if len(stcs[0][0][2]) == 0:
-            #         #translated_word = translated_word + "(" + stcs[0][0][3] +  ")"#"," + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +
-            #         temp_word, synomized_count = findsyn(stcs[0][0][3], synomized_count)
-            #         translated_word = temp_word
-            #     else:
-            #         #translated_word = translated_word + "(" + stcs[0][0][3] + ", " + stcs[0][0][2][0][0] + "-" + stcs[0][0][2][0][2] +")"
-            #         temp_word, synomized_count = findsyn(stcs[0][0][3], synomized_count)
-            #         translated_word = temp_word + stcs[0][0][2][0][0]
-            # if word != " ":
-            #     output_words.append(word[len(word)-1])
         else:
             output_words.append(word)
     print('output_words: ', output_words)
     output_string = "".join(output_words)
     print(output_string)
-    return jsonify([output_string, synomized_count]), 200
+    return jsonify([output_string, synomized_count, synpmized_words]), 200
 
 # @app.route('/autoPostTag/', methods=['POST'])
 # def autoPostTag():
@@ -601,8 +615,7 @@ def searchWord():
 if __name__ == "__main__":
     # main()
     from models import MyOwlReady
-    s = MyOwlReady() ## class initialized, but object not created
-    #print("Object created", MyOwlReady.getInstance()) # Object gets created here
+    s = MyOwlReady()
     config.init_conf()
     app.run(port=5001, debug=True)    
 
