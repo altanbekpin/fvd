@@ -26,7 +26,7 @@
                     <div class="row">
                         <div>Сөзді енгізіңіз</div>
                         <div style="position: relative;">
-                             <InputText type="text" v-model="word" style="width: 230px;" @input="onChange" />
+                             <InputText type="text" v-model="word" style="width: 230px;" @input="onChange($event, '')" />
                             <div v-if="synonyms.length > 1" ref="listbox">
                                 <div style="position: absolute; top: 100%; width: 230px; z-index: 2;">
                                     <div class="listbox">
@@ -49,7 +49,7 @@
                         <div>
                             Сөз табы:
                         </div>
-                        <Listbox v-model="family" :options="families" optionLabel="family"  class="w-full md:w-14rem"  style="margin-left: 26.5px; z-index: 1;" :disabled="true" listStyle="max-height:100px"/>
+                        <Listbox v-model="family" :options="families" optionLabel="family"  class="w-full md:w-14rem"  style="margin-left: 26.5px; z-index: 1;" listStyle="max-height:100px" @change="handleSelection"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
@@ -71,7 +71,7 @@
                     <div class="row">
                         <div>Сөзді енгізіңіз</div>
                         <div style="position: relative;">
-                             <InputText type="text" v-model="word" style="width: 230px;" @input="onChange" />
+                             <InputText type="text" v-model="word" style="width: 230px;" @input="onChange($event, '')" />
                             <div v-if="synonyms.length > 1" ref="listbox">
                                 <div style="position: absolute; top: 100%; width: 230px; z-index: 2;">
                                     <div class="listbox">
@@ -94,7 +94,7 @@
                         <div>
                             Сөз табы:
                         </div>
-                        <Listbox v-model="family" :options="families" optionLabel="family"  class="w-full md:w-14rem"  style="margin-left: 26.5px;" :disabled="true" listStyle="max-height:100px"/>
+                        <Listbox v-model="family" :options="families" optionLabel="family"  class="w-full md:w-14rem"  style="margin-left: 26.5px;" listStyle="max-height:100px" @change="handleSelection"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
@@ -150,6 +150,15 @@ const families = ref([
     {family: 'сан есім'}
 ])
 
+const handleSelection = async(selectedItem)=>{
+    console.log("Selected item:", selectedItem.value['family']);
+    const event = {
+        target: {
+            value: word.value
+        }
+    } 
+    await onChange(event, selectedItem.value['family'])
+}
 
 // Add event listener to the document
 document.addEventListener('click', function(event) {
@@ -176,7 +185,7 @@ const onSelectionChange = ()=>{
         }
     } 
     onChange(
-            event
+            event, ''
         
     )
 }
@@ -213,9 +222,9 @@ const all_words = ref()
     
 //     return highlightedWords.join(" ");
 //   }
-const onChange = async(event)=>{
+const onChange = async(event, words_family)=>{
     var response = {};
-    await axios.post('http://127.0.0.1:5001/word/synomize/', {'value': event.target.value}).then(_ => console.log(response = _.data))
+    await axios.post('http://127.0.0.1:5001/word/synomize/', {'value': event.target.value, 'words_family' : words_family}).then(_ => console.log(response = _.data))
     console.log(event.target.value)
     console.log('response word in console: ',response)
     if(response != null){
@@ -223,7 +232,7 @@ const onChange = async(event)=>{
         word_id.value = response[0]['id']
         family.value = {family: response[0]['words_family']}
         words.value = response[0]['words']
-        synonyms.value = response[1]
+        synonyms.value = response[1]    
         paraphrases.value = response[2]
         all_words.value = response[3]
         console.log('paraphrases: ', paraphrases.value)

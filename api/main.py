@@ -458,6 +458,7 @@ def looking_for_synonym(cur, word, family):
 def synomizing():
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     data = request.json['value']
+    family = request.json['words_family']
     print("$$$$$$$$$$$$$")
     # cur.execute("SELECT DISTINCT CASE WHEN LOWER(TRIM(s.synonym)) LIKE LOWER(%s) THEN s.synonym ELSE z.words END as word, z.meaning, z.words_family,z.id, z.words FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) LIKE LOWER(%s) OR LOWER(TRIM(s.synonym)) = LOWER(%s);", ('%' + data + '%','%' + data + '%', '%' + data + '%'))
     # cur.execute("SELECT DISTINCT LOWER(TRIM(z.words)) AS word ,s.synonym, z.meaning,z.words_family,z.id FROM synamizer z INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synonyms s ON  z WHERE LOWER(TRIM(z.words)) LIKE LOWER(%s)", (data + "%",))
@@ -476,13 +477,10 @@ def synomizing():
         print(e)
         return 'not found', 404
     # print(syn)
-    synonyms = looking_for_synonym(cur, word, found_data[0].get('words_family'))
-    # temp_synonyms = looking_for_synonym(cur, word)
-    # synonyms.extend(temp_synonyms)
-    # for i in range(0, len(synonyms)):
-    #     temp_synonyms = looking_for_synonym(cur, synonyms[i].get('synonym'))
-    #     synonyms.extend(temp_synonyms)
-    #print('synonym that was found: ',synonyms[0].get('synonym'))
+    if family == '':
+        synonyms = looking_for_synonym(cur, word, found_data[0].get('words_family'))
+    else:
+        synonyms = looking_for_synonym(cur, word, family)
     cur.execute("SELECT s.paraphrase FROM paraphrases s INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
     paraphrase = cur.fetchall()
     # print('all_words: ', all_words)
