@@ -15,20 +15,26 @@
                             <div>Символдар саны = {{ inputWords.length }}</div>
                             <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
                             <Button label="Өңдеу" style="margin-left: 80px;" @click="send_to_synomize"/>
-                    </div>
-                    <!-- <Textarea v-model="synomized_words" style="width: 446px; height: 112px; margin-top: 20px;" readonly="true"/> -->
-                    <div class="card-container">
-                        <div class="card">
-                            <div v-html="synomized_words" style="width: 446px; height: 112px; margin-top: 20px;"></div>
+                    </div>                    
+                        <div class="card" style="width: 450px; margin-top: 10px; margin-bottom:10px; height: 130px">
+                            <div v-html="synomized_words" style="width: 420px;overflow: auto; height: 112px;  padding-right: 10px;"></div>
                         </div>
-                    </div>
                 </div>
 
                 </div>
                 <div class="card temp"  style="width: 500px; height: 560px; position: relative;">
                     <div class="row">
                         <div>Сөзді енгізіңіз</div>
-                        <InputText type="text" v-model="word" style="width: 230px;"  @input="onChange"/>
+                        <div style="position: relative;">
+                             <InputText type="text" v-model="word" style="width: 230px;" @input="onChange" />
+                            <div v-if="synonyms.length > 1" ref="listbox">
+                                <div style="position: absolute; top: 100%; width: 230px; z-index: 2;">
+                                    <div class="listbox">
+                                        <Listbox v-model="selectedWord" :options="all_words" optionLabel="words" class="w-full md:w-14rem" @change="onSelectionChange"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <!-- <Listbox v-model="selectedCity" :options="cities" filter optionLabel="name" class="w-full md:w-14rem" /> -->
                         <Button label="Іздеу" style="margin-left: 20px;" ></Button>
                     </div>
@@ -43,28 +49,20 @@
                         <div>
                             Сөз табы:
                         </div>
-                        <Listbox v-model="family" :options="families" optionLabel="family" class="w-full md:w-14rem" style="margin-left: 26.5px;" listStyle="max-height:100px"/>
+                        <Listbox v-model="family" :options="families" optionLabel="family"  class="w-full md:w-14rem"  style="margin-left: 26.5px; z-index: 1;" :disabled="true" listStyle="max-height:100px"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
                             Синонимдері: 
                         </div>
-                        <Listbox v-model="j" :options="synonyms" optionLabel="synonym" class="w-full md:w-14rem" listStyle="max-height:100px"/>
+                        <Listbox v-model="j" :options="synonyms" optionLabel="synonym" class="w-full md:w-14rem" listStyle="max-height:100px" style="z-index: 1;"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
                             Перифраза: 
                         </div>
-                        <Listbox v-model="j" :options="paraphrases" optionLabel="paraphrase" class="w-full md:w-14rem" style="margin-left: 10px;" listStyle="max-height:100px"/>
+                        <Listbox v-model="j" :options="paraphrases" optionLabel="paraphrase" class="w-full md:w-14rem" style="margin-left: 10px;z-index: 1;" listStyle="max-height:100px"/>
                     </div>
-                    <!-- <div class="card" style="height: 70px; margin-top: 10px;">
-                        <div class="row">
-                            <InputText type="text" v-model="synonymInput" style="margin-bottom: 100px; width:200px;" placeholder="Жаңа синоним қосу"/>
-                            <Button label="Қосу" style="margin-bottom: 100px; margin-left: 10px;" @click="addSynonym"></Button>
-                            <Button label="Жабу" style="margin-bottom: 100px; margin-left: 10px;"></Button>
-                            
-                        </div>
-                    </div> -->
                     <Button label="Жаңа синоним қосу" style="position: absolute; bottom: 0; right: 0; margin-right: 10px; margin-bottom: 10px;" @click=showDialog></Button>
                     </div>
                 </div>
@@ -72,7 +70,16 @@
             <div class="card temp-mobile" style="width: 500px; height: 560px; position: relative;">
                     <div class="row">
                         <div>Сөзді енгізіңіз</div>
-                        <InputText type="text" v-model="word" style="width: 230px;" @input="onChange"/>
+                        <div style="position: relative;">
+                             <InputText type="text" v-model="word" style="width: 230px;" @input="onChange" />
+                            <div v-if="synonyms.length > 1" ref="listbox">
+                                <div style="position: absolute; top: 100%; width: 230px; z-index: 2;">
+                                    <div class="listbox">
+                                        <Listbox v-model="selectedWord" :options="all_words" optionLabel="words" class="w-full md:w-14rem" @change="onSelectionChange"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <!-- <Listbox v-model="selectedCity" :options="cities" filter optionLabel="name" class="w-full md:w-14rem" /> -->
                         <Button label="Іздеу" style="margin-left: 20px;" ></Button>
                     </div>
@@ -87,7 +94,7 @@
                         <div>
                             Сөз табы:
                         </div>
-                        <Listbox v-model="family" :options="families" optionLabel="family" class="w-full md:w-14rem" style="margin-left: 26.5px;" listStyle="max-height:100px"/>
+                        <Listbox v-model="family" :options="families" optionLabel="family"  class="w-full md:w-14rem"  style="margin-left: 26.5px;" :disabled="true" listStyle="max-height:100px"/>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                         <div>
@@ -101,32 +108,36 @@
                         </div>
                         <Listbox v-model="j" :options="paraphrases" optionLabel="paraphrase" class="w-full md:w-14rem" style="margin-left: 10px;" listStyle="max-height:100px"/>
                     </div>
-                    <!-- <div class="card" style="height: 70px; margin-top: 10px;">
-                        <div class="row">
-                            <InputText type="text" v-model="synonymInput" style="margin-bottom: 100px; width:200px;" placeholder="Жаңа синоним қосу"/>
-                            <Button label="Қосу" style="margin-bottom: 100px; margin-left: 10px;" @click="addSynonym"></Button>
-                            <Button label="Жабу" style="margin-bottom: 100px; margin-left: 10px;"></Button>
-                            
-                        </div>
-                    </div> -->
                     <Button label="Жаңа сөз қосу" style="position: absolute; bottom: 0; right: 0; margin-right: 10px; margin-bottom: 10px;" @click=showDialog></Button>
                     </div>
                 </div>
                 <Dialog v-model:visible="visible" modal header="Жаңа синоним қосу" :style="{ width: '50vw' }">
-                    <InputText type="text" v-model="synonymInput" placeholder="Түбір сөзді жазыңыз" :style="{ width: '25vw' }" style="margin-bottom: 10px;"></InputText>
-                    <InputText type="text" v-model="synonymInput" placeholder="Мағынасын жазыңыз" :style="{ width: '25vw'}"></InputText>
-                    <div style="margin-top: 10px;">
-                        <Dropdown v-model="selectedFamily" :options="word_family" optionLabel="name" placeholder="Сөз табын таңдаңыз" class="w-full md:w-14rem" />
-                    </div>
-                    <Button label="Қосу" style="margin-right: 10px; position: absolute; bottom: 0; right: 0; margin-bottom: 10px;" @click="addSynonym"></Button>
-                </Dialog>
+  <div style="display: flex; flex-direction: column; align-items: flex-start;">
+    <InputText type="text" v-model="inputValues" placeholder="Түбір сөзді жазыңыз" :style="{ width: '25vw' }" style="margin-bottom: 10px;"></InputText>
+    <div style=" margin-bottom: 10px;">
+      <Dropdown v-model="selectedFamily" :options="word_family" optionLabel="name" placeholder="Сөз табын таңдаңыз" class="w-full md:w-14rem" />
+    </div>
+    <InputText type="text" v-model="meaningInput" style="margin-bottom: 10px;" placeholder="Мағынасын жазыңыз" :style="{ width: '25vw'}"></InputText>
+        <div style="max-width: 600px;">
+            <Chips v-model="synonymInput" separator="," />
+        </div>
+
+
+    <div style="margin-top: auto; align-self: flex-end;">
+        <Button label="Қосу" style="margin-right: 10px; position: absolute; bottom: 0; right: 0; margin-bottom: 10px;" @click="addSynonym"></Button>
+    </div>
+  </div>
+</Dialog>
+
 
             </div>
 </template>
 <script setup>
-import { ref, } from 'vue';
+import { ref} from 'vue';
 import axios from 'axios'
 
+const selectedWord = ref()
+const inputValues = ref([])
 const word = ref('');
 const inputWords = ref('');
 const meaning = ref('');
@@ -138,9 +149,36 @@ const families = ref([
     {family: 'сын есім'},
     {family: 'сан есім'}
 ])
+
+
+// Add event listener to the document
+document.addEventListener('click', function(event) {
+    console.log("tapped")
+  var listBox = document.querySelector('.listbox'); // Select the ListBox element
+
+  // Check if the click event occurred outside the ListBox
+  if (listBox && !listBox.contains(event.target)) {
+    listBox.style.display = 'none'; // Hide the ListBox
+  }
+});
+
+
 const send_to_synomize = async()=>{
     await axios.post('http://127.0.0.1:5001/search/word/', {'value' : inputWords.value}).then(response =>{console.log(response);  synomized_words.value=response.data[0]; synomized_counter.value = response.data[1]})
    
+}
+const onSelectionChange = ()=>{
+    console.log("selectedWord.value.name: ", selectedWord.value.words)
+    word.value = selectedWord.value.words
+    const event = {
+        target: {
+            value: word.value
+        }
+    } 
+    onChange(
+            event
+        
+    )
 }
 const selectedFamily = ref();
 const word_family = ref([
@@ -154,12 +192,14 @@ const word_family = ref([
     { name: 'үстеу', code: 8}
 ]);
 const synonymInput = ref('')
+const meaningInput = ref('')
 const synomized_counter = ref('0')
 const words = ref('')
 const family = ref({family: 'зат есім'})
 const synonyms = ref([{synonym: 'Табылмады'}])
 const paraphrases = ref([{paraphrase: 'Табылмады'}])
 const word_id = ref('')
+const all_words = ref()
 // const highlightMatchingWords = (synomizedWords)=> {
 //     const matchingWords = synomized.value; // Replace with your list of matching words
 //     const words = synomizedWords.split(" ");
@@ -177,14 +217,15 @@ const onChange = async(event)=>{
     var response = {};
     await axios.post('http://127.0.0.1:5001/word/synomize/', {'value': event.target.value}).then(_ => console.log(response = _.data))
     console.log(event.target.value)
-    console.log('response word in console: ',response[0])
+    console.log('response word in console: ',response)
     if(response != null){
         meaning.value = response[0]['meaning']
         word_id.value = response[0]['id']
         family.value = {family: response[0]['words_family']}
-        words.value = response[0]['word']
+        words.value = response[0]['words']
         synonyms.value = response[1]
         paraphrases.value = response[2]
+        all_words.value = response[3]
         console.log('paraphrases: ', paraphrases.value)
     }else{
         console.log("NULL")
@@ -196,10 +237,17 @@ const showDialog = ()=>{
     visible.value = !visible.value;
 }
 const addSynonym = ()=>{
-    if(synonymInput.value == ''){
-        return;
+    console.log('synonymInput.value: ', synonymInput.value)
+    console.log('inputValues.value: ',inputValues.value)
+    console.log('meaningInput.value: ', meaningInput.value)
+    console.log('selectedFamily.value: ', selectedFamily.value)
+    if(synonymInput.value != '' && inputValues.value != '' && meaningInput.value != '' && selectedFamily.value != ''){
+        axios.post('http://127.0.0.1:5001/add/synonym/',{'synonyms': synonymInput.value, 'word' :inputValues.value, 'meaning' : meaningInput.value, 'family' : selectedFamily.value})
     }
-    axios.post('http://127.0.0.1:5001/add/synonym/', {'synonym': synonymInput.value, 'word_id':word_id.value})
+    // if(synonymInput.value == ''){
+    //     return;
+    // }
+    // axios.post('http://127.0.0.1:5001/add/synonym/', {'synonym': synonymInput.value, 'word_id':word_id.value})
 }
 </script>
 <style setup>
