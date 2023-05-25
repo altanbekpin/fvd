@@ -16,11 +16,17 @@
                             <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
                             <Button label="Өңдеу" style="margin-left: 80px;" @click="send_to_synomize"/>
                     </div>                    
-                        <div class="card" style="width: 450px; margin-top: 10px; margin-bottom:10px; height: 130px">
-                            <div v-html="synomized_words" style="width: 420px;overflow: auto; height: 112px;  padding-right: 10px;"></div>
+                    <div class="card" style="width: 450px; margin-top: 10px; margin-bottom:10px; height: 130px">
+                        <div v-html="synomized_words" style="width: 420px;overflow: auto; height: 112px;  padding-right: 10px;" @click="handleLineClick"></div>
+                        <div class="border">
+                            <OverlayPanel ref="op" style="border: none; padding: 0;">
+                                <div class="border-inner">
+                                <Listbox v-model="selectedSyn" :options="optionSynonyms" optionLabel="synonym" class="w-full" style="border: none; margin: 0;" />
+                                </div>
+                            </OverlayPanel>
                         </div>
+                    </div>
                 </div>
-
                 </div>
                 <div class="card temp"  style="width: 500px; height: 560px; position: relative;">
                     <div class="row">
@@ -126,6 +132,7 @@
     <div style="margin-top: auto; align-self: flex-end;">
         <Button label="Қосу" style="margin-right: 10px; position: absolute; bottom: 0; right: 0; margin-bottom: 10px;" @click="addSynonym"></Button>
     </div>
+    
   </div>
 </Dialog>
 
@@ -135,13 +142,29 @@
 <script setup>
 import { ref} from 'vue';
 import axios from 'axios'
-
 const selectedWord = ref()
 const inputValues = ref([])
 const word = ref('');
 const inputWords = ref('');
 const meaning = ref('');
-const synomized_words = ref('')
+// const synomized_words = ref('')
+const synomized_words = ref();
+const handleClick = (event) => {
+  // Call your desired function here
+  console.log('Span clicked!');
+  toggle(event)
+};
+
+// onMounted(() => {
+//   const spanElement = document.querySelector('[ref="dyncont"]');
+//   spanElement.addEventListener('click', handleClick);
+// });
+const op = ref();
+const toggle = (event) => {
+    op.value.toggle(event);
+}
+
+
 const visible = ref(false)
 const families = ref([
     {family: 'етістік'},
@@ -149,6 +172,12 @@ const families = ref([
     {family: 'сын есім'},
     {family: 'сан есім'}
 ])
+
+const selectedSyn = ref();
+const optionSynonyms = ref([
+    { synonym: 'синоним жоқ', words: ''}
+]);
+console.log(optionSynonyms.value)
 
 const handleSelection = async(selectedItem)=>{
     console.log("Selected item:", selectedItem.value['family']);
@@ -159,7 +188,22 @@ const handleSelection = async(selectedItem)=>{
     } 
     await onChange(event, selectedItem.value['family'])
 }
+// const op = ref();
+// const toggle = (event) => {
+//     op.value.toggle(event);
+// }
 
+const handleLineClick = async (e)=> {
+    let clickedElHref = e.target.getAttribute('href');
+    let clickedElId = e.target.id
+    if (clickedElId === 'temp_testing_div2') {
+        handleClick(e)
+      console.log("temp_testing_div2 clicked!", clickedElHref)
+      await axios.post("http://127.0.0.1:5001/search/synonyms/only", {"value":clickedElHref}).then(response => { optionSynonyms.value = response.data; console.log(optionSynonyms.value)})
+    } else {
+      console.log('another element was clicked')
+    }
+  }
 // Add event listener to the document
 document.addEventListener('click', function(event) {
     console.log("tapped")
@@ -173,7 +217,7 @@ document.addEventListener('click', function(event) {
 
 
 const send_to_synomize = async()=>{
-    await axios.post('http://127.0.0.1:5001/search/word/', {'value' : inputWords.value}).then(response =>{console.log(response);  synomized_words.value=response.data[0]; synomized_counter.value = response.data[1]})
+    await axios.post('http://127.0.0.1:5001/search/word/', {'value' : inputWords.value}).then(response =>{console.log(response); synomized_words.value=response.data[0]; synomized_counter.value = response.data[1]})
    
 }
 const onSelectionChange = ()=>{
@@ -204,7 +248,7 @@ const synonymInput = ref('')
 const meaningInput = ref('')
 const synomized_counter = ref('0')
 const words = ref('')
-const family = ref({family: 'зат есім'})
+const family = ref()
 const synonyms = ref([{synonym: 'Табылмады'}])
 const paraphrases = ref([{paraphrase: 'Табылмады'}])
 const word_id = ref('')
@@ -235,7 +279,7 @@ const onChange = async(event, words_family)=>{
         synonyms.value = response[1]    
         paraphrases.value = response[2]
         all_words.value = response[3]
-        console.log('paraphrases: ', paraphrases.value)
+        console.log('family.value: ', family.value)
     }else{
         console.log("NULL")
         meaning.value = ''
@@ -313,4 +357,15 @@ const addSynonym = ()=>{
     color: green;
   }
 }
+.border {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.border-inner {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
 </style>

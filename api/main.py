@@ -454,6 +454,15 @@ def looking_for_synonym(cur, word, family):
     print('synonym that was found: ',synonyms)
     return synonyms
 
+@app.route('/search/synonyms/only', methods=['POST'])
+def searchsyn():
+    cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    data = request.json['value']
+    cur.execute('SELECT DISTINCT words_family FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));', (data,))
+    word_family = cur.fetchone()
+    synonyms = looking_for_synonym(cur, data, word_family.get('words_family'))
+    return synonyms
+
 @app.route('/word/synomize/', methods=['POST'])
 def synomizing():
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -467,7 +476,7 @@ def synomizing():
     # print(found_data)
     cur.execute("SELECT DISTINCT words FROM synamizer WHERE LOWER(TRIM(words)) LIKE LOWER(TRIM(%s)) LIMIT 3;", (data + "%", ) )
     all_words = cur.fetchall()
-    print(all_words)
+    #print(all_words)
     if (len(all_words) == 1) and (all_words[0].get('words') == data):
         all_words = []
     try:
@@ -480,11 +489,13 @@ def synomizing():
     if family == '':
         synonyms = looking_for_synonym(cur, word, found_data[0].get('words_family'))
     else:
+        found_data[0]['words_family'] = family
         synonyms = looking_for_synonym(cur, word, family)
     cur.execute("SELECT s.paraphrase FROM paraphrases s INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
     paraphrase = cur.fetchall()
     # print('all_words: ', all_words)
-
+    print(found_data[0]['words_family'] )
+    
     return jsonify([found_data[0], synonyms, paraphrase, all_words]), 200
 
 def switch_case(argument):
@@ -575,18 +586,18 @@ def split_string(first_string, second_string):
 def searchWord():
     synomized_count = 0
     data = request.json['value']
-    synpmized_words = []
+    synomized_words = []
     sentences = st(data) # тексттен сөйлемдерді бөліп аламыз
     stcs = Lemms.get_kaz_lemms(Lemms,sentences)
-    print("$$$$$$$$$$$$$$$$$$")
-    print('stcs are: ', stcs)
-    print("$$$$$$$$$$$$$$$$$$")
+    # print("$$$$$$$$$$$$$$$$$$")
+    # print('stcs are: ', stcs)
+    # print("$$$$$$$$$$$$$$$$$$")
     words = re.findall(r"[\w']+|[.,!?; ]", data)
-    print(words)
+    # print('words: ',words)
     output_words = []
     for word in words:
         if word not in [",", ".", "!", "?", ";"]:
-            translated_word, synomized_count = findsyn(word, synomized_count, synpmized_words)
+            translated_word, synomized_count = findsyn(word, synomized_count, synomized_words)
             sentences = st(translated_word) # тексттен сөйлемдерді бөліп аламыз
             # if not word == translated_word:
             #     translated_word = word + "(синонимі: " + translated_word + ")"
@@ -597,23 +608,25 @@ def searchWord():
                 length = len(stcs[0]) - 1
                 if len(stcs[0][0][2]) == 0:
                     _, second_part = split_string(translated_word, stcs[0][length][3])
-                    translated_word, synomized_count = findsyn(stcs[0][length][3], synomized_count, synpmized_words)
+                    translated_word, synomized_count = findsyn(stcs[0][length][3], synomized_count, synomized_words)
                     translated_word =   translated_word +second_part 
                 else:
                     _, second_part = split_string(stcs[0][length][3], translated_word)
-                    translated_word, synomized_count = findsyn(stcs[0][length][3], synomized_count, synpmized_words)
+                    translated_word, synomized_count = findsyn(stcs[0][length][3], synomized_count, synomized_words)
                     translated_word =  translated_word +second_part
                     # for i in range(0, length+1):
                     #     translated_word = translated_word + "(" + stcs[0][i][2][0][0] + " - " + stcs[0][i][2][0][2] + ")"
             if word != translated_word:
-                translated_word = '<span style="color: green;">' + translated_word + "</span>"
+                translated_word = '<span id="temp_testing_div2" type="button" style="color: green;"' + 'href=' +word+'>' + translated_word +'</span>'
             output_words.append(translated_word) 
         else:
             output_words.append(word)
     #print('output_words: ', output_words)
     output_string = "".join(output_words)
-    #print(output_string)
-    return jsonify([output_string, synomized_count, synpmized_words]), 200
+    print("#################")
+    print(output_string)
+    print("#################")
+    return jsonify([output_string, synomized_count, synomized_words]), 200
 if __name__ == "__main__":
     # main()
     from models import MyOwlReady
