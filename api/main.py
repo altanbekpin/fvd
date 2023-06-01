@@ -10,7 +10,6 @@ import psycopg2
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import create_access_token, JWTManager, current_user, jwt_required
 import psycopg2.extras
-import pandas as pd
 from flask_cors import CORS
 import os
 import re
@@ -441,26 +440,60 @@ def searchFile():
 
 
 def looking_for_synonym(cur, word, family):
-    cur.execute(
-    "SELECT s.synonym, z.words "
-    "FROM synonyms s "
-    "INNER JOIN synonym_word sw ON s.id = sw.synonym_id "
-    "INNER JOIN synamizer z ON z.id = sw.word_id "
-    "WHERE LOWER(TRIM(z.words)) = LOWER(%s) AND LOWER(TRIM(z.words_family)) = LOWER(%s)"
-    "AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);",
-    (word,family)
-    )
+    if family != '':
+        print("))))))))))))))))))))))))))))))")
+        print("word is:", word)
+        print("family is:", family)
+        cur.execute(
+        "SELECT s.synonym, z.words "
+        "FROM synonyms s "
+        "INNER JOIN synonym_word sw ON s.id = sw.synonym_id "
+        "INNER JOIN synamizer z ON z.id = sw.word_id "
+        "WHERE LOWER(TRIM(z.words)) = LOWER(%s) AND LOWER(TRIM(z.words_family)) = LOWER(%s)"
+        "AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);",
+        (word,family)
+        )
+    else:
+        print("))))))))))))))))))))))))))))))")
+        print("))))))))))))))))))))))))))))))")
+        cur.execute(
+        "SELECT s.synonym, z.words "
+        "FROM synonyms s "
+        "INNER JOIN synonym_word sw ON s.id = sw.synonym_id "
+        "INNER JOIN synamizer z ON z.id = sw.word_id "
+        "WHERE LOWER(TRIM(z.words)) = LOWER(%s)"
+        "AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);",
+        (word,))
     synonyms = cur.fetchall()
     print('synonym that was found: ',synonyms)
     return synonyms
+
+def split_string(first_string, second_string):
+    index = second_string.find(first_string)
+    if index != -1:
+        first_part = second_string[:index]
+        second_part = second_string[index + len(first_string):]
+        return first_part, second_part
+    else:
+        # print("#######################")
+        # print(first_string)
+        # print(second_string)
+        return "", ""
+    
 
 @app.route('/search/synonyms/only', methods=['POST'])
 def searchsyn():
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     data = request.json['value']
-    cur.execute('SELECT DISTINCT words_family FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));', (data,))
-    word_family = cur.fetchone()
-    synonyms = looking_for_synonym(cur, data, word_family.get('words_family'))
+    print("request.json['second_part']: " + request.json['second_part'])
+    second_part = request.json['second_part']
+    print('data: ', data)
+    # cur.execute('SELECT DISTINCT words_family FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));', (data,))
+    # word_family = cur.fetchone()
+    synonyms = looking_for_synonym(cur, data, '')
+    print("synonyms: ", synonyms)
+    for i in range(0, len(synonyms)):
+         synonyms[i]['synonym'] = synonyms[i]['synonym'] + second_part
     return synonyms
 
 @app.route('/word/synomize/', methods=['POST'])
@@ -468,12 +501,27 @@ def synomizing():
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     data = request.json['value']
     family = request.json['words_family']
-    print("$$$$$$$$$$$$$")
+    temp_families = []
+    # print(family)
+    
     # cur.execute("SELECT DISTINCT CASE WHEN LOWER(TRIM(s.synonym)) LIKE LOWER(%s) THEN s.synonym ELSE z.words END as word, z.meaning, z.words_family,z.id, z.words FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) LIKE LOWER(%s) OR LOWER(TRIM(s.synonym)) = LOWER(%s);", ('%' + data + '%','%' + data + '%', '%' + data + '%'))
     # cur.execute("SELECT DISTINCT LOWER(TRIM(z.words)) AS word ,s.synonym, z.meaning,z.words_family,z.id FROM synamizer z INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synonyms s ON  z WHERE LOWER(TRIM(z.words)) LIKE LOWER(%s)", (data + "%",))
-    cur.execute('SELECT DISTINCT id, words_family, status, meaning, words FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));', (data,))
+    if family == "":
+        cur.execute('SELECT DISTINCT id, words_family, status, meaning, words FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));', (data,))
+    else:
+        cur.execute('SELECT DISTINCT words_family FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));', (data,))
+        temp_families = cur.fetchall()
+        cur.execute('SELECT DISTINCT id, status,words_family, meaning, words FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));', (data,family))
     found_data = cur.fetchall()
     # print(found_data)
+    all_families = []
+    if len(temp_families) < len(found_data):
+        for i in found_data:
+            print("words_family: " + i.get("words_family"))
+            all_families.append({"family" : i.get("words_family")})
+    else:
+        for i in temp_families:
+            all_families.append({"family" : i.get("words_family")})
     cur.execute("SELECT DISTINCT words FROM synamizer WHERE LOWER(TRIM(words)) LIKE LOWER(TRIM(%s)) LIMIT 3;", (data + "%", ) )
     all_words = cur.fetchall()
     #print(all_words)
@@ -484,8 +532,11 @@ def synomizing():
     except Exception as e:
         print(found_data)
         print(e)
-        return 'not found', 404
+        return 'bad request', 400
     # print(syn)
+    print("$$$$$$$$$$$$$")
+    print("DATAS THAT I'M GONNA GIVE:", word, found_data[0].get('words_family'))
+    print("family:", family)
     if family == '':
         synonyms = looking_for_synonym(cur, word, found_data[0].get('words_family'))
     else:
@@ -494,9 +545,9 @@ def synomizing():
     cur.execute("SELECT s.paraphrase FROM paraphrases s INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
     paraphrase = cur.fetchall()
     # print('all_words: ', all_words)
-    print(found_data[0]['words_family'] )
+    # print(found_data[0]['words_family'] )
     
-    return jsonify([found_data[0], synonyms, paraphrase, all_words]), 200
+    return jsonify([found_data[0], synonyms, paraphrase, all_words, all_families]), 200
 
 def switch_case(argument):
     if argument == 'зат есім':
@@ -517,11 +568,23 @@ def switch_case(argument):
         return 8
     elif argument == 'үстеу':
         return 9
+    
+def add_Synonyms(cur, synonym, word_id):
+    cur.execute("INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id", (synonym, ))
+    syn_id = cur.fetchone()['id']
+    print("syn_id: ", syn_id)
+    cur.execute("INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)", (word_id, syn_id))
 
+def add_Paraphrases(cur, paraphrase, word_id):
+    cur.execute("INSERT INTO paraphrases (paraphrase) VALUES (%s) RETURNING id", (paraphrase, ))
+    par_id = cur.fetchone()['id']
+    print("par_id: ", par_id)
+    cur.execute("INSERT INTO paraphrase_word (word_id, paraphrase_id) VALUES(%s, %s)", (word_id, par_id))
 
-@app.route('/add/synonym/', methods=['POST'])
-def addSynonym():
+@app.route('/add/word/', methods=['POST'])
+def addWord():
     synonyms = request.json['synonyms']
+    paraphrases = request.json['paraphrases']
     meaning = request.json['meaning']
     word = request.json['word']
     family = request.json['family']['name']
@@ -537,23 +600,53 @@ def addSynonym():
     except Exception as e:
         return e, 400
     word_id = row['id']
-    for i in synonyms:
-        try:
-            cur.execute("INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id", (i, ))
-            syn_id = cur.fetchone()['id']
-            print("syn_id: ", syn_id)
-            cur.execute("INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)", (word_id, syn_id))
-        except Exception as e:
-            return e, 400
+    if len(synonyms) > 0:
+        for i in synonyms:
+            try:
+                add_Synonyms(cur, i, word_id)
+            except Exception as e:
+                return e, 400
+    if len(paraphrases) > 0:
+        for i in paraphrases:
+            try:
+                add_Paraphrases(cur=cur, paraphrase=i, word_id=word_id)
+            except Exception as e:
+                return e, 400
     db.commit()
     return 'success', 200
 
+@app.route('/add/synonym/', methods=['POST'])
+def addSynonym():
+    db = get_db_connection()
+    cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    synonyms = request.json['synonyms']
+    word = request.json['word']
+    family = request.json['family']['family']
+    cur.execute('SELECT id FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));', (word, family))
+    word_id = cur.fetchone()['id']
+    print("word_id:", word_id)
+    for i in synonyms:
+        add_Synonyms(cur, i, word_id)
+    db.commit()
+    return 'success', 200
 
-# SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file
-# FROM tag t
-# JOIN tag_legacy tl ON t.id = tl.tag_id
-# JOIN legacy l ON l.id = tl.legacy_id
-# WHERE t.name = 'Magzhan';
+@app.route('/add/paraphrase/', methods=['POST'])
+def addParaphrase():
+    db = get_db_connection()
+    cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    paraphrases = request.json['paraphrases']
+    word = request.json['word']
+    family = request.json['family']['family']
+    print('word:', word)
+    print('family:', family)
+    print('paraphrases:', paraphrases)
+    cur.execute('SELECT id FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));', (word, family))
+    word_id = cur.fetchone()['id']
+    for i in paraphrases:
+        add_Paraphrases(cur, i, word_id)
+    db.commit()
+    return 'success', 200
+
 def findsyn(word, synomized_count, synomized_words):
     print('word that gives ', word)
     cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -569,18 +662,7 @@ def findsyn(word, synomized_count, synomized_words):
     return [synonym.get('synonym'), synomized_count]
 
 
-def split_string(first_string, second_string):
-    index = second_string.find(first_string)
-    if index != -1:
-        first_part = second_string[:index]
-        second_part = second_string[index + len(first_string):]
-        return first_part, second_part
-    else:
-        # print("#######################")
-        # print(first_string)
-        # print(second_string)
-        return "", ""
-    
+
 
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
@@ -594,10 +676,13 @@ def searchWord():
     # print("$$$$$$$$$$$$$$$$$$")
     words = re.findall(r"[\w']+|[.,!?; ]", data)
     # print('words: ',words)
+    second_part = ''
     output_words = []
+    data_id = 0
     for word in words:
         if word not in [",", ".", "!", "?", ";"]:
             translated_word, synomized_count = findsyn(word, synomized_count, synomized_words)
+            first_part = word
             sentences = st(translated_word) # тексттен сөйлемдерді бөліп аламыз
             # if not word == translated_word:
             #     translated_word = word + "(синонимі: " + translated_word + ")"
@@ -608,20 +693,22 @@ def searchWord():
                 length = len(stcs[0]) - 1
                 if len(stcs[0][0][2]) == 0:
                     _, second_part = split_string(translated_word, stcs[0][length][3])
+                    first_part = stcs[0][length][3]
                     translated_word, synomized_count = findsyn(stcs[0][length][3], synomized_count, synomized_words)
                     translated_word =   translated_word +second_part 
                 else:
                     _, second_part = split_string(stcs[0][length][3], translated_word)
+                    first_part = stcs[0][length][3]
                     translated_word, synomized_count = findsyn(stcs[0][length][3], synomized_count, synomized_words)
                     translated_word =  translated_word +second_part
                     # for i in range(0, length+1):
                     #     translated_word = translated_word + "(" + stcs[0][i][2][0][0] + " - " + stcs[0][i][2][0][2] + ")"
             if word != translated_word:
-                translated_word = '<span id="temp_testing_div2" type="button" style="color: green;"' + 'href=' +word+'>' + translated_word +'</span>'
+                translated_word = '<span class="temp_testing_div2" type="button" style="color: green;"' + 'href="' +first_part+  '"' + 'second_part="' + second_part + '"' + 'id="' + "span-"+str(data_id) + '"' + '>' + translated_word +'</span>'
+                data_id += 1
             output_words.append(translated_word) 
         else:
             output_words.append(word)
-    #print('output_words: ', output_words)
     output_string = "".join(output_words)
     print("#################")
     print(output_string)
