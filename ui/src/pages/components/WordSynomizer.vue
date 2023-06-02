@@ -85,6 +85,7 @@ export default {
       overlayTarget: null,
     };
   },
+
   methods: {
     async send_to_synomize() {
       await axios
