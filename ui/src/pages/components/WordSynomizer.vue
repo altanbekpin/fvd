@@ -1,14 +1,14 @@
 <template>
   <div>
     <div>
-      <div style="font-size: 12px; width: 500px">
+      <span style="font-size: 12px; width: 500px">
         Мәтін синонимайзері қазақ тілінде енгізілген мәтіндегі сөздерді
         синонимдермен алмастыруға көмектеседі. Мәтіндегі сөз синонимдермен
         ауыстырылса жасыл түспен белгіленіп көрсетіледі. Синонимайзер арқылы
         өнделген мәтінге семантикасына қарай өзгеріс енгізу мүмкіндігі бар, ол
         үшін белгіленген сөздің үстінен басып, көрсетілген синонимдер ішінен
         мағынасына сай сөзді таңдап, түзете аласыз
-      </div>
+      </span>
       <div
         class="card main-card"
         style="width: 500px; height: 500px; margin-top: 20px"
@@ -39,9 +39,19 @@
               height: 112px;
               padding-right: 10px;
             "
-            @click="handleLineClick"
           >
-            <div v-html="synomized_words"></div>
+            <!-- <div v-html="synomized_words"></div> -->
+            <div class="word-container">
+              <span v-for="(word, index) in synomized_words" :key="index">
+                <span
+                  v-if="isHtml(word)"
+                  v-html="word"
+                  @click="handleLineClick"
+                ></span>
+                <span v-else>{{ word }}</span>
+              </span>
+            </div>
+
             <OverlayPanel
               ref="op"
               style="border: none; padding: 0"
@@ -79,7 +89,7 @@ export default {
       overlayService: null,
       inputWords: "",
       synomized_counter: 0,
-      synomized_words: null,
+      synomized_words: [],
       optionSynonyms: [{ synonym: "синоним жоқ", words: "" }],
       selectedSyn: null,
       overlayTarget: null,
@@ -143,9 +153,7 @@ export default {
     closeOverlayPanel() {
       this.$refs.op.hide();
     },
-    toggle2(event) {
-      this.$refs.overlayPanel.toggle(event);
-    },
+
     // showOverlayPanel() {
     //   const overlayContainer = this.$refs.overlayContainer;
 
@@ -159,6 +167,15 @@ export default {
 
     //   this.overlayVisible = !this.overlayVisible;
     // },
+  },
+  computed: {
+    isHtml() {
+      return function (word) {
+        const parser = new DOMParser();
+        const parsedHtml = parser.parseFromString(word, "text/html");
+        return parsedHtml.body.childNodes.length !== 0;
+      };
+    },
   },
 };
 // :appendTo="overlayTarget"
