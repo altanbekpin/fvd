@@ -35,6 +35,7 @@ urllib3==1.26.11
 uWSGI==2.0.21
 Werkzeug==2.2.1
 zipp==3.8.1
-psycopg2
+psycopg2==2.9.6
 flask_sqlalchemy==3.0.3
 flask_jwt_extended
+numpy

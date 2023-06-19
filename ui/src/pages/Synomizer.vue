@@ -173,7 +173,7 @@ const targetRef = ref(null);
 //     handleClick(e);
 //     console.log("temp_testing_div2 clicked!", clickedElHref);
 //     await axios
-//       .post("http://127.0.0.1:5001/search/synonyms/only", {
+//       .post("http://localhost:5001/search/synonyms/only", {
 //         value: clickedElHref,
 //         second_part: clickkedRef,
 //       })
@@ -197,7 +197,7 @@ document.addEventListener("click", function (event) {
 // eslint-disable-next-line no-unused-vars
 const send_to_synomize = async () => {
   await axios
-    .post("http://127.0.0.1:5001/search/word/", { value: inputWords.value })
+    .post("http://localhost:5001/search/word/", { value: inputWords.value })
     .then((response) => {
       console.log(response);
       synomized_words.value = response.data[0];
@@ -240,7 +240,7 @@ const onChange = async (event, words_family) => {
   var response = {};
   try {
     await axios
-      .post("http://127.0.0.1:5001/word/synomize/", {
+      .post("http://localhost:5001/word/synomize/", {
         value: event.target.value,
         words_family: words_family,
       })
@@ -284,7 +284,7 @@ const addWord = () => {
     selectedFamily.value != "" &&
     paraphraseInput.value != ""
   ) {
-    axios.post("http://127.0.0.1:5001/add/word/", {
+    axios.post("http://localhost:5001/add/word/", {
       synonyms: synonymInput.value,
       word: inputValues.value,
       meaning: meaningInput.value,

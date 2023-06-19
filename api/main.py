@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from app import app
 # from config import mysql
-from flask import jsonify, send_file
-from flask import request
+from flask import jsonify 
+from flask import request,send_file
 import json
 import config
 import psycopg2
@@ -17,10 +17,11 @@ from nltk.tokenize import sent_tokenize as st
 
 
 
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@localhost/userdb'
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@localhost/userdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@db/userdb'
 CORS(app)
-CORS(app, origins=['http://localhost:8080'])
+CORS(app, origins=['http://localhost:8080', 'http://localhost:5432'])
 
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
@@ -54,11 +55,15 @@ class Role(db.Model):
 
 def get_db_connection():
     conn = psycopg2.connect(
-            host="localhost",
-            database="userdb",
+            host="db",
+            dbname="userdb",
             user='postgres',
             password='magzhan2005')
     return conn
+
+@app.route("/", methods=["GET"])
+def initialRoute():
+    return "success", 200
 
 @app.route('/getontology/<lang>/', methods=['GET'])
 def getontology(lang):
@@ -699,10 +704,11 @@ def searchWord():
     # output_string = "".join(output_words)
     return jsonify([output_words, synomized_count, synomized_words]), 200
 if __name__ == "__main__":
+    print("SERVER STARTED")
     # main()
     from models import MyOwlReady
     s = MyOwlReady()
     config.init_conf()
-    app.run(port=5001, debug=True)    
+    app.run(port=5001, debug=True, host="localhost")    
 
 

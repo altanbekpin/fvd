@@ -179,7 +179,7 @@ export default {
       var response = {};
       try {
         await axios
-          .post("http://127.0.0.1:5001/word/synomize/", {
+          .post("http://localhost:5001/word/synomize/", {
             value: event.target.value,
             words_family: words_family,
           })
@@ -243,14 +243,14 @@ export default {
       this.$emit("custom-event", this.word);
     },
     async addSynonym() {
-      await axios.post("http://127.0.0.1:5001/add/synonym/", {
+      await axios.post("http://localhost:5001/add/synonym/", {
         synonyms: this.sonynomToAdd,
         word: this.word,
         family: this.family,
       });
     },
     async addParaphrase() {
-      await axios.post("http://127.0.0.1:5001/add/paraphrase/", {
+      await axios.post("http://localhost:5001/add/paraphrase/", {
         paraphrases: this.paraphraseToAdd,
         word: this.word,
         family: this.family,

@@ -23,8 +23,8 @@ import psycopg2
 
 def get_db_connection():
     conn = psycopg2.connect(
-            host="localhost",
-            database="userdb",
+            host="db",
+            dbname="userdb",
             user='postgres',
             password='magzhan2005')
     return conn
