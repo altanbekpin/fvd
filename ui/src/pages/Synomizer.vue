@@ -281,8 +281,7 @@ const addWord = () => {
     synonymInput.value != "" &&
     inputValues.value != "" &&
     meaningInput.value != "" &&
-    selectedFamily.value != "" &&
-    paraphraseInput.value != ""
+    (selectedFamily.value != "" || paraphraseInput.value != "")
   ) {
     axios.post("http://localhost:5001/add/word/", {
       synonyms: synonymInput.value,

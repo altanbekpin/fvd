@@ -621,6 +621,7 @@ def addWord():
 
 @app.route('/add/synonym/', methods=['POST'])
 def addSynonym():
+    print('/add/synonym/ started')
     db = get_db_connection()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     synonyms = request.json['synonyms']
