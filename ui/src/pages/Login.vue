@@ -123,7 +123,7 @@ export default {
       var response;
       var roles = [];
       await axios
-        .post("http://localhost:5001/login/", {
+        .post("http://kazlangres.enu.kz/v1/api/login/", {
           email: this.email,
           password: this.password,
         })
@@ -135,7 +135,7 @@ export default {
 
       //console.log(temp)
       await axios
-        .get("http://localhost:5001/who_am_i/", {
+        .get("http://kazlangres.enu.kz/v1/api/who_am_i/", {
           headers: { Authorization: `Bearer ${temp}` },
         })
         .then((response) => console.log((roles = response.data["roles"])));

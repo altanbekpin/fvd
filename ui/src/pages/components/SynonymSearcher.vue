@@ -179,7 +179,7 @@ export default {
       var response = {};
       try {
         await axios
-          .post("http://kazlangres.enu.kz/word/synomize/", {
+          .post("http://kazlangres.enu.kz/v1/api/word/synomize/", {
             value: event.target.value,
             words_family: words_family,
           })
@@ -243,14 +243,14 @@ export default {
       this.$emit("custom-event", this.word);
     },
     async addSynonym() {
-      await axios.post("http://kazlangres.enu.kz/add/synonym/", {
+      await axios.post("http://kazlangres.enu.kz/v1/api/add/synonym/", {
         synonyms: this.sonynomToAdd,
         word: this.word,
         family: this.family,
       });
     },
     async addParaphrase() {
-      await axios.post("http://kazlangres.enu.kz/add/paraphrase/", {
+      await axios.post("http://kazlangres.enu.kz/v1/api/add/paraphrase/", {
         paraphrases: this.paraphraseToAdd,
         word: this.word,
         family: this.family,

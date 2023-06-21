@@ -88,10 +88,10 @@
       <div style="margin-top: 10px">
         <form @submit.prevent="uploadFile">
           <!-- <input type="file" @change="handleFileChange" style="margin-top: 10px;"> -->
-          <!-- <FileUpload mode="basic" name="demo[]" url="http://kazlangres.enu.kz/upload" :maxFileSize="1000000000000" @upload="onUpload" style="margin-top: 10px;" /> -->
+          <!-- <FileUpload mode="basic" name="demo[]" url="http://kazlangres.enu.kz/v1/api/upload" :maxFileSize="1000000000000" @upload="onUpload" style="margin-top: 10px;" /> -->
           <FileUpload
             :name="FileName"
-            url="http://kazlangres.enu.kz/upload"
+            url="http://kazlangres.enu.kz/v1/api/upload"
             :formData="form_Data"
             @upload="handleFileUpload"
           ></FileUpload>
@@ -197,7 +197,7 @@ const handleFileUpload = (event) => {
   formData.append("path_to_save", path_to_save.value);
   formData.append("parent_id", parent_id.value);
   console.log("acess token", store.state.user.access_token);
-  fetch("http://kazlangres.enu.kz/upload", {
+  fetch("http://kazlangres.enu.kz/v1/api/upload", {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
@@ -252,7 +252,7 @@ const deleteFile = () => {
   const formData = new FormData();
   console.log(fileID.value);
   formData.append("fileID", fileID.value);
-  fetch("http://kazlangres.enu.kz/delete/file", {
+  fetch("http://kazlangres.enu.kz/v1/api/delete/file", {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
@@ -264,7 +264,7 @@ const changeFileName = () => {
   console.log(fileID.value);
   formData.append("fileID", fileID.value);
   formData.append("FileName", FileName.value);
-  fetch("http://kazlangres.enu.kz/change/file/name", {
+  fetch("http://kazlangres.enu.kz/v1/api/change/file/name", {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,

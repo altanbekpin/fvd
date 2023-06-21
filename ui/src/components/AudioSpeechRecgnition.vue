@@ -87,7 +87,7 @@ export default {
         this.selectedWord = button.innerText;
         console.log(`${this.selectedWord} button clicked`);
         axios
-          .post("http://kazlangres.enu.kz/search/book/file/", {
+          .post("http://kazlangres.enu.kz/v1/api/search/book/file/", {
             global: this.selectedWord,
           })
           .then((resp) => {
