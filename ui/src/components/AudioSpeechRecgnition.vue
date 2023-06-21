@@ -87,7 +87,7 @@ export default {
         this.selectedWord = button.innerText;
         console.log(`${this.selectedWord} button clicked`);
         axios
-          .post("http://localhost:5001/search/book/file/", {
+          .post("http://kazlangres.enu.kz/search/book/file/", {
             global: this.selectedWord,
           })
           .then((resp) => {
@@ -130,7 +130,7 @@ export default {
     },
     getJson() {
       axios
-        .get("http://localhost:5001/getontology/")
+        .get("kazlangres.enu.kz/getontology/")
         .then((response) => (this.OntNames = response.data));
     },
     uploadAudioFile() {

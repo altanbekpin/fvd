@@ -1,3 +1,4 @@
 env/
 __pycache__/
 morphology_api/
+.env

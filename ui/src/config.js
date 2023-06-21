@@ -1,1 +1,1 @@
-export const AHMET_API = 'http://localhost:5001/';
+export const AHMET_API = "http://kazlangres.enu.kz/";

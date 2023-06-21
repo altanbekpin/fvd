@@ -39,3 +39,4 @@ psycopg2==2.9.6
 flask_sqlalchemy==3.0.3
 flask_jwt_extended
 numpy
+python-dotenv

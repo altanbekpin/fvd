@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from flask.cli import load_dotenv
 from app import app
 # from config import mysql
 from flask import jsonify 
@@ -21,8 +22,7 @@ from nltk.tokenize import sent_tokenize as st
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@localhost/userdb'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@db/userdb'
 CORS(app)
-CORS(app, origins=['http://localhost:8080', 'http://localhost:5432'])
-
+CORS(app, origins=['http://localhost:8080', 'http://kazlangres.enu.kz'])
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
 @jwt.user_identity_loader
@@ -706,10 +706,13 @@ def searchWord():
     return jsonify([output_words, synomized_count, synomized_words]), 200
 if __name__ == "__main__":
     print("SERVER STARTED")
+    load_dotenv()
+    print(os.environ.get("HOST"))
+    host = os.environ.get("HOST")
     # main()
     from models import MyOwlReady
     s = MyOwlReady()
     config.init_conf()
-    app.run(port=5001, debug=True, host="localhost")    
+    app.run(port=5001, debug=True, host="kazlangres.enu.kz")    
 
 

@@ -88,10 +88,10 @@
       <div style="margin-top: 10px">
         <form @submit.prevent="uploadFile">
           <!-- <input type="file" @change="handleFileChange" style="margin-top: 10px;"> -->
-          <!-- <FileUpload mode="basic" name="demo[]" url="http://localhost:5001/upload" :maxFileSize="1000000000000" @upload="onUpload" style="margin-top: 10px;" /> -->
+          <!-- <FileUpload mode="basic" name="demo[]" url="http://kazlangres.enu.kz/upload" :maxFileSize="1000000000000" @upload="onUpload" style="margin-top: 10px;" /> -->
           <FileUpload
             :name="FileName"
-            url="http://localhost:5001/upload"
+            url="http://kazlangres.enu.kz/upload"
             :formData="form_Data"
             @upload="handleFileUpload"
           ></FileUpload>
@@ -172,7 +172,7 @@ const changeDialog = ref(false);
 //     }
 //     else{
 //         loading.value = true
-//     const temp = await axios.post('http://localhost:5001/search/book/', filters);
+//     const temp = await axios.post('http://kazlangres.enu.kz/search/book/', filters);
 //     console.log('temp: ',temp)
 //         loading.value = false
 //         let legacies = temp.data;
@@ -197,7 +197,7 @@ const handleFileUpload = (event) => {
   formData.append("path_to_save", path_to_save.value);
   formData.append("parent_id", parent_id.value);
   console.log("acess token", store.state.user.access_token);
-  fetch("http://localhost:5001/upload", {
+  fetch("http://kazlangres.enu.kz/upload", {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
@@ -252,7 +252,7 @@ const deleteFile = () => {
   const formData = new FormData();
   console.log(fileID.value);
   formData.append("fileID", fileID.value);
-  fetch("http://localhost:5001/delete/file", {
+  fetch("http://kazlangres.enu.kz/delete/file", {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
@@ -264,7 +264,7 @@ const changeFileName = () => {
   console.log(fileID.value);
   formData.append("fileID", fileID.value);
   formData.append("FileName", FileName.value);
-  fetch("http://localhost:5001/change/file/name", {
+  fetch("http://kazlangres.enu.kz/change/file/name", {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,

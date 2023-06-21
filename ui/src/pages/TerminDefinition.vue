@@ -172,7 +172,7 @@ const saveProduct = async (method) => {
   if (request.name.value === "") {
     submitted.value = true;
   } else {
-    await axios.post("http://localhost:5001/editPost/", request, {
+    await axios.post("http://kazlangres.enu.kz/editPost/", request, {
       headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     });
     submitted.value = false;
@@ -195,7 +195,7 @@ const confirmDeleteSelected = async (method) => {
     method: { _value: method },
     id: id,
   };
-  await axios.post("http://localhost:5001/editPost/", request, {
+  await axios.post("http://kazlangres.enu.kz/editPost/", request, {
     headers: { Authorization: `Bearer ${store.state.user.access_token}` },
   });
   console.log(request);
@@ -211,7 +211,7 @@ const filters = ref({
 const submitted = ref(false);
 const loadLazyData = async () => {
   var temp = await axios.post(
-    "http://localhost:5001/classification/",
+    "http://kazlangres.enu.kz/classification/",
     lazyParams.value
   );
   products.value = temp.data;

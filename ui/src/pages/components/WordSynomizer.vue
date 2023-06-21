@@ -99,7 +99,9 @@ export default {
   methods: {
     async send_to_synomize() {
       await axios
-        .post("http://localhost:5001/search/word/", { value: this.inputWords })
+        .post("http://kazlangres.enu.kz/search/word/", {
+          value: this.inputWords,
+        })
         .then((response) => {
           console.log(response);
           this.synomized_words = response.data[0];
@@ -122,7 +124,7 @@ export default {
         this.handleClick(e);
         console.log("temp_testing_div2 clicked!", clickedElHref);
         await axios
-          .post("http://localhost:5001/search/synonyms/only", {
+          .post("http://kazlangres.enu.kz/search/synonyms/only", {
             value: clickedElHref,
             second_part: clickkedRef,
           })

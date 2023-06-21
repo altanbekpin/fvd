@@ -59,7 +59,7 @@ export default {
   methods: {
     getJson() {
       axios
-        .get("http://localhost:5001/getontology/kz/")
+        .get("http://kazlangres.enu.kz/getontology/kz/")
         .then((response) => (this.OntNames = response.data));
     },
     async searchFunc() {
@@ -68,7 +68,7 @@ export default {
       };
       console.log(reqbody);
       var temp = await axios.post(
-        "http://localhost:5001/getontology/ask/",
+        "http://kazlangres.enu.kz/getontology/ask/",
         reqbody
       );
 
@@ -78,7 +78,7 @@ export default {
     // }
   },
   async mounted() {
-    this.getJson("http://localhost:5001/getontology/ask/");
+    this.getJson("http://kazlangres.enu.kz/getontology/ask/");
     const self = this;
     window.DoSubmit = async function (text) {
       console.log(text);
@@ -89,7 +89,7 @@ export default {
 
       console.log(reqbody);
       var temp = await axios.post(
-        "http://localhost:5001/getontology/ask/",
+        "http://kazlangres.enu.kz/getontology/ask/",
         reqbody
       );
       console.log(temp.data);
@@ -111,7 +111,7 @@ export default {
 
       console.log(reqbody);
       var temp = await axios.post(
-        "http://localhost:5001/getontology/ask/",
+        "http://kazlangres.enu.kz/getontology/ask/",
         reqbody
       );
       console.log(temp.data);
