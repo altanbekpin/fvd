@@ -13,11 +13,14 @@ services:
 
   api:
     build: ./api
-    image: altinbekpin/echo1:api-v2
+    image: altinbekpin/echo1:api-v5
     container_name: api
     restart: always
     volumes:
       - ./api/:/app
+    environment:
+      - API_URL=localhost
+      - API_PORT=5001
     depends_on:
       - db
     expose:
@@ -25,10 +28,15 @@ services:
     ports:
       - "5001:9000"
   ui:
-    build: ./ui
-    image: altinbekpin/echo1:ui-v2
+    build:
+      context: ./ui
+      args:
+        - VUE_APP_API_URL=http://localhost:5001
+    image: altinbekpin/echo1:ui-v5
     container_name: ui
     restart: always
+    environment:
+      - VUE_APP_API_URL=http://localhost:5001
     expose:
       - 80
     ports:

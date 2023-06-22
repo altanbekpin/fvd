@@ -75,6 +75,7 @@ import axios from "axios";
 import { getWaveBlob } from "./webm-to-wav-converter";
 import { faWindowRestore } from "@fortawesome/free-solid-svg-icons";
 import { AhmetService } from "@/service/AhmetService";
+import { AHMET_API } from "../config";
 export default {
   name: "AudioSpeechRecognition",
   mounted() {
@@ -87,7 +88,7 @@ export default {
         this.selectedWord = button.innerText;
         console.log(`${this.selectedWord} button clicked`);
         axios
-          .post("http://kazlangres.enu.kz/v1/api/search/book/file/", {
+          .post(`${AHMET_API}/search/book/file/`, {
             global: this.selectedWord,
           })
           .then((resp) => {
@@ -130,7 +131,7 @@ export default {
     },
     getJson() {
       axios
-        .get("kazlangres.enu.kz/getontology/")
+        .get(`${AHMET_API}/getontology/`)
         .then((response) => (this.OntNames = response.data));
     },
     uploadAudioFile() {

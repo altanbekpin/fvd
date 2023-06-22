@@ -139,6 +139,8 @@ import { FilterMatchMode } from "primevue/api";
 import store from "../store.js";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
+import { AHMET_API, getHeader } from "../config";
+
 //import { reactive } from 'vue';
 const toast = useToast();
 onMounted(() => {
@@ -172,8 +174,11 @@ const saveProduct = async (method) => {
   if (request.name.value === "") {
     submitted.value = true;
   } else {
-    await axios.post("http://kazlangres.enu.kz/v1/api/editPost/", request, {
-      headers: { Authorization: `Bearer ${store.state.user.access_token}` },
+    await axios.post(`${AHMET_API}/editPost/`, request, {
+      headers: { Authorization: `Bearer ${store.state.user.access_token}`,
+      'Access-Control-Allow-Credentials':'true',
+        'Content-Type': 'application/json',
+        'Accept':"*/*" },
     });
     submitted.value = false;
     productDialog.value = false;
@@ -195,8 +200,11 @@ const confirmDeleteSelected = async (method) => {
     method: { _value: method },
     id: id,
   };
-  await axios.post("http://kazlangres.enu.kz/v1/api/editPost/", request, {
-    headers: { Authorization: `Bearer ${store.state.user.access_token}` },
+  await axios.post(`${AHMET_API}/editPost/`, request, {
+    headers: { Authorization: `Bearer ${store.state.user.access_token}`,
+    'Access-Control-Allow-Credentials':'true',
+        'Content-Type': 'application/json',
+        'Accept':"*/*" },
   });
   console.log(request);
 };
@@ -211,8 +219,8 @@ const filters = ref({
 const submitted = ref(false);
 const loadLazyData = async () => {
   var temp = await axios.post(
-    "http://kazlangres.enu.kz/v1/api/classification/",
-    lazyParams.value
+    `${AHMET_API}/classification/`,
+    lazyParams.value, {headers: getHeader()}
   );
   products.value = temp.data;
   loading.value = false;

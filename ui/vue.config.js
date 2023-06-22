@@ -1,4 +1,4 @@
-process.env.VUE_APP_AHMET_API = "http://kazlangres.enu.kz/v1/api";
+//process.env.VUE_APP_AHMET_API = "AHMET_API";
 // process.env.HOST = "kazlangres.enu.kz";
 module.exports = {
   pluginOptions: {

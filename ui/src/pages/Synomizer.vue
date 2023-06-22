@@ -84,6 +84,7 @@ import { ref } from "vue";
 import axios from "axios";
 import SynonymSearcher from "./components/SynonymSearcher.vue";
 import WordSynomizer from "./components/WordSynomizer.vue";
+import { AHMET_API, getHeader } from "../config";
 
 // import WordSynomizer from "./components/WordSynomizer.vue";
 const selectedWord = ref();
@@ -197,9 +198,9 @@ document.addEventListener("click", function (event) {
 // eslint-disable-next-line no-unused-vars
 const send_to_synomize = async () => {
   await axios
-    .post("http://kazlangres.enu.kz/v1/api/search/word/", {
+    .post(`${AHMET_API}/search/word/`, {
       value: inputWords.value,
-    })
+    }, {headers: getHeader()})
     .then((response) => {
       console.log(response);
       synomized_words.value = response.data[0];
@@ -242,7 +243,7 @@ const onChange = async (event, words_family) => {
   var response = {};
   try {
     await axios
-      .post("http://kazlangres.enu.kz/v1/api/word/synomize/", {
+      .post(`${AHMET_API}/word/synomize/`, {
         value: event.target.value,
         words_family: words_family,
       })
@@ -285,13 +286,13 @@ const addWord = () => {
     meaningInput.value != "" &&
     (selectedFamily.value != "" || paraphraseInput.value != "")
   ) {
-    axios.post("http://kazlangres.enu.kz/v1/api/add/word/", {
+    axios.post(`${AHMET_API}/add/word/`, {
       synonyms: synonymInput.value,
       word: inputValues.value,
       meaning: meaningInput.value,
       family: selectedFamily.value,
       paraphrases: paraphraseInput.value,
-    });
+    }, {headers: getHeader()});
     synonymInput.value = "";
     inputValues.value = "";
     meaningInput.value = "";

@@ -91,7 +91,7 @@
           <!-- <FileUpload mode="basic" name="demo[]" url="http://kazlangres.enu.kz/v1/api/upload" :maxFileSize="1000000000000" @upload="onUpload" style="margin-top: 10px;" /> -->
           <FileUpload
             :name="FileName"
-            url="http://kazlangres.enu.kz/v1/api/upload"
+            :url="url"
             :formData="form_Data"
             @upload="handleFileUpload"
           ></FileUpload>
@@ -134,9 +134,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { AhmetService } from "@/service/AhmetService";
 import store from "../store.js";
+import { AHMET_API } from "../config.js";
 // import axios from 'axios'
 const nodes = ref(null);
 const loading = ref(false);
@@ -148,6 +149,7 @@ const form_Data = ref(new FormData());
 const fileID = ref("");
 const parent_id = ref("");
 const changeDialog = ref(false);
+const url = computed(() => AHMET_API + "api/upload")
 // const globalSearch = ref('')
 // const filters = ref({
 //     'global' : globalSearch.value
@@ -197,7 +199,7 @@ const handleFileUpload = (event) => {
   formData.append("path_to_save", path_to_save.value);
   formData.append("parent_id", parent_id.value);
   console.log("acess token", store.state.user.access_token);
-  fetch("http://kazlangres.enu.kz/v1/api/upload", {
+  fetch(`${AHMET_API}/upload`, {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
@@ -252,7 +254,7 @@ const deleteFile = () => {
   const formData = new FormData();
   console.log(fileID.value);
   formData.append("fileID", fileID.value);
-  fetch("http://kazlangres.enu.kz/v1/api/delete/file", {
+  fetch(`${AHMET_API}/delete/file`, {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
@@ -264,7 +266,7 @@ const changeFileName = () => {
   console.log(fileID.value);
   formData.append("fileID", fileID.value);
   formData.append("FileName", FileName.value);
-  fetch("http://kazlangres.enu.kz/v1/api/change/file/name", {
+  fetch(`${AHMET_API}/change/file/name`, {
     method: "POST",
     //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,

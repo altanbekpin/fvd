@@ -82,6 +82,7 @@
 </template>
 <script>
 import axios from "axios";
+import { AHMET_API, getHeader } from "../../config"; 
 
 export default {
   data() {
@@ -99,9 +100,9 @@ export default {
   methods: {
     async send_to_synomize() {
       await axios
-        .post("http://kazlangres.enu.kz/v1/api/search/word/", {
-          value: this.inputWords,
-        })
+        .post(`${AHMET_API}/search/word/`, {
+          value: this.inputWords
+        }, {headers: getHeader()})
         .then((response) => {
           console.log(response);
           this.synomized_words = response.data[0];
@@ -124,10 +125,10 @@ export default {
         this.handleClick(e);
         console.log("temp_testing_div2 clicked!", clickedElHref);
         await axios
-          .post("http://kazlangres.enu.kz/v1/api/search/synonyms/only", {
+          .post(`${AHMET_API}/search/synonyms/only`, {
             value: clickedElHref,
             second_part: clickkedRef,
-          })
+          }, {headers: getHeader()})
           .then((response) => {
             this.optionSynonyms = response.data;
           });

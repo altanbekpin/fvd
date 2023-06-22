@@ -15,6 +15,7 @@ import os
 import re
 from morphology_api.morphology import Lemms
 from nltk.tokenize import sent_tokenize as st
+import os
 
 
 
@@ -713,6 +714,6 @@ if __name__ == "__main__":
     from models import MyOwlReady
     s = MyOwlReady()
     config.init_conf()
-    app.run(port=5001, debug=True, host="kazlangres.enu.kz")    
+    app.run(port=os.environ.get("API_PORT"), debug=True, host=os.environ.get("API_URL"))    
 
 

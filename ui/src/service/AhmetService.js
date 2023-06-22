@@ -8,7 +8,7 @@ export const  AhmetService = {
         return api.get("/getlegacies/" +param, {baseURL:AHMET_API});
     },
     getFile(fileID) {
-        window.location.href = AHMET_API + "legacy/download/" + fileID
+        window.location.href = AHMET_API + "/legacy/download/" + fileID
         console.log(fileID)
     }
 }

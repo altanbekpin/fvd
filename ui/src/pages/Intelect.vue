@@ -45,6 +45,7 @@
 </template>
 <script>
 import axios from "axios";
+import { AHMET_API, getHeader } from "../config";
 
 export default {
   name: "Intelect",
@@ -59,7 +60,7 @@ export default {
   methods: {
     getJson() {
       axios
-        .get("http://kazlangres.enu.kz/v1/api/getontology/kz/")
+        .get(`${AHMET_API}/getontology/kz/`)
         .then((response) => (this.OntNames = response.data));
     },
     async searchFunc() {
@@ -68,8 +69,8 @@ export default {
       };
       console.log(reqbody);
       var temp = await axios.post(
-        "http://kazlangres.enu.kz/v1/api/getontology/ask/",
-        reqbody
+        `${AHMET_API}/getontology/ask/`,
+        reqbody, {headers: getHeader()}
       );
 
       this.OntoInner = temp.data;
@@ -78,7 +79,7 @@ export default {
     // }
   },
   async mounted() {
-    this.getJson("http://kazlangres.enu.kz/v1/api/getontology/ask/");
+    this.getJson(`${AHMET_API}/getontology/ask/`);
     const self = this;
     window.DoSubmit = async function (text) {
       console.log(text);
@@ -89,8 +90,8 @@ export default {
 
       console.log(reqbody);
       var temp = await axios.post(
-        "http://kazlangres.enu.kz/v1/api/getontology/ask/",
-        reqbody
+        `${AHMET_API}/getontology/ask/`,
+        reqbody, {headers: getHeader()}
       );
       console.log(temp.data);
       self.OntoInner = temp.data;
@@ -111,8 +112,8 @@ export default {
 
       console.log(reqbody);
       var temp = await axios.post(
-        "http://kazlangres.enu.kz/v1/api/getontology/ask/",
-        reqbody
+        `${AHMET_API}/getontology/ask/`,
+        reqbody, {headers: getHeader()}
       );
       console.log(temp.data);
       this.OntoInner = temp.data;

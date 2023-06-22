@@ -149,6 +149,7 @@
 <script>
 // import { ref } from "vue";
 import axios from "axios";
+import { AHMET_API, getHeader } from "../../config"; 
 export default {
   data() {
     return {
@@ -179,7 +180,7 @@ export default {
       var response = {};
       try {
         await axios
-          .post("http://kazlangres.enu.kz/v1/api/word/synomize/", {
+          .post(`${AHMET_API}/word/synomize/`, {
             value: event.target.value,
             words_family: words_family,
           })
@@ -243,18 +244,18 @@ export default {
       this.$emit("custom-event", this.word);
     },
     async addSynonym() {
-      await axios.post("http://kazlangres.enu.kz/v1/api/add/synonym/", {
+      await axios.post(`${AHMET_API}/add/synonym/`, {
         synonyms: this.sonynomToAdd,
         word: this.word,
         family: this.family,
-      });
+      }, {headers: getHeader()});
     },
     async addParaphrase() {
-      await axios.post("http://kazlangres.enu.kz/v1/api/add/paraphrase/", {
+      await axios.post(`${AHMET_API}/add/paraphrase/`, {
         paraphrases: this.paraphraseToAdd,
         word: this.word,
         family: this.family,
-      });
+      }, {headers: getHeader()});
     },
   },
 };

@@ -102,6 +102,8 @@
 import axios from "axios";
 //import { store } from './store.js';
 import store from "../store.js";
+import { AHMET_API } from "../config";
+
 export default {
   data() {
     return {
@@ -123,7 +125,7 @@ export default {
       var response;
       var roles = [];
       await axios
-        .post("http://kazlangres.enu.kz/v1/api/login/", {
+        .post(`${AHMET_API}/login/`, {
           email: this.email,
           password: this.password,
         })
@@ -135,7 +137,7 @@ export default {
 
       //console.log(temp)
       await axios
-        .get("http://kazlangres.enu.kz/v1/api/who_am_i/", {
+        .get(`${AHMET_API}/who_am_i/`, {
           headers: { Authorization: `Bearer ${temp}` },
         })
         .then((response) => console.log((roles = response.data["roles"])));
