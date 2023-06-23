@@ -3,14 +3,14 @@
     class="surface-0 flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden"
   >
     <div class="grid justify-content-center p-2 lg:p-0" style="min-width: 80%">
-      <div class="col-12 mt-5 xl:mt-0 text-center">
+      <!-- <div class="col-12 mt-5 xl:mt-0 text-center">
         <img
           :src="'layout/images/logo-' + logoColor + '.svg'"
           alt="Sakai logo"
           class="mb-5"
           style="width: 81px; height: 60px"
         />
-      </div>
+      </div> -->
       <div
         class="col-12 xl:col-6"
         style="

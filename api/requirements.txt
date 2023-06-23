@@ -41,3 +41,6 @@ flask_jwt_extended
 numpy
 python-dotenv
 nltk
+marshmallow
+rdflib
+owlready

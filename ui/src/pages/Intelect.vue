@@ -59,6 +59,7 @@ export default {
   },
   methods: {
     getJson() {
+      console.log("AHMET_API:", `${AHMET_API}/getontology/kz/`);
       axios
         .get(`${AHMET_API}/getontology/kz/`)
         .then((response) => (this.OntNames = response.data));
@@ -68,10 +69,9 @@ export default {
         question: this.textController,
       };
       console.log(reqbody);
-      var temp = await axios.post(
-        `${AHMET_API}/getontology/ask/`,
-        reqbody, {headers: getHeader()}
-      );
+      var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
+        headers: getHeader(),
+      });
 
       this.OntoInner = temp.data;
     },
@@ -89,10 +89,9 @@ export default {
       };
 
       console.log(reqbody);
-      var temp = await axios.post(
-        `${AHMET_API}/getontology/ask/`,
-        reqbody, {headers: getHeader()}
-      );
+      var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
+        headers: getHeader(),
+      });
       console.log(temp.data);
       self.OntoInner = temp.data;
       self.textController = text;
@@ -111,10 +110,9 @@ export default {
       };
 
       console.log(reqbody);
-      var temp = await axios.post(
-        `${AHMET_API}/getontology/ask/`,
-        reqbody, {headers: getHeader()}
-      );
+      var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
+        headers: getHeader(),
+      });
       console.log(temp.data);
       this.OntoInner = temp.data;
     },

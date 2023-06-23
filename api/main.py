@@ -7,25 +7,20 @@ from flask import request,send_file
 import json
 import config
 import psycopg2
-from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import create_access_token, JWTManager, current_user, jwt_required
 import psycopg2.extras
 from flask_cors import CORS
 import os
 import re
 from morphology_api.morphology import Lemms
-from nltk.tokenize import sent_tokenize as st
 import os
-
-
-
+from db import *
+from nltk.tokenize import sent_tokenize as st
+print("######################################################################################################################################################")
 # app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@localhost/userdb'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@db/userdb'
-CORS(app)
-CORS(app, origins=['http://localhost:8080', 'http://kazlangres.enu.kz'])
+
 jwt = JWTManager(app)
-db = SQLAlchemy(app)
 @jwt.user_identity_loader
 def user_identity_lookup(user):
     return user.id
@@ -34,33 +29,6 @@ def user_identity_lookup(user):
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
     return User.query.filter_by(id=identity).one_or_none()
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(80), unique=True, nullable=False)
-    password_salt = db.Column(db.String(120), nullable=False)
-    password_hash = db.Column(db.String(120), nullable=False)
-
-class UserRole(db.Model):
-    __tablename__ = 'user_role'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    role_id = db.Column(db.Integer)
-
-class Role(db.Model):
-    __tablename__ = 'role'
-    role_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
-    description = db.Column(db.String(100), unique=True, nullable=False)
-    
-
-def get_db_connection():
-    conn = psycopg2.connect(
-            host="db",
-            dbname="userdb",
-            user='postgres',
-            password='magzhan2005')
-    return conn
 
 @app.route("/", methods=["GET"])
 def initialRoute():
@@ -68,6 +36,8 @@ def initialRoute():
 
 @app.route('/getontology/<lang>/', methods=['GET'])
 def getontology(lang):
+    from models import MyOwlReady
+    print("/getontology/<lang>/")
     s = MyOwlReady()
     owls = s.GetJson(lang=lang)
     return jsonify(owls)
@@ -92,9 +62,6 @@ def protected():
     roles = []
     for i in role_ids:
         roles.append(Role.query.filter_by(role_id=i).one_or_none().name)
-    #role_names = [role for role in roles]
-    # print(roles)
-    # print(role_ids)
     return jsonify(
         roles = roles,
         id=current_user.id,
@@ -104,8 +71,6 @@ def protected():
 
 @app.route('/getontology/ask/', methods=['POST'])
 def send_question():
-    #print('send_question')
-    #print(request)
     nation_to_lang = {
         'qazaq': 'kz',
         'qyrgyz': 'kg',
@@ -148,20 +113,12 @@ def send_question():
         'tr': 'Hiponim',
         'uz': 'Giponim'
     }
-
-    # question = request.POST['question']
-    # lang = request.POST['language']
-    #print(request.data.decode('utf-8'))
     temp = json.loads(request.data.decode('utf-8'))
     
     question = temp['question']
-    #print('#####################')
-    #print(question)
-    # lang = request.POST['language']
     lang = 'kz'
 
     g = MyOwlReady().TurkOnto
-    #g.parse ('ontology.owl')
 
     s= ''
     quest = '''
@@ -223,14 +180,13 @@ def send_question():
             def_qres = g.query(quest)
             for row in def_qres:
                 s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
-    print(s)
     return jsonify(s)
+
 @app.route('/getlegacies/', defaults={'parent_id': None}, methods=['GET'])
 @app.route('/getlegacies/<int:parent_id>', methods=['GET'])
 def get_legacy_records(parent_id):
-    print('get_legacy_records')
     try:
-        cur = get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)#mysql.get_db().cursor(pymysql.cursors.DictCursor)#cur = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+        cur = DB.get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)#mysql.get_db().cursor(pymysql.cursors.DictCursor)#cur = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
         if parent_id == None:  # Если parent_id равно 0, выбираем корневые записи
             cur.execute("SELECT id AS key, name AS label, path AS data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id IS NULL;")
         else:  # В противном случае выбираем записи с указанным parent_id
@@ -238,34 +194,24 @@ def get_legacy_records(parent_id):
 
 
         results = cur.fetchall()
-        print(results)
         legacies = jsonify(results)
         return legacies
 
     except Exception as e:
-        print('exeption')
         return jsonify(str(e)), 500
 
 @app.route('/legacy/download/<int:file_id>', methods=['GET'])
 def download_file(file_id):
-    print('download_file')
-    cur = get_db_connection().cursor()
+    cur = DB.get_db_connection().cursor()
     cur.execute("SELECT path from legacy WHERE id = %s",[file_id])
-    print('SELECTING')
     results = cur.fetchall()
     for row in results:
         path = row[0]
-    print(path)
     return send_file(path, as_attachment=True)
-# Мұрасы/Тіл ғылымы/Әліппелер/Сауат ашқыш. Ересектерге арналған әліппе. Семей. 1926.pdf
-# Мұрасы/Тіл ғылымы/Әліппелер
-# @app.after_request
-# def after_request(response):
-#   response.headers.add('Access-Control-Allow-Origin', '*')
+
 @app.route('/editPost/', methods = ['POST'])
 @jwt_required()
 def edit_post():
-    print('edit_post')
     results = UserRole.query.filter_by(user_id=current_user.id).with_entities(UserRole.role_id).all()
     role_ids = [result[0] for result in results]
     roles = []
@@ -274,10 +220,7 @@ def edit_post():
     if not 'admin' in roles:
         return jsonify("you don't have enough permission"), 500
     data = request.json
-    print('PRINTING DATA')
-    print(data)
-
-    conn = get_db_connection()
+    conn = DB.get_db_connection()
     method = data.get('method').get('_value')
     cursor = conn.cursor()
     if method == 'delete':
@@ -294,57 +237,34 @@ def edit_post():
         return jsonify(e), 500
     return jsonify('successful'), 200
 
-# @app.route(', methods=['DELETE'])
-# def delete(row_id):
-#     cur = conn.cursor()
-#     cur.execute('DELETE FROM your_table_name WHERE id = %s RETURNING *', (row_id,))
-#     deleted_row = cur.fetchone()
-#     conn.commit()
-#     cur.close()
-#     return jsonify(deleted_row)
-
 @app.route('/delete/file', methods=['POST'])
 def delete():
     fileID = request.form.get('fileID')
     try:
-        conn = get_db_connection()
+        conn = DB.get_db_connection()
         cur = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
         cur.execute('DELETE FROM legacy WHERE id = %s RETURNING *;', (fileID,))
         deleted_row = cur.fetchone()
         path = deleted_row['path']
-        print('deleted row:', deleted_row)
-        print('path: ',path)
-        print(fileID)
         if os.path.exists(path):
-            print('file is found')
             os.remove(path)
             conn.commit()
             return 'successfully deleted', 200
         else:
-            print('file is not found')
             return 'failed', 404
     except Exception as e:
-        print(e)
         return 'error', 400
-    # path_to_delete = request.form.get('path_to_delete')
-    # if os.path.exists('api/' + path_to_delete):
-    #     return 'exist', 200
-    # else:
-    #     return 'not found', 404
 
 @app.route('/change/file/name', methods=['POST'])
 def changeFileName():
     fileID = request.form.get('fileID')
     fileName = request.form.get('FileName')
-    print(fileID)
-    print(fileName)
     try:
-        conn = get_db_connection()
+        conn = DB.get_db_connection()
         cur = conn.cursor()
         cur.execute('UPDATE legacy SET name = %s WHERE id = %s', (fileName, fileID))
         conn.commit()
     except Exception as e:
-        print(e)
         return 'failed', 404
     return 'success', 200
 
@@ -359,8 +279,6 @@ def upload_file():
         }
         return ('', 204, headers)
     data = request.files
-    print('###########################################')
-    print('formData: ', request.form.keys())
     path_to_save = request.form.get('path_to_save')
     parent_id = request.form.get('parent_id')
     
@@ -369,35 +287,29 @@ def upload_file():
         file_storage = data.get(key)
         #filename = file_storage.filename
         content_type = file_storage.content_type
-        print('File object', data)
-        print('path to save: ', path_to_save)
-        print('parent_id: ', parent_id)
         path_to_save = path_to_save
         content_type = content_type.split("/")[1]
         try:
             #data[key].save(f'./{path_to_save}/' + filename)
             file_storage.filename = key
             file_storage.save(f'./{path_to_save}/' + key + '.' + content_type) 
-            db = get_db_connection()
+            db = DB.get_db_connection()
             cur = db.cursor()
             cur.execute('ALTER SEQUENCE legacy_id_seq RESTART WITH 100;')
             cur.execute("INSERT INTO legacy (name, path, parent_id, is_file) VALUES (%s, %s, %s, %s);", (key, path_to_save + "/" + file_storage.filename + '.' + content_type, parent_id, 1))
-            print(cur.rowcount)
             db.commit()
             cur.close()
             db.close()
         except Exception as e:
-            print(e)
             return 'File uploading failed', 400
         print(f"File {file_storage.filename} with content type {content_type} uploaded with key '{key}'")
-    print('###########################################')
     return 'File uploaded successfully'
 # @app.route('/justPost', methods = ['POST'])
 # def justPost():
 #     return 'success'
 @app.route('/classification/', methods=['POST'])
 def get_classification():
-    conn = get_db_connection()
+    conn = DB.get_db_connection()
     data = request.json
 
     first = data.get("first")
@@ -423,55 +335,21 @@ def get_classification():
 
 @app.route('/search/book/', methods=['POST'])
 def searchBook():
-    cur = get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+    cur = DB.get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)
     data = request.json['_rawValue']['global']
-    print(data)
     cur.execute("SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file FROM tag t JOIN tag_legacy tl ON t.id = tl.tag_id JOIN legacy l ON l.id = tl.legacy_id WHERE t.name LIKE %s;", ('%' + data + '%',))
     results = cur.fetchall()
-    print(results)
     legacies = jsonify(results)
     return legacies, 200
 
 @app.route('/search/book/file/', methods=['POST'])
 def searchFile():
-    cur = get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)
+    cur = DB.get_db_connection().cursor(cursor_factory = psycopg2.extras.RealDictCursor)
     data = request.json['global']
-    print(data)
     cur.execute("SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file FROM tag t JOIN tag_legacy tl ON t.id = tl.tag_id JOIN legacy l ON l.id = tl.legacy_id WHERE t.name ILIKE %s;", ('%' + data + '%',))
     results = cur.fetchall()
-    print(results)
     legacies = jsonify(results)
     return legacies, 200
-
-
-def looking_for_synonym(cur, word, family):
-    if family != '':
-        print("))))))))))))))))))))))))))))))")
-        print("word is:", word)
-        print("family is:", family)
-        cur.execute(
-        "SELECT s.synonym, z.words "
-        "FROM synonyms s "
-        "INNER JOIN synonym_word sw ON s.id = sw.synonym_id "
-        "INNER JOIN synamizer z ON z.id = sw.word_id "
-        "WHERE LOWER(TRIM(z.words)) = LOWER(%s) AND LOWER(TRIM(z.words_family)) = LOWER(%s)"
-        "AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);",
-        (word,family)
-        )
-    else:
-        print("))))))))))))))))))))))))))))))")
-        print("))))))))))))))))))))))))))))))")
-        cur.execute(
-        "SELECT s.synonym, z.words "
-        "FROM synonyms s "
-        "INNER JOIN synonym_word sw ON s.id = sw.synonym_id "
-        "INNER JOIN synamizer z ON z.id = sw.word_id "
-        "WHERE LOWER(TRIM(z.words)) = LOWER(%s)"
-        "AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);",
-        (word,))
-    synonyms = cur.fetchall()
-    print('synonym that was found: ',synonyms)
-    return synonyms
 
 def split_string(first_string, second_string):
     index = second_string.find(first_string)
@@ -480,34 +358,29 @@ def split_string(first_string, second_string):
         second_part = second_string[index + len(first_string):]
         return first_part, second_part
     else:
-        # print("#######################")
-        # print(first_string)
-        # print(second_string)
+        # "#######################")
+        # first_string)
+        # second_string)
         return "", ""
     
 
 @app.route('/search/synonyms/only', methods=['POST'])
 def searchsyn():
-    cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur = DB.get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     data = request.json['value']
-    print("request.json['second_part']: " + request.json['second_part'])
     second_part = request.json['second_part']
-    print('data: ', data)
-    # cur.execute('SELECT DISTINCT words_family FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));', (data,))
-    # word_family = cur.fetchone()
-    synonyms = looking_for_synonym(cur, data, '')
-    print("synonyms: ", synonyms)
+    synonyms = DB.looking_for_synonym(cur, data, '')
     for i in range(0, len(synonyms)):
          synonyms[i]['synonym'] = synonyms[i]['synonym'] + second_part
     return synonyms
 
 @app.route('/word/synomize/', methods=['POST'])
 def synomizing():
-    cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur = DB.get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     data = request.json['value']
     family = request.json['words_family']
     temp_families = []
-    # print(family)
+    # family)
     
     # cur.execute("SELECT DISTINCT CASE WHEN LOWER(TRIM(s.synonym)) LIKE LOWER(%s) THEN s.synonym ELSE z.words END as word, z.meaning, z.words_family,z.id, z.words FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) LIKE LOWER(%s) OR LOWER(TRIM(s.synonym)) = LOWER(%s);", ('%' + data + '%','%' + data + '%', '%' + data + '%'))
     # cur.execute("SELECT DISTINCT LOWER(TRIM(z.words)) AS word ,s.synonym, z.meaning,z.words_family,z.id FROM synamizer z INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synonyms s ON  z WHERE LOWER(TRIM(z.words)) LIKE LOWER(%s)", (data + "%",))
@@ -518,37 +391,35 @@ def synomizing():
         temp_families = cur.fetchall()
         cur.execute('SELECT DISTINCT id, status,words_family, meaning, words FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));', (data,family))
     found_data = cur.fetchall()
-    # print(found_data)
+    # found_data)
     all_families = []
     if len(temp_families) < len(found_data):
         for i in found_data:
-            print("words_family: " + i.get("words_family"))
             all_families.append({"family" : i.get("words_family")})
     else:
         for i in temp_families:
             all_families.append({"family" : i.get("words_family")})
     cur.execute("SELECT DISTINCT words FROM synamizer WHERE LOWER(TRIM(words)) LIKE LOWER(TRIM(%s)) LIMIT 3;", (data + "%", ) )
     all_words = cur.fetchall()
-    #print(all_words)
+    #all_words)
     if (len(all_words) == 1) and (all_words[0].get('words') == data):
         all_words = []
     try:
         word = found_data[0].get('words')
     except Exception as e:
-        print(found_data)
-        print(e)
         return 'bad request', 400
-    # print(syn)
-    print("$$$$$$$$$$$$$")
-    print("DATAS THAT I'M GONNA GIVE:", word, found_data[0].get('words_family'))
-    print("family:", family)
     if family == '':
-        synonyms = looking_for_synonym(cur, word, found_data[0].get('words_family'))
+        synonyms = DB.looking_for_synonym(cur, word, found_data[0].get('words_family'))
     else:
         found_data[0]['words_family'] = family
-        synonyms = looking_for_synonym(cur, word, family)
+        synonyms = DB.looking_for_synonym(cur, word, family)
     cur.execute("SELECT s.paraphrase FROM paraphrases s INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
     paraphrase = cur.fetchall()
+    paraphrase = cur.fetchall()
+    # print('all_words: ', all_words)
+    # print(found_data[0]['words_family'] )
+    
+    paraphrase = cur.fetchall()    
     # print('all_words: ', all_words)
     # print(found_data[0]['words_family'] )
     
@@ -574,17 +445,6 @@ def switch_case(argument):
     elif argument == 'үстеу':
         return 9
     
-def add_Synonyms(cur, synonym, word_id):
-    cur.execute("INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id", (synonym, ))
-    syn_id = cur.fetchone()['id']
-    print("syn_id: ", syn_id)
-    cur.execute("INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)", (word_id, syn_id))
-
-def add_Paraphrases(cur, paraphrase, word_id):
-    cur.execute("INSERT INTO paraphrases (paraphrase) VALUES (%s) RETURNING id", (paraphrase, ))
-    par_id = cur.fetchone()['id']
-    print("par_id: ", par_id)
-    cur.execute("INSERT INTO paraphrase_word (word_id, paraphrase_id) VALUES(%s, %s)", (word_id, par_id))
 
 @app.route('/add/word/', methods=['POST'])
 def addWord():
@@ -594,27 +454,26 @@ def addWord():
     word = request.json['word']
     family = request.json['family']['name']
     pos = switch_case(family)
-    db = get_db_connection()
+    db = DB.get_db_connection()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     try:
         # cur.execute("""SELECT setval('synamizer_id_seq', 1172, true)""")
         cur.execute("""INSERT INTO synamizer (words, words_family, meaning, pos, status)
         VALUES (%s, %s, %s, %s, 'омоним') RETURNING id""", (word, family, meaning, pos))
         row = cur.fetchone()
-        print("ROW: ", row)
     except Exception as e:
         return e, 400
     word_id = row['id']
     if len(synonyms) > 0:
         for i in synonyms:
             try:
-                add_Synonyms(cur, i, word_id)
+                DB.add_Synonyms(cur, i, word_id)
             except Exception as e:
                 return e, 400
     if len(paraphrases) > 0:
         for i in paraphrases:
             try:
-                add_Paraphrases(cur=cur, paraphrase=i, word_id=word_id)
+                DB.add_Paraphrases(cur=cur, paraphrase=i, word_id=word_id)
             except Exception as e:
                 return e, 400
     db.commit()
@@ -622,50 +481,31 @@ def addWord():
 
 @app.route('/add/synonym/', methods=['POST'])
 def addSynonym():
-    print('/add/synonym/ started')
-    db = get_db_connection()
+    db = DB.get_db_connection()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     synonyms = request.json['synonyms']
     word = request.json['word']
     family = request.json['family']['family']
     cur.execute('SELECT id FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));', (word, family))
     word_id = cur.fetchone()['id']
-    print("word_id:", word_id)
     for i in synonyms:
-        add_Synonyms(cur, i, word_id)
+        DB.add_Synonyms(cur, i, word_id)
     db.commit()
     return 'success', 200
 
 @app.route('/add/paraphrase/', methods=['POST'])
 def addParaphrase():
-    db = get_db_connection()
+    db = DB.get_db_connection()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     paraphrases = request.json['paraphrases']
     word = request.json['word']
     family = request.json['family']['family']
-    print('word:', word)
-    print('family:', family)
-    print('paraphrases:', paraphrases)
     cur.execute('SELECT id FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));', (word, family))
     word_id = cur.fetchone()['id']
     for i in paraphrases:
-        add_Paraphrases(cur, i, word_id)
+        DB.add_Paraphrases(cur, i, word_id)
     db.commit()
     return 'success', 200
-
-def findsyn(word, synomized_count, synomized_words):
-    print('word that gives ', word)
-    cur = get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s);", (word,))#LOWER(z.words)
-    synonym = cur.fetchone()
-    if synonym == None:
-        return [word, synomized_count]
-    print(synonym)
-    synomized_count += 1
-    synomized_words.append(synonym.get('synonym'))
-    return [synonym.get('synonym'), synomized_count]
-
-
 
 
 @app.route('/search/word/', methods=['POST'])
@@ -681,7 +521,7 @@ def searchWord():
     data_id = 0
     for word in words:
         if word not in [",", ".", "!", "?", ";"]:
-            translated_word, synomized_count = findsyn(word, synomized_count, synomized_words)
+            translated_word, synomized_count = DB.findsyn(word, synomized_count, synomized_words)
             first_part = word
             sentences = st(translated_word) # тексттен сөйлемдерді бөліп аламыз
             stcs = Lemms.get_kaz_lemms(Lemms,sentences)
@@ -690,12 +530,12 @@ def searchWord():
                 if len(stcs[0][0][2]) == 0:
                     _, second_part = split_string(translated_word, stcs[0][length][3])
                     first_part = stcs[0][length][3]
-                    translated_word, synomized_count = findsyn(stcs[0][length][3], synomized_count, synomized_words)
+                    translated_word, synomized_count = DB.findsyn(stcs[0][length][3], synomized_count, synomized_words)
                     translated_word =   translated_word +second_part 
                 else:
                     _, second_part = split_string(stcs[0][length][3], translated_word)
                     first_part = stcs[0][length][3]
-                    translated_word, synomized_count = findsyn(stcs[0][length][3], synomized_count, synomized_words)
+                    translated_word, synomized_count = DB.findsyn(stcs[0][length][3], synomized_count, synomized_words)
                     translated_word =  translated_word +second_part
             if word != translated_word:
                 translated_word = '<span class="temp_testing_div2" type="button" style="color: green;"' + 'href="' +first_part+  '"' + 'second_part="' + second_part + '"' + 'id="' + "span-"+str(data_id) + '"' + '>' + translated_word +'</span>'
@@ -703,15 +543,10 @@ def searchWord():
             output_words.append(translated_word) 
         else:
             output_words.append(word)
-    # output_string = "".join(output_words)
     return jsonify([output_words, synomized_count, synomized_words]), 200
 if __name__ == "__main__":
-    print("SERVER STARTED")
-    load_dotenv()
-    print(os.environ.get("HOST"))
-    host = os.environ.get("HOST")
-    # main()
     from models import MyOwlReady
+    load_dotenv()
     s = MyOwlReady()
     config.init_conf()
     app.run(port=os.environ.get("API_PORT"), debug=True, host=os.environ.get("API_URL"))    

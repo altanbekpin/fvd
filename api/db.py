@@ -1,109 +1,82 @@
-from datetime import date, datetime
-from decimal import Decimal
-
-from sqlalchemy import create_engine
-
-import urllib.parse
+from flask_sqlalchemy import SQLAlchemy
 import psycopg2
+from app import app
 
-def initialize_database():
-    conn = psycopg2.connect(
-            host="localhost",
-            database="userdb",
+db = SQLAlchemy(app)
+
+class DB():
+    @staticmethod
+    def get_db_connection():
+        conn = psycopg2.connect(
+            host="db",
+            dbname="userdb",
             user='postgres',
             password='magzhan2005')
+        return conn
 
-    # Open a cursor to perform database operations
-    cur = conn.cursor()
+    @staticmethod
+    def looking_for_synonym(cur, word, family):
+        if family != '':
+            cur.execute(
+            "SELECT s.synonym, z.words "
+            "FROM synonyms s "
+            "INNER JOIN synonym_word sw ON s.id = sw.synonym_id "
+            "INNER JOIN synamizer z ON z.id = sw.word_id "
+            "WHERE LOWER(TRIM(z.words)) = LOWER(%s) AND LOWER(TRIM(z.words_family)) = LOWER(%s)"
+            "AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);",
+            (word,family)
+            )
+        else:
+            cur.execute(
+            "SELECT s.synonym, z.words "
+            "FROM synonyms s "
+            "INNER JOIN synonym_word sw ON s.id = sw.synonym_id "
+            "INNER JOIN synamizer z ON z.id = sw.word_id "
+            "WHERE LOWER(TRIM(z.words)) = LOWER(%s)"
+            "AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);",
+            (word,))
+        synonyms = cur.fetchall()
+        return synonyms
+    
+    @staticmethod
+    def add_Synonyms(cur, synonym, word_id):
+        cur.execute("INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id", (synonym, ))
+        syn_id = cur.fetchone()['id']
+        cur.execute("INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)", (word_id, syn_id))
 
-    # Execute a command: this creates a new table
-    cur.execute('DROP TABLE IF EXISTS users;')
-    cur.execute('CREATE TABLE users (id SERIAL PRIMARY KEY,'
-                                    'email VARCHAR (150) NOT NULL,'
-                                    'password TEXT NOT NULL,'
-                                    'fullname VARCHAR (50) NOT NULL,'
-                                    'date_added DATE DEFAULT CURRENT_TIMESTAMP);'
-                                    )
+    @staticmethod
+    def add_Paraphrases(cur, paraphrase, word_id):
+        cur.execute("INSERT INTO paraphrases (paraphrase) VALUES (%s) RETURNING id", (paraphrase, ))
+        par_id = cur.fetchone()['id']
+        cur.execute("INSERT INTO paraphrase_word (word_id, paraphrase_id) VALUES(%s, %s)", (word_id, par_id))
 
-    # Insert data into the table
-    # cur.execute('INSERT INTO users (title, author, pages_num, review)'
-    #             'VALUES (%s, %s, %s, %s)',
-    #             ('A Tale of Two Cities',
-    #             'Charles Dickens',
-    #             489,
-    #             'A great classic!')
-    #             )
-
-
-    # cur.execute('INSERT INTO books (title, author, pages_num, review)'
-    #             'VALUES (%s, %s, %s, %s)',
-    #             ('Anna Karenina',
-    #             'Leo Tolstoy',
-    #             864,
-    #             'Another great classic!')
-    #             )
-
-    conn.commit()
-
-    cur.close()
-    conn.close()
-
-initialize_database()
+    @staticmethod
+    def findsyn(word, synomized_count, synomized_words):
+        cur = DB.get_db_connection().cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s);", (word,))#LOWER(z.words)
+        synonym = cur.fetchone()
+        if synonym == None:
+            return [word, synomized_count]
+        synomized_count += 1
+        synomized_words.append(synonym.get('synonym'))
+        return [synonym.get('synonym'), synomized_count]
 
 
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(80), unique=True, nullable=False)
+    password_salt = db.Column(db.String(120), nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
 
+class UserRole(db.Model):
+    __tablename__ = 'user_role'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    role_id = db.Column(db.Integer)
 
-
-
-
-
-#password = urllib.parse.quote_plus("alhafizu")
-#password = urllib.parse.quote_plus("@Remote2022")
-# class Db():
-
-#     def __init__(self):
-#         #db_url = f'mysql+pymysql://root:{password}@10.1.1.161/quotes_db'
-
-#         #engine = create_engine(f'mysql+pymysql://dbuser:{password}@db/quotes_db')
-#         engine = create_engine(f'mysql+pymysql://root:{password}@10.1.1.161/quotes_db')
-#         self.connection = engine.connect()
-
-#     def __del__(self):
-#         self.connection.close()
-#     # Рекурсивная функция для сканирования директории и записи информации в базу данных
-#     def scan_directory(path, parent_id=None):
-#         print(path)
-#         for name in os.listdir(path):
-#             full_path = os.path.join(path, name)
-#             is_file = os.path.isfile(full_path)
-
-#             # Добавляем запись в базу данных
-#             c.execute('''INSERT INTO directory_structure (name, path, parent_id, is_file) VALUES (?, ?, ?, ?)''', (name, full_path, parent_id, is_file))
-#             conn.commit()
-
-#             # Получаем ID последней добавленной записи
-#             id = c.lastrowid
-
-#             # Если это директория, рекурсивно вызываем эту же функцию для сканирования этой директории
-#             if not is_file:
-#                 scan_directory(full_path, id)
-#     def clean_select_row(self, row, keys):
-#         try:
-#             clean_row = [str(field) if isinstance(field, datetime) or isinstance(
-#                 field, Decimal) or isinstance(field, date) else field for field in list(row)]
-#             current_row = {}
-#             i = 0
-#             for key in keys:
-#                 current_row[key] = clean_row[i]
-#                 i= i +1
-#             return current_row
-#         except:
-#             return None
-
-#     def clean_select_results(self, data, keys):
-#         if len(data) == 0:
-#             return {}
-#         result_data = []
-#         for row in data:
-#             result_data.append(self.clean_select_row(row, keys))
-#         return result_data
+class Role(db.Model):
+    __tablename__ = 'role'
+    role_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    description = db.Column(db.String(100), unique=True, nullable=False)

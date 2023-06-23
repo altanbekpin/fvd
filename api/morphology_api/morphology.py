@@ -20,14 +20,8 @@ import re
 import sqlite3
 from .word import Word
 import psycopg2
+from db import *
 
-def get_db_connection():
-    conn = psycopg2.connect(
-            host="db",
-            dbname="userdb",
-            user='postgres',
-            password='magzhan2005')
-    return conn
 
 
 def is_soft(word) : 
@@ -216,7 +210,7 @@ class Lemms:
         return PosName
 
     def get_kaz_lemms(self, sentences):
-        con = get_db_connection()
+        con = DB.get_db_connection()
         cur = con.cursor()
         token_list = []
         lemms_list = []
@@ -280,7 +274,7 @@ class Lemms:
         print('lemms_list: ', lemms_list)
         return lemms_list
     def solve_math_task(self, sentences):
-        con = get_db_connection()
+        con = DB.get_db_connection()
         cur = con.cursor()
         token_list = []
         lemms_list = []
@@ -349,7 +343,7 @@ class Lemms:
         return lemms_list
     def get_expert_words(self):
         list = []
-        con = get_db_connection()
+        con = DB.get_db_connection()
         cursor = con.cursor()
         query = 'SELECT id, morphem, pos FROM morphemes WHERE isModerated = 0'
         cursor.execute(query)
@@ -363,7 +357,7 @@ class Lemms:
         arr = {}
         list = []
         posCountList = []
-        con = get_db_connection()
+        con = DB.get_db_connection()
         cursor = con.cursor()
         query = 'SELECT * FROM morphemes'
         cursor.execute(query)
@@ -388,7 +382,7 @@ class Lemms:
     def get_all_morphemes(self):
         arr = {}
         list = []
-        con = get_db_connection()
+        con = DB.get_db_connection()
         cursor = con.cursor()
         query = 'SELECT * FROM morphemes ORDER BY morphem DESC'
         cursor.execute(query)
