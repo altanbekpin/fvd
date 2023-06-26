@@ -36,7 +36,7 @@ class MyOwlReady:
             print(" __init__ method called..")
 
             _turkOnto = rdflib.Graph()
-            _turkOnto.parse ('ahmettanu/Akhmettanu.owl')
+            _turkOnto.parse ('owl/Akhmettanu.owl')
             
 
         else:
@@ -52,7 +52,7 @@ class MyOwlReady:
             cls.__instance = MyOwlReady()
         print("TurkOntology loading...")
         cls._turkOnto = rdflib.Graph()
-        cls._turkOnto.parse('ahmettanu/Akhmettanu.owl')
+        cls._turkOnto.parse('owl/Akhmettanu.owl')
     def SyncReasoner(cls):
         if not cls.__instance:
             cls.__instance = MyOwlReady()
@@ -73,7 +73,7 @@ class MyOwlReady:
         #lang = "kg"
         res= ""
         g = rdflib.Graph()
-        g.parse('ahmettanu/Akhmettanu.owl')
+        g.parse('owl/Akhmettanu.owl')
         quest = 'SELECT ?label WHERE { ?subject rdfs:subClassOf ?object . ?subject rdfs:label ?label FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "' + lang + '")) } order by ?label '
         qres = g.query(quest)
         owlclasses = []
@@ -90,7 +90,7 @@ class MyOwlReady:
         if cls._turkOnto == None:
             print("TurkOntology loading...")
             cls._turkOnto = rdflib.Graph()
-            cls._turkOnto.parse('ahmettanu/Akhmettanu.owl')
+            cls._turkOnto.parse('owl/Akhmettanu.owl')
 
         return cls._turkOnto
     @property
@@ -116,7 +116,7 @@ class MyOntology():
     
         
     def savetofile(self):
-        f = open( 'ahmettanu/Akhmettanu.owl', 'w',encoding='utf-8')
+        f = open( 'owl/Akhmettanu.owl', 'w',encoding='utf-8')
 
         f.write(self.text)
         f.close()
