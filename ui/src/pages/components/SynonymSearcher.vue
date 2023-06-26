@@ -1,11 +1,11 @@
 <template>
   <div class="row">
     <div>Сөзді енгізіңіз</div>
-    <div style="position: relative">
+    <div style="position: relative; width: 100%">
       <InputText
         type="text"
         v-model="word"
-        style="width: 230px"
+        style="width: 100%"
         @input="onChange($event, '')"
       />
       <div v-if="synonyms.length > 1" ref="listbox">
@@ -25,7 +25,7 @@
     <!-- <Listbox v-model="selectedCity" :options="cities" filter optionLabel="name" class="w-full md:w-14rem" /> -->
     <Button
       label="Іздеу"
-      style="margin-left: 20px"
+      style="padding-right: 30px; padding-left: 10px"
       @click="onSearchTap"
     ></Button>
   </div>
@@ -149,7 +149,7 @@
 <script>
 // import { ref } from "vue";
 import axios from "axios";
-import { AHMET_API, getHeader } from "../../config"; 
+import { AHMET_API, getHeader } from "../../config";
 export default {
   data() {
     return {
@@ -244,18 +244,26 @@ export default {
       this.$emit("custom-event", this.word);
     },
     async addSynonym() {
-      await axios.post(`${AHMET_API}/add/synonym/`, {
-        synonyms: this.sonynomToAdd,
-        word: this.word,
-        family: this.family,
-      }, {headers: getHeader()});
+      await axios.post(
+        `${AHMET_API}/add/synonym/`,
+        {
+          synonyms: this.sonynomToAdd,
+          word: this.word,
+          family: this.family,
+        },
+        { headers: getHeader() }
+      );
     },
     async addParaphrase() {
-      await axios.post(`${AHMET_API}/add/paraphrase/`, {
-        paraphrases: this.paraphraseToAdd,
-        word: this.word,
-        family: this.family,
-      }, {headers: getHeader()});
+      await axios.post(
+        `${AHMET_API}/add/paraphrase/`,
+        {
+          paraphrases: this.paraphraseToAdd,
+          word: this.word,
+          family: this.family,
+        },
+        { headers: getHeader() }
+      );
     },
   },
 };

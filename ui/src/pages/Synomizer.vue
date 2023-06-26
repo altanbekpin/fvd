@@ -7,18 +7,35 @@
     </div>
     <hr height="20px" />
     <div class="row">
-      <WordSynomizer></WordSynomizer>
-      <div
-        class="card temp"
-        style="width: 500px; height: 560px; position: relative"
-      >
-        <SynonymSearcher @custom-event="showDialog" />
+      <div>
+        <span style="font-size: 12px; width: 500px">
+          Мәтін синонимайзері қазақ тілінде енгізілген мәтіндегі сөздерді
+          синонимдермен алмастыруға көмектеседі. Мәтіндегі сөз синонимдермен
+          ауыстырылса жасыл түспен белгіленіп көрсетіледі. Синонимайзер арқылы
+          өнделген мәтінге семантикасына қарай өзгеріс енгізу мүмкіндігі бар, ол
+          үшін белгіленген сөздің үстінен басып, көрсетілген синонимдер ішінен
+          мағынасына сай сөзді таңдап, түзете аласыз
+        </span>
+        <div
+          class="card main-card"
+          style="width: 100%; height: 500px; margin-top: 20px"
+        >
+          <WordSynomizer></WordSynomizer>
+        </div>
+      </div>
+      <div style="height: 100%">
+        <div
+          class="card temp"
+          style="width: 500px; height: 560px; position: relative"
+        >
+          <SynonymSearcher @custom-event="showDialog" />
+        </div>
       </div>
     </div>
 
     <div
       class="card temp-mobile"
-      style="width: 500px; height: 560px; position: relative"
+      style="width: 100%; height: 100%; position: relative; min-height: 560px"
     >
       <SynonymSearcher @custom-event="showDialog" />
     </div>
@@ -161,31 +178,6 @@ const handleSelection = async (selectedItem) => {
   return await onChange(event, selectedItem.value["family"]);
 };
 const targetRef = ref(null);
-// eslint-disable-next-line no-unused-vars
-// const handleLineClick = async (e) => {
-//   let clickedElHref = e.target.getAttribute("href");
-//   let clickedElId = e.target.id;
-//   let clickkedRef = e.target.getAttribute("second_part");
-//   const target = e.target;
-//   if (target.tagName === "SPAN") {
-//     targetRef.value = target;
-//   }
-//   if (clickedElId === "temp_testing_div2") {
-//     handleClick(e);
-//     console.log("temp_testing_div2 clicked!", clickedElHref);
-//     await axios
-//       .post("http://kazlangres.enu.kz/v1/api/search/synonyms/only", {
-//         value: clickedElHref,
-//         second_part: clickkedRef,
-//       })
-//       .then((response) => {
-//         optionSynonyms.value = response.data;
-//       });
-//   } else {
-//     console.log("another element was clicked");
-//   }
-// };
-
 document.addEventListener("click", function (event) {
   console.log("tapped");
   var listBox = document.querySelector(".listbox"); // Select the ListBox element
@@ -198,9 +190,13 @@ document.addEventListener("click", function (event) {
 // eslint-disable-next-line no-unused-vars
 const send_to_synomize = async () => {
   await axios
-    .post(`${AHMET_API}/search/word/`, {
-      value: inputWords.value,
-    }, {headers: getHeader()})
+    .post(
+      `${AHMET_API}/search/word/`,
+      {
+        value: inputWords.value,
+      },
+      { headers: getHeader() }
+    )
     .then((response) => {
       console.log(response);
       synomized_words.value = response.data[0];
@@ -286,13 +282,17 @@ const addWord = () => {
     meaningInput.value != "" &&
     (selectedFamily.value != "" || paraphraseInput.value != "")
   ) {
-    axios.post(`${AHMET_API}/add/word/`, {
-      synonyms: synonymInput.value,
-      word: inputValues.value,
-      meaning: meaningInput.value,
-      family: selectedFamily.value,
-      paraphrases: paraphraseInput.value,
-    }, {headers: getHeader()});
+    axios.post(
+      `${AHMET_API}/add/word/`,
+      {
+        synonyms: synonymInput.value,
+        word: inputValues.value,
+        meaning: meaningInput.value,
+        family: selectedFamily.value,
+        paraphrases: paraphraseInput.value,
+      },
+      { headers: getHeader() }
+    );
     synonymInput.value = "";
     inputValues.value = "";
     meaningInput.value = "";
@@ -334,10 +334,6 @@ const addWord = () => {
 .dropDown {
   border-radius: 100px;
 }
-.bounder {
-  /* //align-items: center; */
-  height: 700px;
-}
 /* Define the breakpoint where the menu will appear below the body */
 @media screen and (max-width: 1400px) {
   /* Hide the menu when the screen width is greater than or equal to the breakpoint */
@@ -345,7 +341,7 @@ const addWord = () => {
     display: none;
   }
   .bounder {
-    height: 1300px;
+    height: 100%;
   }
   .temp-mobile {
     display: block;

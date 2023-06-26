@@ -1,80 +1,70 @@
 <template>
   <div>
     <div>
-      <span style="font-size: 12px; width: 500px">
-        Мәтін синонимайзері қазақ тілінде енгізілген мәтіндегі сөздерді
-        синонимдермен алмастыруға көмектеседі. Мәтіндегі сөз синонимдермен
-        ауыстырылса жасыл түспен белгіленіп көрсетіледі. Синонимайзер арқылы
-        өнделген мәтінге семантикасына қарай өзгеріс енгізу мүмкіндігі бар, ол
-        үшін белгіленген сөздің үстінен басып, көрсетілген синонимдер ішінен
-        мағынасына сай сөзді таңдап, түзете аласыз
-      </span>
+      <Textarea rows="15" cols="55" v-model="inputWords" style="width: 100%" />
+      <div class="row texts" style="margin-top: 30px">
+        <div>Символдар саны = {{ inputWords.length }}</div>
+        <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
+        <Button
+          label="Өңдеу"
+          style="margin-left: 80px"
+          @click="send_to_synomize"
+        />
+      </div>
       <div
-        class="card main-card"
-        style="width: 500px; height: 500px; margin-top: 20px"
+        class="card"
+        style="
+          width: 100%;
+          margin-top: 10px;
+          margin-bottom: 10px;
+          overflow: hidden;
+          height: 130px;
+          max-height: 130px;
+          padding-bottom: 40px;
+        "
       >
-        <Textarea rows="15" cols="55" v-model="inputWords" />
-        <div class="row texts" style="margin-top: 30px">
-          <div>Символдар саны = {{ inputWords.length }}</div>
-          <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
-          <Button
-            label="Өңдеу"
-            style="margin-left: 80px"
-            @click="send_to_synomize"
-          />
-        </div>
         <div
-          class="card"
           style="
-            width: 450px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            height: 130px;
+            width: 100%;
+            overflow-y: auto;
+            padding-right: 10px;
+            max-height: 100px;
+            height: 100px;
           "
         >
-          <div
-            style="
-              width: 420px;
-              overflow: auto;
-              height: 112px;
-              padding-right: 10px;
-            "
-          >
-            <!-- <div v-html="synomized_words"></div> -->
-            <div class="word-container">
-              <span v-for="(word, index) in synomized_words" :key="index">
-                <span
-                  v-if="isHtml(word)"
-                  v-html="word"
-                  @click="handleLineClick"
-                ></span>
-                <span v-else>{{ word }}</span>
-              </span>
-            </div>
-
-            <OverlayPanel
-              ref="op"
-              style="border: none; padding: 0"
-              v-if="synomized_counter != 0"
-              :appendTo="'span#span-2.temp_testing_div2'"
-            >
-              <div class="border-inner">
-                <Listbox
-                  v-model="selectedSyn"
-                  :options="optionSynonyms"
-                  optionLabel="synonym"
-                  class="w-full"
-                  style="
-                    border: none;
-                    margin: 0;
-                    max-height: 80px;
-                    overflow-y: auto;
-                  "
-                  @change="onSynonymTap"
-                />
-              </div>
-            </OverlayPanel>
+          <div class="word-container">
+            <span v-for="(word, index) in synomized_words" :key="index">
+              <span
+                v-if="isHtml(word)"
+                v-html="word"
+                @click="handleLineClick"
+              ></span>
+              <span v-else>{{ word }}</span>
+            </span>
           </div>
+
+          <OverlayPanel
+            ref="op"
+            style="border: none; padding: 0"
+            v-if="synomized_counter != 0"
+            :appendTo="'span#span-2.temp_testing_div2'"
+          >
+            <div class="border-inner">
+              <Listbox
+                v-model="selectedSyn"
+                :options="optionSynonyms"
+                optionLabel="synonym"
+                class="w-full"
+                style="
+                  border: none;
+                  margin: 0;
+                  max-height: 80px;
+                  overflow-y: auto;
+                "
+                @change="onSynonymTap"
+              />
+            </div>
+          </OverlayPanel>
         </div>
       </div>
     </div>
@@ -82,7 +72,7 @@
 </template>
 <script>
 import axios from "axios";
-import { AHMET_API, getHeader } from "../../config"; 
+import { AHMET_API, getHeader } from "../../config";
 
 export default {
   data() {
@@ -100,9 +90,13 @@ export default {
   methods: {
     async send_to_synomize() {
       await axios
-        .post(`${AHMET_API}/search/word/`, {
-          value: this.inputWords
-        }, {headers: getHeader()})
+        .post(
+          `${AHMET_API}/search/word/`,
+          {
+            value: this.inputWords,
+          },
+          { headers: getHeader() }
+        )
         .then((response) => {
           console.log(response);
           this.synomized_words = response.data[0];
@@ -125,10 +119,14 @@ export default {
         this.handleClick(e);
         console.log("temp_testing_div2 clicked!", clickedElHref);
         await axios
-          .post(`${AHMET_API}/search/synonyms/only`, {
-            value: clickedElHref,
-            second_part: clickkedRef,
-          }, {headers: getHeader()})
+          .post(
+            `${AHMET_API}/search/synonyms/only`,
+            {
+              value: clickedElHref,
+              second_part: clickkedRef,
+            },
+            { headers: getHeader() }
+          )
           .then((response) => {
             this.optionSynonyms = response.data;
           });
