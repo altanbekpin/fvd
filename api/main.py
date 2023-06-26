@@ -71,6 +71,7 @@ def protected():
 
 @app.route('/getontology/ask/', methods=['POST'])
 def send_question():
+    from models import MyOwlReady
     nation_to_lang = {
         'qazaq': 'kz',
         'qyrgyz': 'kg',
@@ -373,6 +374,18 @@ def searchsyn():
     for i in range(0, len(synonyms)):
          synonyms[i]['synonym'] = synonyms[i]['synonym'] + second_part
     return synonyms
+
+@app.route('/add/tag', methods=['POST'])
+def addTag():
+    definition_id = request.json['definition_id']
+    file_id = request.json['file_id']
+    connection = DB.get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO tag_legacy (tag_id, legacy_id) VALUES (%s, %s);", (definition_id, file_id))
+    connection.commit()
+    cursor.close()
+    connection.close()
+    return 'success', 200
 
 @app.route('/word/synomize/', methods=['POST'])
 def synomizing():

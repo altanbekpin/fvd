@@ -99,6 +99,7 @@
         </form>
       </div>
     </Dialog>
+
     <Dialog
       v-model:visible="showDialog"
       modal
@@ -127,8 +128,30 @@
         <Button style="margin-right: 20px" @click="setChangeDialog"
           >Артқа қайту</Button
         >
-        <Button @click="changeFileName">Өзгерту</Button>
+        <Button style="margin-right: 20px" @click="changeFileName"
+          >Өзгерту</Button
+        >
+        <Button @click="showTagsDialog">Тег қосу</Button>
       </div>
+      <Dialog
+        v-model:visible="isDialogForTagsVisible"
+        modal
+        header="Жаңа тег қосу?"
+        :style="{ width: '30vw' }"
+      >
+        <Dropdown
+          v-model="selectedTag"
+          :options="tagsToAdd"
+          optionLabel="name"
+          placeholder="Таңдаңыз"
+          class="w-full md:w-14rem"
+        />
+        <div>
+          <Button @click="addTag" style="margin-top: 10px; margin-left: 10px"
+            >Тегті қосу</Button
+          >
+        </div>
+      </Dialog>
     </Dialog>
   </div>
 </template>
@@ -138,58 +161,50 @@ import { ref, onMounted, computed } from "vue";
 import { AhmetService } from "@/service/AhmetService";
 import store from "../store.js";
 import { AHMET_API } from "../config.js";
+import axios from "axios";
 // import axios from 'axios'
+const selectedTag = ref({ name: "", id: "" });
 const nodes = ref(null);
 const loading = ref(false);
 const visible = ref(false);
 const showDialog = ref(false);
+const isDialogForTagsVisible = ref(false);
 const FileName = ref("");
 const path_to_save = ref("");
 const form_Data = ref(new FormData());
 const fileID = ref("");
 const parent_id = ref("");
 const changeDialog = ref(false);
-const url = computed(() => AHMET_API + "api/upload")
-// const globalSearch = ref('')
-// const filters = ref({
-//     'global' : globalSearch.value
-// });
-// const lazyParams = ref({})
-
-// const onFilter = async()=>{
-//     if(filters.value['global'] == ""){
-//         loading.value =true
-//     AhmetService.getTreeTableNodes().then((data) => {
-//         console.log(data)
-//         loading.value = false
-//         let legacies = data.data;
-//         for (var i=0;legacies.length; i++) {
-//             legacies[i].key = String(legacies[i].key)
-//             if(legacies[i].is_file  === 0) {
-//                 legacies[i].leaf = false
-//             }
-//             nodes.value = legacies
-//         }
-//     });
-//     }
-//     else{
-//         loading.value = true
-//     const temp = await axios.post('http://kazlangres.enu.kz/search/book/', filters);
-//     console.log('temp: ',temp)
-//         loading.value = false
-//         let legacies = temp.data;
-//         for (var i=0;legacies.length; i++) {
-//             legacies[i].key = String(legacies[i].key)
-//             if(legacies[i].is_file  === 0) {
-//                 legacies[i].leaf = false
-//             }
-//             nodes.value = legacies
-//     }
-//     console.log('nodes.value: ', nodes.value)
-//     }
-//     console.log('global value: ', filters.value['global'])
-
-// }
+const url = computed(() => AHMET_API + "api/upload");
+const tagsToAdd = [
+  { name: "АҒАРТУШЫ", id: "1" },
+  { name: "ҰЛТ ҰСТАЗЫ", id: "2" },
+  { name: "ҚОҒАМ ҚАЙРАТКЕРІ", id: "3" },
+  { name: "ТІЛТАНУШЫ", id: "4" },
+  { name: "ТҮРКІТАНУШЫ", id: "5" },
+  { name: "ТЕРМИНТАНУШЫ", id: "6" },
+  { name: "ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ", id: "7" },
+  { name: "ӘДЕБИЕТТАНУШЫ", id: "8" },
+  { name: "ФОЛЬКЛОРТАНУШЫ", id: "9" },
+  { name: "ӨНЕРТАНУШЫ", id: "10" },
+  { name: "АҚЫН", id: "11" },
+  { name: "ЖАЗУШЫ", id: "12" },
+  { name: "ПУБЛИЦИСТ", id: "13" },
+  { name: "АУДАРМАШЫ", id: "14" },
+  { name: "ӘДІСКЕР", id: "15" },
+  { name: "ПЕДАГОГ", id: "16" },
+  { name: "ПСИХОЛОГ", id: "17" },
+  { name: "ЗАҢГЕР", id: "18" },
+  { name: "САЯСАТКЕР", id: "19" },
+  { name: "ДЕМОГРАФ", id: "20" },
+  { name: "ТАРИХШЫ", id: "21" },
+];
+const addTag = () => {
+  axios.post(`${AHMET_API}/add/tag`, {
+    file_id: fileID.value,
+    definition_id: selectedTag.value.id,
+  });
+};
 
 const handleFileUpload = (event) => {
   console.log(event);
@@ -292,6 +307,9 @@ const setFalse = () => {
 const setChangeDialog = (fileID_) => {
   fileID.value = fileID_;
   changeDialog.value = !changeDialog.value;
+};
+const showTagsDialog = () => {
+  isDialogForTagsVisible.value = true;
 };
 </script>
 <style setup>

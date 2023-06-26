@@ -11,39 +11,41 @@
       <template #content>
         <ul>
           <li>
-            <span class="button">АҒАРТУШЫ</span>,
-            <span class="button">ҰЛТ ҰСТАЗЫ</span>,
-            <span class="button">ҚОҒАМ ҚАЙРАТКЕРІ</span>
+            <span class="button" id="1">АҒАРТУШЫ</span>,
+            <span class="button" id="2">ҰЛТ ҰСТАЗЫ</span>,
+            <span class="button" id="3">ҚОҒАМ ҚАЙРАТКЕРІ</span>
           </li>
           <li>
-            <span class="button">ТІЛТАНУШЫ</span>,
-            <span class="button">ТҮРКІТАНУШЫ</span>,
-            <span class="button">ТЕРМИНТАНУШЫ</span>
+            <span class="button" id="4">ТІЛТАНУШЫ</span>,
+            <span class="button" id="5">ТҮРКІТАНУШЫ</span>,
+            <span class="button" id="6">ТЕРМИНТАНУШЫ</span>
           </li>
           <li>
-            <span class="button">ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ</span>
+            <span class="button" id="7"
+              >ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ</span
+            >
           </li>
           <li>
-            <span class="button">ӘДЕБИЕТТАНУШЫ</span>,
-            <span class="button">ФОЛЬКЛОРТАНУШЫ</span>,
-            <span class="button">ӨНЕРТАНУШЫ</span>
+            <span class="button" id="8">ӘДЕБИЕТТАНУШЫ</span>,
+            <span class="button" id="9">ФОЛЬКЛОРТАНУШЫ</span>,
+            <span class="button" id="10">ӨНЕРТАНУШЫ</span>
           </li>
           <li>
-            <span class="button">АҚЫН</span>,
-            <span class="button">ЖАЗУШЫ</span>,
-            <span class="button">ПУБЛИЦИСТ</span>,
-            <span class="button">АУДАРМАШЫ</span>
+            <span class="button" id="11">АҚЫН</span>,
+            <span class="button" id="12">ЖАЗУШЫ</span>,
+            <span class="button" id="13">ПУБЛИЦИСТ</span>,
+            <span class="button" id="14">АУДАРМАШЫ</span>
           </li>
           <li>
-            <span class="button">ӘДІСКЕР</span>,
-            <span class="button">ПЕДАГОГ</span>,
-            <span class="button">ПСИХОЛОГ</span>
+            <span class="button" id="15">ӘДІСКЕР</span>,
+            <span class="button" id="16">ПЕДАГОГ</span>,
+            <span class="button" id="17">ПСИХОЛОГ</span>
           </li>
           <li>
-            <span class="button">ЗАҢГЕР</span>,
-            <span class="button">САЯСАТКЕР</span>,
-            <span class="button">ДЕМОГРАФ</span>,
-            <span class="button">ТАРИХШЫ</span>
+            <span class="button" id="18">ЗАҢГЕР</span>,
+            <span class="button" id="19">САЯСАТКЕР</span>,
+            <span class="button" id="20">ДЕМОГРАФ</span>,
+            <span class="button" id="21">ТАРИХШЫ</span>
           </li>
         </ul>
         <div class="card">
