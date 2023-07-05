@@ -241,7 +241,7 @@ class Lemms:
                 token = token.lower()
                 while len(token) > 0:
                     token = token[:-1] + self.change_syngor(self, token[-1:])
-                    cur.execute("SELECT words, pos FROM synamizer WHERE words = %s", (token,))
+                    cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(words) = LOWER(%s)", (token,))
                     for result in cur.fetchall():
                         if (not(token in kaz_stop_words)):
                             tok.append(u"".join(result[0]))

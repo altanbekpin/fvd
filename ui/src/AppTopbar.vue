@@ -22,13 +22,34 @@
         />
       </li>
     </ul>
-    <button class="p-link layout-topbar-button" @click="$router.push('/auth')">
-      <i class="pi pi-user"></i><span>Profile</span>
-    </button>
+    <Button icon="pi pi-user" @click="$router.push('/auth')" />
+    <Toast />
+    <ConfirmPopup group="demo">
+      <template #message="slotProps">
+        <div class="flex p-4">
+          <i :class="slotProps.message.icon" style="font-size: 1.5rem"></i>
+          <p class="pl-2">{{ slotProps.message.message }}</p>
+        </div>
+      </template>
+    </ConfirmPopup>
+    <Button
+      v-if="$store.getters.isUserRegistered"
+      @click="showTemplate($event)"
+      icon="pi pi-sign-out"
+      style="
+        margin-left: 10px;
+        background-color: red;
+        color: white;
+        outline: none;
+        border: none;
+      "
+    />
   </div>
 </template>
 
 <script>
+import { useStore } from "vuex";
+import store from "./store";
 export default {
   data() {
     return {
@@ -38,9 +59,50 @@ export default {
         { name: "English", value: "en" },
       ],
       language: null,
+      showConformation: false,
     };
   },
+  setup() {
+    const store = useStore();
+
+    // Access store.getters here
+    const isUserRegistered = store.getters.isUserRegistered;
+    console.log("isUserRegistered:", isUserRegistered);
+
+    // Rest of your component's code
+  },
+  mounted() {
+    console.log();
+  },
   methods: {
+    showTemplate(event) {
+      this.$confirm.require({
+        target: event.currentTarget,
+        group: "demo",
+        message: "Аккаунттан шығуғу сенімдісіз бе?",
+        icon: "pi pi-question-circle",
+        acceptIcon: "pi pi-check",
+        rejectIcon: "pi pi-times",
+        accept: () => {
+          store.commit("unLogUser");
+          this.$toast.add({
+            severity: "success",
+            summary: "Қабылданды",
+            detail: "Сәтті жүзеге асырылды",
+            life: 3000,
+          });
+          this.$router.push("/");
+        },
+        reject: () => {
+          this.$toast.add({
+            severity: "error",
+            summary: "Қабылданды",
+            detail: "Шығу бас тартылды",
+            life: 3000,
+          });
+        },
+      });
+    },
     onMenuToggle(event) {
       this.$emit("menu-toggle", event);
     },
@@ -77,7 +139,7 @@ export default {
               "Кез келгеніне сәйкес келу"),
             (this.$primevue.config.locale.addRule = "Ереже қосу"),
             (this.$primevue.config.locale.removeRule = "Ережені өшіру"),
-            (this.$primevue.config.locale.accept = "Йә"),
+            (this.$primevue.config.locale.accept = "Иә"),
             (this.$primevue.config.locale.reject = "Жоқ"),
             (this.$primevue.config.locale.choose = "Таңдау"),
             (this.$primevue.config.locale.upload = "Жүктеу"),

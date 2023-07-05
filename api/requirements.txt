@@ -44,3 +44,4 @@ nltk
 marshmallow
 rdflib
 owlready
+flask_mail

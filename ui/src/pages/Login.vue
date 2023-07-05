@@ -3,14 +3,7 @@
     class="surface-0 flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden"
   >
     <div class="grid justify-content-center p-2 lg:p-0" style="min-width: 80%">
-      <!-- <div class="col-12 mt-5 xl:mt-0 text-center">
-        <img
-          :src="'layout/images/logo-' + logoColor + '.svg'"
-          alt="Sakai logo"
-          class="mb-5"
-          style="width: 81px; height: 60px"
-        />
-      </div> -->
+      <Toast />
       <div
         class="col-12 xl:col-6"
         style="
@@ -35,8 +28,9 @@
           "
         >
           <div class="text-center mb-5">
-            <!-- <img src="layout/images/avatar.png" alt="Image" height="50" class="mb-3"> -->
-            <div class="text-900 text-3xl font-medium mb-3">Қош келдіңіз</div>
+            <div class="text-900 text-3xl font-medium mb-3">
+              Қайта оралуыңызбен!
+            </div>
             <span class="text-600 font-medium"
               >Жалғастыру үшін аккаунтқа кіріңіз</span
             >
@@ -83,7 +77,8 @@
               <a
                 class="font-medium no-underline ml-2 text-right cursor-pointer"
                 style="color: var(--primary-color)"
-                >Пароль ұмыттыңыз?</a
+                @click="$router.push('/register')"
+                >Біріншірет кіріп тұрсыз ба? Тіркелу</a
               >
             </div>
             <Button
@@ -124,18 +119,27 @@ export default {
       var temp = "";
       var response;
       var roles = [];
-      await axios
-        .post(`${AHMET_API}/login/`, {
-          email: this.email,
-          password: this.password,
-        })
-        .then((_response) => {
-          response = _response;
-        }); //temp = response.data['access_token']})
-      //const token = logged_as.data['access_token']
+      try {
+        await axios
+          .post(`${AHMET_API}/login/`, {
+            email: this.email,
+            password: this.password,
+          })
+          .then((_response) => {
+            response = _response;
+          });
+      } catch (error) {
+        this.$toast.add({
+          severity: "error",
+          summary: "Сәтсіз",
+          detail: "Қате логин немесе пароль",
+          life: 3000,
+        });
+        return;
+      }
       temp = response.data["access_token"];
 
-      //console.log(temp)
+      console.log("temp:", temp);
       await axios
         .get(`${AHMET_API}/who_am_i/`, {
           headers: { Authorization: `Bearer ${temp}` },
@@ -143,7 +147,12 @@ export default {
         .then((response) => console.log((roles = response.data["roles"])));
       console.log("who am i returns:");
       if (response.status == 200) {
-        console.log("after asssigning response:");
+        this.$toast.add({
+          severity: "info",
+          summary: "Аккаунтқа кіру",
+          detail: "Сәтті жүзеге асырылды",
+          life: 3000,
+        });
         console.log(store.state.roles);
         const data = {
           email: this.email,

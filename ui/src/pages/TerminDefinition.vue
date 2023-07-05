@@ -7,14 +7,14 @@
       >
         <template #start>
           <Button
-            label="New"
+            label="Жаңа ұғым қосу"
             icon="pi pi-plus"
             severity="success"
             class="mr-2"
             @click="openNew"
           />
           <Button
-            label="Delete"
+            label="Өшіру"
             icon="pi pi-trash"
             severity="danger"
             @click="confirmDeleteSelected('delete')"
@@ -175,10 +175,12 @@ const saveProduct = async (method) => {
     submitted.value = true;
   } else {
     await axios.post(`${AHMET_API}/editPost/`, request, {
-      headers: { Authorization: `Bearer ${store.state.user.access_token}`,
-      'Access-Control-Allow-Credentials':'true',
-        'Content-Type': 'application/json',
-        'Accept':"*/*" },
+      headers: {
+        Authorization: `Bearer ${store.state.user.access_token}`,
+        "Access-Control-Allow-Credentials": "true",
+        "Content-Type": "application/json",
+        Accept: "*/*",
+      },
     });
     submitted.value = false;
     productDialog.value = false;
@@ -201,10 +203,12 @@ const confirmDeleteSelected = async (method) => {
     id: id,
   };
   await axios.post(`${AHMET_API}/editPost/`, request, {
-    headers: { Authorization: `Bearer ${store.state.user.access_token}`,
-    'Access-Control-Allow-Credentials':'true',
-        'Content-Type': 'application/json',
-        'Accept':"*/*" },
+    headers: {
+      Authorization: `Bearer ${store.state.user.access_token}`,
+      "Access-Control-Allow-Credentials": "true",
+      "Content-Type": "application/json",
+      Accept: "*/*",
+    },
   });
   console.log(request);
 };
@@ -220,7 +224,8 @@ const submitted = ref(false);
 const loadLazyData = async () => {
   var temp = await axios.post(
     `${AHMET_API}/classification/`,
-    lazyParams.value, {headers: getHeader()}
+    lazyParams.value,
+    { headers: getHeader() }
   );
   products.value = temp.data;
   loading.value = false;

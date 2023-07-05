@@ -318,8 +318,3 @@ class Ontothing:
             elif child.type == OT_Class:
                 props = props + child.GetProperties()
         return props
-
-#fa-code-fork
-#fa-link
-#fa-crosshairs
-#fa-dot-circle-o

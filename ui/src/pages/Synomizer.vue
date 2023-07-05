@@ -1,10 +1,9 @@
 <template>
   <div class="card bounder">
-    <div class="row">
-      <div style="font-size: 20px; margin-right: 450px; margin-left: 50px">
-        Мәтін синомайзері
-      </div>
+    <div style="font-size: 20px; margin-right: 450px; margin-left: 50px">
+      Мәтін синомайзері
     </div>
+    <Toast />
     <hr height="20px" />
     <div class="row">
       <div>
@@ -102,6 +101,9 @@ import axios from "axios";
 import SynonymSearcher from "./components/SynonymSearcher.vue";
 import WordSynomizer from "./components/WordSynomizer.vue";
 import { AHMET_API, getHeader } from "../config";
+import { useStore } from "vuex";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 
 // import WordSynomizer from "./components/WordSynomizer.vue";
 const selectedWord = ref();
@@ -225,6 +227,7 @@ const word_family = ref([
   { name: "шылау", code: 7 },
   { name: "үстеу", code: 8 },
 ]);
+const store = useStore();
 const synonymInput = ref("");
 const paraphraseInput = ref("");
 const meaningInput = ref("");
@@ -276,6 +279,15 @@ const addWord = () => {
   console.log("inputValues.value: ", inputValues.value);
   console.log("meaningInput.value: ", meaningInput.value);
   console.log("selectedFamily.value: ", selectedFamily.value);
+  if (!store.getters.isUserRegistered) {
+    toast.add({
+      severity: "error",
+      summary: "Ақау",
+      detail: "Сұраныс жібері үшін сайтқа тіркелу міндетті",
+      life: 3000,
+    });
+    return;
+  }
   if (
     synonymInput.value != "" &&
     inputValues.value != "" &&

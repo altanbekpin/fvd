@@ -49,6 +49,13 @@ export default {
         },
         {
           label: "Сөздік",
+          items: [
+            {
+              label: "Мектеп оқулықтары терминологиясы",
+              icon: "pi pi-file-word",
+              to: "/schoolterminology",
+            },
+          ],
         },
         {
           label: "Интегралдық модел",

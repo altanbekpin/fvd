@@ -153,6 +153,14 @@
         </div>
       </Dialog>
     </Dialog>
+    <Dialog v-model:visible="showFile" modal>
+      <object
+        :data="path_to_download"
+        type="application/pdf"
+        width="1300px"
+        height="600px"
+      ></object>
+    </Dialog>
   </div>
 </template>
 
@@ -261,9 +269,16 @@ const onNodeExpand = (node) => {
 // const onUpload = () => {
 //     console.log('asdasjnfkjafnksjdf')
 // };
+const path_to_download = ref("");
+const showFile = ref(false);
 const getFile = (fileID) => {
+  path_to_download.value = "http://localhost:5001/legacy/download/" + fileID;
   console.log(fileID);
-  AhmetService.getFile(fileID);
+  showFile.value = true;
+  // axios
+  //   .post(`${AHMET_API}/legacy/${fileID}`)
+  //   .then((response) => console.log(response["data"]));
+  // AhmetService.getFile(fileID);
 };
 const deleteFile = () => {
   const formData = new FormData();
