@@ -202,14 +202,23 @@ const confirmDeleteSelected = async (method) => {
     method: { _value: method },
     id: id,
   };
-  await axios.post(`${AHMET_API}/editPost/`, request, {
-    headers: {
-      Authorization: `Bearer ${store.state.user.access_token}`,
-      "Access-Control-Allow-Credentials": "true",
-      "Content-Type": "application/json",
-      Accept: "*/*",
-    },
-  });
+  try {
+    await axios.post(`${AHMET_API}/editPost/`, request, {
+      headers: {
+        Authorization: `Bearer ${store.state.user.access_token}`,
+        "Access-Control-Allow-Credentials": "true",
+        "Content-Type": "application/json",
+        Accept: "*/*",
+      },
+    });
+    toast.add({
+      severity: "success",
+      summary: "Сәтті",
+      detail: "Термин сәтті өшірілді",
+      life: 3000,
+    });
+  } catch (error) {}
+
   console.log(request);
 };
 const dt = ref();

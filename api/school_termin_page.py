@@ -11,12 +11,13 @@ def getTermins():
     first = data['first']
     filters = data["filters"]
     word = data.get("word", "")
-    schoolTermins = DB.getSchoolTermins(first, filters, word)
+    schoolTermins = DB.get_instance().getSchoolTermins(first, filters, word)
     return schoolTermins
 
 @app.route("/countTermins", methods=['GET'])
 def countTermins():
-    amoung = DB.countSchoolTermins()
+    print("/countTermins")
+    amoung = DB.get_instance().countSchoolTermins()
     return amoung
 
 @app.route("/add/termin", methods=['POST'])
@@ -28,14 +29,19 @@ def addTermin():
     subject_id = data['subject']['id']
     school_class = data['school_class']
     try:
-        DB.addTermin(termin=termin, definition=definition, subject_id=subject_id, school_class=school_class)
+        DB.get_instance().addTermin(termin=termin, definition=definition, subject_id=subject_id, school_class=school_class)
     except Exception as e:
         return 400, e
     return "success", 200
 
 @app.route("/get/class/subject", methods=['GET'])
 def get_subject_class():
-    return DB.get_subjects()
+    print("/get/class/subject")
+    try:
+        subjects = DB.get_instance().get_subjects()
+    except Exception as e:
+        print(e)
+    return subjects
 
 @app.route("/add/subject", methods=['POST'])
 @jwt_required()
@@ -45,7 +51,7 @@ def addSubject():
     data = request.json['data']
     subject = data['subject']
     try:
-        DB.add_subject(subject)
+        DB.get_instance().add_subject(subject)
     except Exception as e:
         return "Bad request", 400
     return 'success', 200

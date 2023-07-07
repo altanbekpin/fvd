@@ -210,7 +210,7 @@ class Lemms:
         return PosName
 
     def get_kaz_lemms(self, sentences):
-        con = DB.get_db_connection()
+        con = DB.get_instance().get_db_connection()
         cur = con.cursor()
         token_list = []
         lemms_list = []
@@ -274,7 +274,7 @@ class Lemms:
         print('lemms_list: ', lemms_list)
         return lemms_list
     def solve_math_task(self, sentences):
-        con = DB.get_db_connection()
+        con = DB.get_instance().get_db_connection()
         cur = con.cursor()
         token_list = []
         lemms_list = []
@@ -343,7 +343,7 @@ class Lemms:
         return lemms_list
     def get_expert_words(self):
         list = []
-        con = DB.get_db_connection()
+        con = DB.get_instance().get_db_connection()
         cursor = con.cursor()
         query = 'SELECT id, morphem, pos FROM morphemes WHERE isModerated = 0'
         cursor.execute(query)
@@ -357,7 +357,7 @@ class Lemms:
         arr = {}
         list = []
         posCountList = []
-        con = DB.get_db_connection()
+        con = DB.get_instance().get_db_connection()
         cursor = con.cursor()
         query = 'SELECT * FROM morphemes'
         cursor.execute(query)
@@ -382,7 +382,7 @@ class Lemms:
     def get_all_morphemes(self):
         arr = {}
         list = []
-        con = DB.get_db_connection()
+        con = DB.get_instance().get_db_connection()
         cursor = con.cursor()
         query = 'SELECT * FROM morphemes ORDER BY morphem DESC'
         cursor.execute(query)

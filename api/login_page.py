@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, current_user, jwt_required
 from flask import request, jsonify 
 from db import User, UserRole, Role
 from flask_jwt_extended import JWTManager
-
+import random
 jwt = JWTManager(app)
 
 @jwt.user_identity_loader
@@ -44,3 +44,33 @@ def protected():
         id=current_user.id,
         email=current_user.email,
     )
+
+@app.route('/register', methods=['POST'])
+def register():
+    global confirmation_code  # Access the global variable
+    
+    email = request.json['email']
+    confirmation_code = generate_confirmation_code()
+    
+    # Rest of the code to send the confirmation email
+    
+    return jsonify({'message': 'Confirmation code sent successfully'})
+
+@app.route('/confirm', methods=['POST'])
+def confirm():
+    global confirmation_code  # Access the global variable
+    
+    email = request.json['email']
+    code = request.json['code']
+    
+    if confirmation_code and code == confirmation_code:
+        # Code validation successful
+        return jsonify({'message': 'Confirmation successful'})
+    else:
+        # Code validation failed
+        return 400, jsonify({'message': 'Invalid confirmation code'})
+
+def generate_confirmation_code():
+    # Generate and return a random confirmation code
+    # You can use your own logic here
+    return random.randint(100000, 999999)

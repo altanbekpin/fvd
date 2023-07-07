@@ -24,9 +24,8 @@ export const AhmetService = {
       headers: getHeader(),
     });
   },
-  async saveTermin(request) {
-    const store = useStore();
-    const access_token = store.getters.getAccessToken;
+  async saveTermin(request, access_token) {
+    console.log("access_token:", access_token);
     await api.post(AHMET_API + "/add/termin", {
       data: request,
       headers: getHeader(access_token),

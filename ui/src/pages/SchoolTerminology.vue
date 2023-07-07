@@ -274,11 +274,12 @@ export default {
         school_class: null,
       },
       subjects: [],
+      store: null,
     };
   },
   async mounted() {
-    const store = useStore();
-    this.isUserAdmin = store.getters.isUserAdmin;
+    this.store = useStore();
+    this.isUserAdmin = this.store.getters.isUserAdmin;
     this.lazyParams = {
       first: 0,
       rows: this.$refs.dt.rows,
@@ -333,8 +334,11 @@ export default {
       this.showAddTerminDialog = false;
     },
     async saveTermin() {
+      console.log("store:", this.store);
+      console.log("store.state:", this.store.state);
+      const access_token = this.store.getters.getAccessToken;
       try {
-        await AhmetService.saveTermin(this.request);
+        await AhmetService.saveTermin(this.request, access_token);
         this.$toast.add({
           severity: "success",
           summary: "Қабылданды",
@@ -342,6 +346,7 @@ export default {
           life: 3000,
         });
       } catch (error) {
+        console.error("error:", error);
         this.$toast.add({
           severity: "error",
           summary: "Ақау",

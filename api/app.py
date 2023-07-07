@@ -5,7 +5,9 @@ from flask_mail import Mail
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:magzhan2005@db/userdb'
+app.config['DB_PASSWORD'] = "magzhan2005"
+password = app.config['DB_PASSWORD']
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@db/userdb'
 app.config['JSON_AS_ASCII'] = False
 app.config["JWT_SECRET_KEY"] = "@Remote2022" 
 # app.config['MAIL_SERVER'] = 'your_smtp_server'
