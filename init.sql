@@ -5,7 +5,7 @@
 -- Dumped from database version 15.1
 -- Dumped by pg_dump version 15.1
 
--- Started on 2023-07-03 11:59:18 +06
+-- Started on 2023-07-10 12:31:50 +06
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -18,9 +18,65 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- TOC entry 248 (class 1255 OID 19109)
+-- Name: create_offer_trigger(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.create_offer_trigger() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  INSERT INTO offers (offer_id, user_id, activate_type, activated)
+  VALUES (NEW.id, NEW.id, 2, FALSE);
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.create_offer_trigger() OWNER TO postgres;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- TOC entry 245 (class 1259 OID 19089)
+-- Name: activate_types; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.activate_types (
+    id integer NOT NULL,
+    name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.activate_types OWNER TO postgres;
+
+--
+-- TOC entry 244 (class 1259 OID 19088)
+-- Name: activate_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.activate_types_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.activate_types_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3782 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: activate_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.activate_types_id_seq OWNED BY public.activate_types.id;
+
 
 --
 -- TOC entry 215 (class 1259 OID 18108)
@@ -55,7 +111,7 @@ CREATE SEQUENCE public.legacy_id_seq
 ALTER TABLE public.legacy_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3756 (class 0 OID 0)
+-- TOC entry 3783 (class 0 OID 0)
 -- Dependencies: 214
 -- Name: legacy_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -95,7 +151,7 @@ CREATE SEQUENCE public.morphemes_id_seq
 ALTER TABLE public.morphemes_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3757 (class 0 OID 0)
+-- TOC entry 3784 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: morphemes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -135,12 +191,53 @@ CREATE SEQUENCE public.my_serial
 ALTER TABLE public.my_serial OWNER TO postgres;
 
 --
--- TOC entry 3758 (class 0 OID 0)
+-- TOC entry 3785 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: my_serial; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.my_serial OWNED BY public.termin.id;
+
+
+--
+-- TOC entry 247 (class 1259 OID 19098)
+-- Name: offers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.offers (
+    id integer NOT NULL,
+    offer_id integer,
+    user_id integer,
+    activate_type integer,
+    activated boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.offers OWNER TO postgres;
+
+--
+-- TOC entry 246 (class 1259 OID 19097)
+-- Name: offers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.offers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.offers_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3786 (class 0 OID 0)
+-- Dependencies: 246
+-- Name: offers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.offers_id_seq OWNED BY public.offers.id;
 
 
 --
@@ -177,7 +274,7 @@ CREATE SEQUENCE public.page_id_seq
 ALTER TABLE public.page_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3759 (class 0 OID 0)
+-- TOC entry 3787 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: page_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -228,7 +325,7 @@ CREATE SEQUENCE public.paraphrases_id_seq
 ALTER TABLE public.paraphrases_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3760 (class 0 OID 0)
+-- TOC entry 3788 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: paraphrases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -270,7 +367,7 @@ CREATE SEQUENCE public.quote_id_seq
 ALTER TABLE public.quote_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3761 (class 0 OID 0)
+-- TOC entry 3789 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: quote_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -325,7 +422,7 @@ CREATE SEQUENCE public.school_termins_id_seq
 ALTER TABLE public.school_termins_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3762 (class 0 OID 0)
+-- TOC entry 3790 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: school_termins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -363,7 +460,7 @@ CREATE SEQUENCE public.subjects_id_seq
 ALTER TABLE public.subjects_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3763 (class 0 OID 0)
+-- TOC entry 3791 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: subjects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -405,7 +502,7 @@ CREATE SEQUENCE public.synamizer_id_seq
 ALTER TABLE public.synamizer_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3764 (class 0 OID 0)
+-- TOC entry 3792 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: synamizer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -456,7 +553,7 @@ CREATE SEQUENCE public.synonyms_id_seq
 ALTER TABLE public.synonyms_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3765 (class 0 OID 0)
+-- TOC entry 3793 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: synonyms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -494,7 +591,7 @@ CREATE SEQUENCE public.tag_id_seq
 ALTER TABLE public.tag_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3766 (class 0 OID 0)
+-- TOC entry 3794 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: tag_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -546,7 +643,7 @@ CREATE SEQUENCE public.user_role_id_seq
 ALTER TABLE public.user_role_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3767 (class 0 OID 0)
+-- TOC entry 3795 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: user_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -563,7 +660,10 @@ CREATE TABLE public.users (
     id integer NOT NULL,
     email character varying(255) NOT NULL,
     password_hash character varying(255) NOT NULL,
-    password_salt text
+    password_salt text,
+    is_verified boolean DEFAULT false,
+    confirmation_code_hash text,
+    full_name "char"
 );
 
 
@@ -586,7 +686,7 @@ CREATE SEQUENCE public.users_id_seq
 ALTER TABLE public.users_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3768 (class 0 OID 0)
+-- TOC entry 3796 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -595,7 +695,15 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- TOC entry 3537 (class 2604 OID 18111)
+-- TOC entry 3563 (class 2604 OID 19092)
+-- Name: activate_types id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.activate_types ALTER COLUMN id SET DEFAULT nextval('public.activate_types_id_seq'::regclass);
+
+
+--
+-- TOC entry 3548 (class 2604 OID 18111)
 -- Name: legacy id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -603,7 +711,7 @@ ALTER TABLE ONLY public.legacy ALTER COLUMN id SET DEFAULT nextval('public.legac
 
 
 --
--- TOC entry 3548 (class 2604 OID 18351)
+-- TOC entry 3560 (class 2604 OID 18351)
 -- Name: morphemes id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -611,7 +719,15 @@ ALTER TABLE ONLY public.morphemes ALTER COLUMN id SET DEFAULT nextval('public.mo
 
 
 --
--- TOC entry 3538 (class 2604 OID 18120)
+-- TOC entry 3564 (class 2604 OID 19101)
+-- Name: offers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.offers ALTER COLUMN id SET DEFAULT nextval('public.offers_id_seq'::regclass);
+
+
+--
+-- TOC entry 3549 (class 2604 OID 18120)
 -- Name: page id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -619,7 +735,7 @@ ALTER TABLE ONLY public.page ALTER COLUMN id SET DEFAULT nextval('public.page_id
 
 
 --
--- TOC entry 3547 (class 2604 OID 18316)
+-- TOC entry 3559 (class 2604 OID 18316)
 -- Name: paraphrases id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -627,7 +743,7 @@ ALTER TABLE ONLY public.paraphrases ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 3539 (class 2604 OID 18129)
+-- TOC entry 3550 (class 2604 OID 18129)
 -- Name: quote id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -635,7 +751,7 @@ ALTER TABLE ONLY public.quote ALTER COLUMN id SET DEFAULT nextval('public.quote_
 
 
 --
--- TOC entry 3550 (class 2604 OID 19045)
+-- TOC entry 3562 (class 2604 OID 19045)
 -- Name: school_termins id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -643,7 +759,7 @@ ALTER TABLE ONLY public.school_termins ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3549 (class 2604 OID 19038)
+-- TOC entry 3561 (class 2604 OID 19038)
 -- Name: subjects id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -651,7 +767,7 @@ ALTER TABLE ONLY public.subjects ALTER COLUMN id SET DEFAULT nextval('public.sub
 
 
 --
--- TOC entry 3545 (class 2604 OID 18300)
+-- TOC entry 3557 (class 2604 OID 18300)
 -- Name: synamizer id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -659,7 +775,7 @@ ALTER TABLE ONLY public.synamizer ALTER COLUMN id SET DEFAULT nextval('public.sy
 
 
 --
--- TOC entry 3546 (class 2604 OID 18309)
+-- TOC entry 3558 (class 2604 OID 18309)
 -- Name: synonyms id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -667,7 +783,7 @@ ALTER TABLE ONLY public.synonyms ALTER COLUMN id SET DEFAULT nextval('public.syn
 
 
 --
--- TOC entry 3544 (class 2604 OID 18289)
+-- TOC entry 3556 (class 2604 OID 18289)
 -- Name: tag id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -675,7 +791,7 @@ ALTER TABLE ONLY public.tag ALTER COLUMN id SET DEFAULT nextval('public.tag_id_s
 
 
 --
--- TOC entry 3542 (class 2604 OID 18212)
+-- TOC entry 3554 (class 2604 OID 18212)
 -- Name: termin id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -683,7 +799,7 @@ ALTER TABLE ONLY public.termin ALTER COLUMN id SET DEFAULT nextval('public.my_se
 
 
 --
--- TOC entry 3543 (class 2604 OID 18199)
+-- TOC entry 3555 (class 2604 OID 18199)
 -- Name: user_role id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -691,7 +807,7 @@ ALTER TABLE ONLY public.user_role ALTER COLUMN id SET DEFAULT nextval('public.us
 
 
 --
--- TOC entry 3541 (class 2604 OID 18139)
+-- TOC entry 3552 (class 2604 OID 18139)
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -699,7 +815,19 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- TOC entry 3722 (class 0 OID 18108)
+-- TOC entry 3774 (class 0 OID 19089)
+-- Dependencies: 245
+-- Data for Name: activate_types; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.activate_types (id, name) FROM stdin;
+2	User
+1	Word
+\.
+
+
+--
+-- TOC entry 3744 (class 0 OID 18108)
 -- Dependencies: 215
 -- Data for Name: legacy; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -803,7 +931,7 @@ COPY public.legacy (id, name, path, parent_id, is_file) FROM stdin;
 
 
 --
--- TOC entry 3746 (class 0 OID 18348)
+-- TOC entry 3768 (class 0 OID 18348)
 -- Dependencies: 239
 -- Data for Name: morphemes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -991,7 +1119,1177 @@ COPY public.morphemes (id, morphem, pos, ismoderated) FROM stdin;
 
 
 --
--- TOC entry 3724 (class 0 OID 18117)
+-- TOC entry 3776 (class 0 OID 19098)
+-- Dependencies: 247
+-- Data for Name: offers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.offers (id, offer_id, user_id, activate_type, activated) FROM stdin;
+1	1	1	1	t
+2	2	1	1	t
+3	3	1	1	t
+4	4	1	1	t
+5	5	1	1	t
+6	6	1	1	t
+7	7	1	1	t
+8	8	1	1	t
+9	9	1	1	t
+10	10	1	1	t
+11	11	1	1	t
+12	12	1	1	t
+13	13	1	1	t
+14	14	1	1	t
+15	15	1	1	t
+16	16	1	1	t
+17	17	1	1	t
+18	18	1	1	t
+19	19	1	1	t
+20	20	1	1	t
+21	21	1	1	t
+22	22	1	1	t
+23	23	1	1	t
+24	24	1	1	t
+25	25	1	1	t
+26	26	1	1	t
+27	27	1	1	t
+28	28	1	1	t
+29	29	1	1	t
+30	30	1	1	t
+31	31	1	1	t
+32	32	1	1	t
+33	33	1	1	t
+34	34	1	1	t
+35	35	1	1	t
+36	36	1	1	t
+37	37	1	1	t
+38	38	1	1	t
+39	39	1	1	t
+40	40	1	1	t
+41	41	1	1	t
+42	42	1	1	t
+43	43	1	1	t
+44	44	1	1	t
+45	45	1	1	t
+46	46	1	1	t
+47	47	1	1	t
+48	48	1	1	t
+49	49	1	1	t
+50	50	1	1	t
+51	51	1	1	t
+52	52	1	1	t
+53	53	1	1	t
+54	54	1	1	t
+55	55	1	1	t
+56	56	1	1	t
+57	57	1	1	t
+58	58	1	1	t
+59	59	1	1	t
+60	60	1	1	t
+61	61	1	1	t
+62	62	1	1	t
+63	63	1	1	t
+64	64	1	1	t
+65	65	1	1	t
+66	66	1	1	t
+67	67	1	1	t
+68	68	1	1	t
+69	69	1	1	t
+70	70	1	1	t
+71	71	1	1	t
+72	72	1	1	t
+73	73	1	1	t
+74	74	1	1	t
+75	75	1	1	t
+76	76	1	1	t
+77	77	1	1	t
+78	78	1	1	t
+79	79	1	1	t
+80	80	1	1	t
+81	81	1	1	t
+82	82	1	1	t
+83	83	1	1	t
+84	84	1	1	t
+85	85	1	1	t
+86	86	1	1	t
+87	87	1	1	t
+88	88	1	1	t
+89	89	1	1	t
+90	90	1	1	t
+91	91	1	1	t
+92	92	1	1	t
+93	93	1	1	t
+94	94	1	1	t
+95	95	1	1	t
+96	96	1	1	t
+97	97	1	1	t
+98	98	1	1	t
+99	99	1	1	t
+100	100	1	1	t
+101	101	1	1	t
+102	102	1	1	t
+103	103	1	1	t
+104	104	1	1	t
+105	105	1	1	t
+106	106	1	1	t
+107	107	1	1	t
+108	108	1	1	t
+109	109	1	1	t
+110	110	1	1	t
+111	111	1	1	t
+112	112	1	1	t
+113	113	1	1	t
+114	114	1	1	t
+115	115	1	1	t
+116	116	1	1	t
+117	117	1	1	t
+118	118	1	1	t
+119	119	1	1	t
+120	120	1	1	t
+121	121	1	1	t
+122	122	1	1	t
+123	123	1	1	t
+124	124	1	1	t
+125	125	1	1	t
+126	126	1	1	t
+127	127	1	1	t
+128	128	1	1	t
+129	129	1	1	t
+130	130	1	1	t
+131	131	1	1	t
+132	132	1	1	t
+133	133	1	1	t
+134	134	1	1	t
+135	135	1	1	t
+136	136	1	1	t
+137	137	1	1	t
+138	138	1	1	t
+139	139	1	1	t
+140	140	1	1	t
+141	141	1	1	t
+142	142	1	1	t
+143	143	1	1	t
+144	144	1	1	t
+145	145	1	1	t
+146	146	1	1	t
+147	147	1	1	t
+148	148	1	1	t
+149	149	1	1	t
+150	150	1	1	t
+151	151	1	1	t
+152	152	1	1	t
+153	153	1	1	t
+154	154	1	1	t
+155	155	1	1	t
+156	156	1	1	t
+157	157	1	1	t
+158	158	1	1	t
+159	159	1	1	t
+160	160	1	1	t
+161	161	1	1	t
+162	162	1	1	t
+163	163	1	1	t
+164	164	1	1	t
+165	165	1	1	t
+166	166	1	1	t
+167	167	1	1	t
+168	168	1	1	t
+169	169	1	1	t
+170	170	1	1	t
+171	171	1	1	t
+172	172	1	1	t
+173	173	1	1	t
+174	174	1	1	t
+175	175	1	1	t
+176	176	1	1	t
+177	177	1	1	t
+178	178	1	1	t
+179	179	1	1	t
+180	180	1	1	t
+181	181	1	1	t
+182	182	1	1	t
+183	183	1	1	t
+184	184	1	1	t
+185	185	1	1	t
+186	186	1	1	t
+187	187	1	1	t
+188	188	1	1	t
+189	189	1	1	t
+190	190	1	1	t
+191	191	1	1	t
+192	192	1	1	t
+193	193	1	1	t
+194	194	1	1	t
+195	195	1	1	t
+196	196	1	1	t
+197	197	1	1	t
+198	198	1	1	t
+199	199	1	1	t
+200	200	1	1	t
+201	201	1	1	t
+202	202	1	1	t
+203	203	1	1	t
+204	204	1	1	t
+205	205	1	1	t
+206	206	1	1	t
+207	207	1	1	t
+208	208	1	1	t
+209	209	1	1	t
+210	210	1	1	t
+211	211	1	1	t
+212	212	1	1	t
+213	213	1	1	t
+214	214	1	1	t
+215	215	1	1	t
+216	216	1	1	t
+217	217	1	1	t
+218	218	1	1	t
+219	219	1	1	t
+220	220	1	1	t
+221	221	1	1	t
+222	222	1	1	t
+223	223	1	1	t
+224	224	1	1	t
+225	225	1	1	t
+226	226	1	1	t
+227	227	1	1	t
+228	228	1	1	t
+229	229	1	1	t
+230	230	1	1	t
+231	231	1	1	t
+232	232	1	1	t
+233	233	1	1	t
+234	234	1	1	t
+235	235	1	1	t
+236	236	1	1	t
+237	237	1	1	t
+238	238	1	1	t
+239	239	1	1	t
+240	240	1	1	t
+241	241	1	1	t
+242	242	1	1	t
+243	243	1	1	t
+244	244	1	1	t
+245	245	1	1	t
+246	246	1	1	t
+247	247	1	1	t
+248	248	1	1	t
+249	249	1	1	t
+250	250	1	1	t
+251	251	1	1	t
+252	252	1	1	t
+253	253	1	1	t
+254	254	1	1	t
+255	255	1	1	t
+256	256	1	1	t
+257	257	1	1	t
+258	258	1	1	t
+259	259	1	1	t
+260	260	1	1	t
+261	261	1	1	t
+262	262	1	1	t
+263	263	1	1	t
+264	264	1	1	t
+265	265	1	1	t
+266	266	1	1	t
+267	267	1	1	t
+268	268	1	1	t
+269	269	1	1	t
+270	270	1	1	t
+271	271	1	1	t
+272	272	1	1	t
+273	273	1	1	t
+274	275	1	1	t
+275	276	1	1	t
+276	277	1	1	t
+277	279	1	1	t
+278	280	1	1	t
+279	281	1	1	t
+280	283	1	1	t
+281	284	1	1	t
+282	285	1	1	t
+283	287	1	1	t
+284	288	1	1	t
+285	289	1	1	t
+286	290	1	1	t
+287	291	1	1	t
+288	292	1	1	t
+289	293	1	1	t
+290	294	1	1	t
+291	295	1	1	t
+292	296	1	1	t
+293	297	1	1	t
+294	298	1	1	t
+295	300	1	1	t
+296	301	1	1	t
+297	302	1	1	t
+298	303	1	1	t
+299	304	1	1	t
+300	305	1	1	t
+301	306	1	1	t
+302	307	1	1	t
+303	308	1	1	t
+304	309	1	1	t
+305	310	1	1	t
+306	311	1	1	t
+307	312	1	1	t
+308	313	1	1	t
+309	314	1	1	t
+310	317	1	1	t
+311	318	1	1	t
+312	319	1	1	t
+313	320	1	1	t
+314	321	1	1	t
+315	322	1	1	t
+316	323	1	1	t
+317	324	1	1	t
+318	325	1	1	t
+319	326	1	1	t
+320	327	1	1	t
+321	328	1	1	t
+322	329	1	1	t
+323	330	1	1	t
+324	331	1	1	t
+325	332	1	1	t
+326	333	1	1	t
+327	334	1	1	t
+328	335	1	1	t
+329	336	1	1	t
+330	337	1	1	t
+331	338	1	1	t
+332	339	1	1	t
+333	340	1	1	t
+334	341	1	1	t
+335	342	1	1	t
+336	343	1	1	t
+337	344	1	1	t
+338	345	1	1	t
+339	346	1	1	t
+340	347	1	1	t
+341	348	1	1	t
+342	349	1	1	t
+343	350	1	1	t
+344	351	1	1	t
+345	352	1	1	t
+346	353	1	1	t
+347	354	1	1	t
+348	355	1	1	t
+349	356	1	1	t
+350	357	1	1	t
+351	358	1	1	t
+352	359	1	1	t
+353	360	1	1	t
+354	361	1	1	t
+355	362	1	1	t
+356	363	1	1	t
+357	364	1	1	t
+358	365	1	1	t
+359	366	1	1	t
+360	367	1	1	t
+361	368	1	1	t
+362	369	1	1	t
+363	370	1	1	t
+364	371	1	1	t
+365	372	1	1	t
+366	373	1	1	t
+367	374	1	1	t
+368	375	1	1	t
+369	376	1	1	t
+370	377	1	1	t
+371	378	1	1	t
+372	379	1	1	t
+373	380	1	1	t
+374	381	1	1	t
+375	382	1	1	t
+376	383	1	1	t
+377	384	1	1	t
+378	385	1	1	t
+379	386	1	1	t
+380	387	1	1	t
+381	388	1	1	t
+382	389	1	1	t
+383	390	1	1	t
+384	391	1	1	t
+385	392	1	1	t
+386	393	1	1	t
+387	394	1	1	t
+388	395	1	1	t
+389	396	1	1	t
+390	397	1	1	t
+391	398	1	1	t
+392	399	1	1	t
+393	400	1	1	t
+394	401	1	1	t
+395	402	1	1	t
+396	403	1	1	t
+397	404	1	1	t
+398	405	1	1	t
+399	406	1	1	t
+400	407	1	1	t
+401	408	1	1	t
+402	409	1	1	t
+403	410	1	1	t
+404	411	1	1	t
+405	412	1	1	t
+406	413	1	1	t
+407	414	1	1	t
+408	415	1	1	t
+409	416	1	1	t
+410	417	1	1	t
+411	418	1	1	t
+412	419	1	1	t
+413	420	1	1	t
+414	421	1	1	t
+415	422	1	1	t
+416	423	1	1	t
+417	424	1	1	t
+418	425	1	1	t
+419	426	1	1	t
+420	427	1	1	t
+421	428	1	1	t
+422	429	1	1	t
+423	430	1	1	t
+424	431	1	1	t
+425	432	1	1	t
+426	433	1	1	t
+427	434	1	1	t
+428	435	1	1	t
+429	436	1	1	t
+430	437	1	1	t
+431	438	1	1	t
+432	439	1	1	t
+433	440	1	1	t
+434	441	1	1	t
+435	442	1	1	t
+436	443	1	1	t
+437	444	1	1	t
+438	445	1	1	t
+439	446	1	1	t
+440	447	1	1	t
+441	448	1	1	t
+442	449	1	1	t
+443	450	1	1	t
+444	451	1	1	t
+445	452	1	1	t
+446	453	1	1	t
+447	454	1	1	t
+448	455	1	1	t
+449	456	1	1	t
+450	457	1	1	t
+451	458	1	1	t
+452	459	1	1	t
+453	460	1	1	t
+454	461	1	1	t
+455	462	1	1	t
+456	463	1	1	t
+457	464	1	1	t
+458	465	1	1	t
+459	466	1	1	t
+460	467	1	1	t
+461	468	1	1	t
+462	469	1	1	t
+463	470	1	1	t
+464	471	1	1	t
+465	472	1	1	t
+466	473	1	1	t
+467	474	1	1	t
+468	475	1	1	t
+469	476	1	1	t
+470	477	1	1	t
+471	478	1	1	t
+472	479	1	1	t
+473	480	1	1	t
+474	481	1	1	t
+475	482	1	1	t
+476	483	1	1	t
+477	484	1	1	t
+478	485	1	1	t
+479	486	1	1	t
+480	487	1	1	t
+481	488	1	1	t
+482	489	1	1	t
+483	490	1	1	t
+484	491	1	1	t
+485	492	1	1	t
+486	493	1	1	t
+487	494	1	1	t
+488	495	1	1	t
+489	496	1	1	t
+490	497	1	1	t
+491	498	1	1	t
+492	499	1	1	t
+493	500	1	1	t
+494	501	1	1	t
+495	502	1	1	t
+496	503	1	1	t
+497	504	1	1	t
+498	505	1	1	t
+499	506	1	1	t
+500	507	1	1	t
+501	508	1	1	t
+502	509	1	1	t
+503	510	1	1	t
+504	511	1	1	t
+505	512	1	1	t
+506	513	1	1	t
+507	514	1	1	t
+508	515	1	1	t
+509	516	1	1	t
+510	517	1	1	t
+511	518	1	1	t
+512	519	1	1	t
+513	520	1	1	t
+514	521	1	1	t
+515	522	1	1	t
+516	523	1	1	t
+517	524	1	1	t
+518	525	1	1	t
+519	526	1	1	t
+520	527	1	1	t
+521	528	1	1	t
+522	529	1	1	t
+523	530	1	1	t
+524	531	1	1	t
+525	532	1	1	t
+526	533	1	1	t
+527	534	1	1	t
+528	535	1	1	t
+529	536	1	1	t
+530	537	1	1	t
+531	538	1	1	t
+532	539	1	1	t
+533	540	1	1	t
+534	541	1	1	t
+535	542	1	1	t
+536	543	1	1	t
+537	544	1	1	t
+538	545	1	1	t
+539	546	1	1	t
+540	547	1	1	t
+541	548	1	1	t
+542	549	1	1	t
+543	550	1	1	t
+544	551	1	1	t
+545	552	1	1	t
+546	553	1	1	t
+547	554	1	1	t
+548	555	1	1	t
+549	556	1	1	t
+550	557	1	1	t
+551	558	1	1	t
+552	559	1	1	t
+553	560	1	1	t
+554	561	1	1	t
+555	562	1	1	t
+556	563	1	1	t
+557	564	1	1	t
+558	565	1	1	t
+559	566	1	1	t
+560	567	1	1	t
+561	568	1	1	t
+562	569	1	1	t
+563	570	1	1	t
+564	571	1	1	t
+565	572	1	1	t
+566	573	1	1	t
+567	574	1	1	t
+568	575	1	1	t
+569	576	1	1	t
+570	577	1	1	t
+571	578	1	1	t
+572	579	1	1	t
+573	580	1	1	t
+574	581	1	1	t
+575	582	1	1	t
+576	583	1	1	t
+577	584	1	1	t
+578	585	1	1	t
+579	586	1	1	t
+580	587	1	1	t
+581	588	1	1	t
+582	589	1	1	t
+583	590	1	1	t
+584	591	1	1	t
+585	592	1	1	t
+586	593	1	1	t
+587	594	1	1	t
+588	595	1	1	t
+589	596	1	1	t
+590	597	1	1	t
+591	598	1	1	t
+592	599	1	1	t
+593	600	1	1	t
+594	601	1	1	t
+595	602	1	1	t
+596	603	1	1	t
+597	604	1	1	t
+598	605	1	1	t
+599	606	1	1	t
+600	607	1	1	t
+601	608	1	1	t
+602	609	1	1	t
+603	610	1	1	t
+604	611	1	1	t
+605	612	1	1	t
+606	613	1	1	t
+607	614	1	1	t
+608	615	1	1	t
+609	616	1	1	t
+610	617	1	1	t
+611	618	1	1	t
+612	619	1	1	t
+613	620	1	1	t
+614	621	1	1	t
+615	622	1	1	t
+616	623	1	1	t
+617	624	1	1	t
+618	625	1	1	t
+619	626	1	1	t
+620	627	1	1	t
+621	628	1	1	t
+622	629	1	1	t
+623	630	1	1	t
+624	631	1	1	t
+625	632	1	1	t
+626	633	1	1	t
+627	634	1	1	t
+628	635	1	1	t
+629	636	1	1	t
+630	637	1	1	t
+631	638	1	1	t
+632	639	1	1	t
+633	640	1	1	t
+634	641	1	1	t
+635	642	1	1	t
+636	643	1	1	t
+637	644	1	1	t
+638	645	1	1	t
+639	646	1	1	t
+640	647	1	1	t
+641	648	1	1	t
+642	649	1	1	t
+643	650	1	1	t
+644	651	1	1	t
+645	652	1	1	t
+646	653	1	1	t
+647	654	1	1	t
+648	655	1	1	t
+649	656	1	1	t
+650	657	1	1	t
+651	658	1	1	t
+652	659	1	1	t
+653	660	1	1	t
+654	661	1	1	t
+655	662	1	1	t
+656	663	1	1	t
+657	664	1	1	t
+658	665	1	1	t
+659	666	1	1	t
+660	667	1	1	t
+661	668	1	1	t
+662	669	1	1	t
+663	670	1	1	t
+664	671	1	1	t
+665	672	1	1	t
+666	673	1	1	t
+667	674	1	1	t
+668	675	1	1	t
+669	676	1	1	t
+670	677	1	1	t
+671	678	1	1	t
+672	679	1	1	t
+673	680	1	1	t
+674	681	1	1	t
+675	682	1	1	t
+676	683	1	1	t
+677	684	1	1	t
+678	685	1	1	t
+679	686	1	1	t
+680	687	1	1	t
+681	688	1	1	t
+682	689	1	1	t
+683	690	1	1	t
+684	691	1	1	t
+685	692	1	1	t
+686	693	1	1	t
+687	694	1	1	t
+688	695	1	1	t
+689	696	1	1	t
+690	697	1	1	t
+691	698	1	1	t
+692	699	1	1	t
+693	700	1	1	t
+694	701	1	1	t
+695	702	1	1	t
+696	703	1	1	t
+697	704	1	1	t
+698	705	1	1	t
+699	706	1	1	t
+700	707	1	1	t
+701	708	1	1	t
+702	709	1	1	t
+703	710	1	1	t
+704	711	1	1	t
+705	712	1	1	t
+706	713	1	1	t
+707	714	1	1	t
+708	715	1	1	t
+709	716	1	1	t
+710	717	1	1	t
+711	718	1	1	t
+712	719	1	1	t
+713	720	1	1	t
+714	721	1	1	t
+715	722	1	1	t
+716	723	1	1	t
+717	724	1	1	t
+718	725	1	1	t
+719	726	1	1	t
+720	727	1	1	t
+721	728	1	1	t
+722	729	1	1	t
+723	730	1	1	t
+724	731	1	1	t
+725	732	1	1	t
+726	733	1	1	t
+727	734	1	1	t
+728	735	1	1	t
+729	736	1	1	t
+730	737	1	1	t
+731	738	1	1	t
+732	739	1	1	t
+733	740	1	1	t
+734	741	1	1	t
+735	742	1	1	t
+736	743	1	1	t
+737	744	1	1	t
+738	745	1	1	t
+739	746	1	1	t
+740	747	1	1	t
+741	748	1	1	t
+742	749	1	1	t
+743	750	1	1	t
+744	751	1	1	t
+745	752	1	1	t
+746	753	1	1	t
+747	754	1	1	t
+748	755	1	1	t
+749	756	1	1	t
+750	757	1	1	t
+751	758	1	1	t
+752	759	1	1	t
+753	760	1	1	t
+754	761	1	1	t
+755	762	1	1	t
+756	763	1	1	t
+757	764	1	1	t
+758	765	1	1	t
+759	766	1	1	t
+760	767	1	1	t
+761	768	1	1	t
+762	769	1	1	t
+763	770	1	1	t
+764	771	1	1	t
+765	772	1	1	t
+766	773	1	1	t
+767	774	1	1	t
+768	775	1	1	t
+769	776	1	1	t
+770	777	1	1	t
+771	778	1	1	t
+772	779	1	1	t
+773	780	1	1	t
+774	781	1	1	t
+775	782	1	1	t
+776	783	1	1	t
+777	784	1	1	t
+778	785	1	1	t
+779	786	1	1	t
+780	787	1	1	t
+781	788	1	1	t
+782	789	1	1	t
+783	790	1	1	t
+784	791	1	1	t
+785	792	1	1	t
+786	793	1	1	t
+787	794	1	1	t
+788	795	1	1	t
+789	796	1	1	t
+790	797	1	1	t
+791	798	1	1	t
+792	799	1	1	t
+793	800	1	1	t
+794	801	1	1	t
+795	802	1	1	t
+796	803	1	1	t
+797	804	1	1	t
+798	805	1	1	t
+799	806	1	1	t
+800	807	1	1	t
+801	808	1	1	t
+802	809	1	1	t
+803	810	1	1	t
+804	811	1	1	t
+805	812	1	1	t
+806	813	1	1	t
+807	814	1	1	t
+808	815	1	1	t
+809	816	1	1	t
+810	817	1	1	t
+811	818	1	1	t
+812	819	1	1	t
+813	820	1	1	t
+814	821	1	1	t
+815	822	1	1	t
+816	823	1	1	t
+817	824	1	1	t
+818	825	1	1	t
+819	826	1	1	t
+820	827	1	1	t
+821	828	1	1	t
+822	829	1	1	t
+823	830	1	1	t
+824	831	1	1	t
+825	832	1	1	t
+826	833	1	1	t
+827	834	1	1	t
+828	835	1	1	t
+829	836	1	1	t
+830	837	1	1	t
+831	838	1	1	t
+832	839	1	1	t
+833	840	1	1	t
+834	841	1	1	t
+835	842	1	1	t
+836	843	1	1	t
+837	844	1	1	t
+838	845	1	1	t
+839	846	1	1	t
+840	847	1	1	t
+841	848	1	1	t
+842	849	1	1	t
+843	850	1	1	t
+844	851	1	1	t
+845	852	1	1	t
+846	853	1	1	t
+847	854	1	1	t
+848	855	1	1	t
+849	856	1	1	t
+850	857	1	1	t
+851	858	1	1	t
+852	859	1	1	t
+853	860	1	1	t
+854	861	1	1	t
+855	862	1	1	t
+856	863	1	1	t
+857	864	1	1	t
+858	865	1	1	t
+859	866	1	1	t
+860	867	1	1	t
+861	868	1	1	t
+862	869	1	1	t
+863	870	1	1	t
+864	871	1	1	t
+865	872	1	1	t
+866	873	1	1	t
+867	874	1	1	t
+868	875	1	1	t
+869	876	1	1	t
+870	877	1	1	t
+871	878	1	1	t
+872	879	1	1	t
+873	880	1	1	t
+874	881	1	1	t
+875	882	1	1	t
+876	883	1	1	t
+877	884	1	1	t
+878	885	1	1	t
+879	886	1	1	t
+880	887	1	1	t
+881	888	1	1	t
+882	889	1	1	t
+883	890	1	1	t
+884	891	1	1	t
+885	892	1	1	t
+886	893	1	1	t
+887	894	1	1	t
+888	895	1	1	t
+889	896	1	1	t
+890	897	1	1	t
+891	898	1	1	t
+892	899	1	1	t
+893	900	1	1	t
+894	901	1	1	t
+895	902	1	1	t
+896	903	1	1	t
+897	904	1	1	t
+898	905	1	1	t
+899	906	1	1	t
+900	907	1	1	t
+901	908	1	1	t
+902	909	1	1	t
+903	910	1	1	t
+904	911	1	1	t
+905	912	1	1	t
+906	913	1	1	t
+907	914	1	1	t
+908	915	1	1	t
+909	916	1	1	t
+910	917	1	1	t
+911	918	1	1	t
+912	919	1	1	t
+913	920	1	1	t
+914	921	1	1	t
+915	922	1	1	t
+916	923	1	1	t
+917	924	1	1	t
+918	925	1	1	t
+919	926	1	1	t
+920	927	1	1	t
+921	928	1	1	t
+922	929	1	1	t
+923	930	1	1	t
+924	931	1	1	t
+925	932	1	1	t
+926	933	1	1	t
+927	934	1	1	t
+928	935	1	1	t
+929	936	1	1	t
+930	937	1	1	t
+931	938	1	1	t
+932	939	1	1	t
+933	940	1	1	t
+934	941	1	1	t
+935	942	1	1	t
+936	943	1	1	t
+937	944	1	1	t
+938	945	1	1	t
+939	946	1	1	t
+940	947	1	1	t
+941	948	1	1	t
+942	949	1	1	t
+943	950	1	1	t
+944	951	1	1	t
+945	952	1	1	t
+946	953	1	1	t
+947	954	1	1	t
+948	955	1	1	t
+949	956	1	1	t
+950	957	1	1	t
+951	958	1	1	t
+952	959	1	1	t
+953	960	1	1	t
+954	961	1	1	t
+955	962	1	1	t
+956	963	1	1	t
+957	964	1	1	t
+958	965	1	1	t
+959	966	1	1	t
+960	967	1	1	t
+961	968	1	1	t
+962	969	1	1	t
+963	970	1	1	t
+964	971	1	1	t
+965	972	1	1	t
+966	973	1	1	t
+967	974	1	1	t
+968	975	1	1	t
+969	976	1	1	t
+970	977	1	1	t
+971	978	1	1	t
+972	979	1	1	t
+973	980	1	1	t
+974	981	1	1	t
+975	982	1	1	t
+976	983	1	1	t
+977	984	1	1	t
+978	985	1	1	t
+979	986	1	1	t
+980	987	1	1	t
+981	988	1	1	t
+982	989	1	1	t
+983	990	1	1	t
+984	991	1	1	t
+985	992	1	1	t
+986	993	1	1	t
+987	994	1	1	t
+988	995	1	1	t
+989	996	1	1	t
+990	997	1	1	t
+991	998	1	1	t
+992	999	1	1	t
+993	1000	1	1	t
+994	1001	1	1	t
+995	1002	1	1	t
+996	1004	1	1	t
+997	1005	1	1	t
+998	1006	1	1	t
+999	1007	1	1	t
+1000	1008	1	1	t
+1001	1009	1	1	t
+1002	1010	1	1	t
+1003	1011	1	1	t
+1004	1012	1	1	t
+1005	1013	1	1	t
+1006	1014	1	1	t
+1007	1015	1	1	t
+1008	1016	1	1	t
+1009	1017	1	1	t
+1010	1018	1	1	t
+1011	1019	1	1	t
+1012	1020	1	1	t
+1013	1021	1	1	t
+1014	1022	1	1	t
+1015	1023	1	1	t
+1016	1024	1	1	t
+1017	1025	1	1	t
+1018	1026	1	1	t
+1019	1027	1	1	t
+1020	1028	1	1	t
+1021	1029	1	1	t
+1022	1030	1	1	t
+1023	1031	1	1	t
+1024	1032	1	1	t
+1025	1033	1	1	t
+1026	1034	1	1	t
+1027	1035	1	1	t
+1028	1036	1	1	t
+1029	1037	1	1	t
+1030	1038	1	1	t
+1031	1039	1	1	t
+1032	1040	1	1	t
+1033	1041	1	1	t
+1034	1042	1	1	t
+1035	1043	1	1	t
+1036	1044	1	1	t
+1037	1045	1	1	t
+1038	1047	1	1	t
+1039	1048	1	1	t
+1040	1049	1	1	t
+1041	1050	1	1	t
+1042	1052	1	1	t
+1043	1053	1	1	t
+1044	1054	1	1	t
+1045	1055	1	1	t
+1046	1056	1	1	t
+1047	1057	1	1	t
+1048	1058	1	1	t
+1049	1059	1	1	t
+1050	1060	1	1	t
+1051	1061	1	1	t
+1052	1062	1	1	t
+1053	1063	1	1	t
+1054	1064	1	1	t
+1055	1065	1	1	t
+1056	1066	1	1	t
+1057	1067	1	1	t
+1058	1068	1	1	t
+1059	1069	1	1	t
+1060	1070	1	1	t
+1061	1071	1	1	t
+1062	1072	1	1	t
+1063	1073	1	1	t
+1064	1074	1	1	t
+1065	1075	1	1	t
+1066	1076	1	1	t
+1067	1077	1	1	t
+1068	1078	1	1	t
+1069	1079	1	1	t
+1070	1080	1	1	t
+1071	1081	1	1	t
+1072	1082	1	1	t
+1073	1083	1	1	t
+1074	1084	1	1	t
+1075	1085	1	1	t
+1076	1086	1	1	t
+1077	1087	1	1	t
+1078	1088	1	1	t
+1079	1089	1	1	t
+1080	1090	1	1	t
+1081	1091	1	1	t
+1082	1092	1	1	t
+1083	1093	1	1	t
+1084	1094	1	1	t
+1085	1096	1	1	t
+1086	1097	1	1	t
+1087	1098	1	1	t
+1088	1099	1	1	t
+1089	1100	1	1	t
+1090	1101	1	1	t
+1091	1102	1	1	t
+1092	1103	1	1	t
+1093	1104	1	1	t
+1094	1105	1	1	t
+1095	1106	1	1	t
+1096	1107	1	1	t
+1097	1108	1	1	t
+1098	1109	1	1	t
+1099	1110	1	1	t
+1100	1111	1	1	t
+1101	1112	1	1	t
+1102	1113	1	1	t
+1103	1114	1	1	t
+1104	1115	1	1	t
+1105	1116	1	1	t
+1106	1117	1	1	t
+1107	1118	1	1	t
+1108	1119	1	1	t
+1109	1120	1	1	t
+1110	1121	1	1	t
+1111	1122	1	1	t
+1112	1123	1	1	t
+1113	1124	1	1	t
+1114	1125	1	1	t
+1115	1126	1	1	t
+1116	1128	1	1	t
+1117	1129	1	1	t
+1118	1130	1	1	t
+1119	1131	1	1	t
+1120	1132	1	1	t
+1121	1133	1	1	t
+1122	1134	1	1	t
+1123	1135	1	1	t
+1124	1136	1	1	t
+1125	1137	1	1	t
+1126	1138	1	1	t
+1127	1139	1	1	t
+1128	1140	1	1	t
+1129	1141	1	1	t
+1130	1142	1	1	t
+1131	1143	1	1	t
+1132	1144	1	1	t
+1133	1145	1	1	t
+1134	1146	1	1	t
+1135	1147	1	1	t
+1136	1148	1	1	t
+1137	1149	1	1	t
+1138	1150	1	1	t
+1139	1151	1	1	t
+1140	1152	1	1	t
+1141	1153	1	1	t
+1142	1154	1	1	t
+1143	1155	1	1	t
+1144	1156	1	1	t
+1145	1157	1	1	t
+1146	1158	1	1	t
+1147	1159	1	1	t
+1148	1161	1	1	t
+1149	1162	1	1	t
+1150	1163	1	1	t
+1151	1164	1	1	t
+1152	1165	1	1	t
+1153	1166	1	1	t
+1154	1167	1	1	t
+1155	1168	1	1	t
+1156	1169	1	1	t
+1157	1170	1	1	t
+1158	1171	1	1	t
+1159	1178	1	1	t
+1162	1	1	2	t
+\.
+
+
+--
+-- TOC entry 3746 (class 0 OID 18117)
 -- Dependencies: 217
 -- Data for Name: page; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -1001,7 +2299,7 @@ COPY public.page (id, name, parent_id, content, is_deleted, is_hidden) FROM stdi
 
 
 --
--- TOC entry 3744 (class 0 OID 18322)
+-- TOC entry 3766 (class 0 OID 18322)
 -- Dependencies: 237
 -- Data for Name: paraphrase_word; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2110,7 +3408,7 @@ COPY public.paraphrase_word (word_id, paraphrase_id) FROM stdin;
 
 
 --
--- TOC entry 3742 (class 0 OID 18313)
+-- TOC entry 3764 (class 0 OID 18313)
 -- Dependencies: 235
 -- Data for Name: paraphrases; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3219,7 +4517,7 @@ COPY public.paraphrases (id, paraphrase) FROM stdin;
 
 
 --
--- TOC entry 3726 (class 0 OID 18126)
+-- TOC entry 3748 (class 0 OID 18126)
 -- Dependencies: 219
 -- Data for Name: quote; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3231,7 +4529,7 @@ COPY public.quote (id, quote, quote_by, added_by, created, updated) FROM stdin;
 
 
 --
--- TOC entry 3730 (class 0 OID 18160)
+-- TOC entry 3752 (class 0 OID 18160)
 -- Dependencies: 223
 -- Data for Name: role; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3243,7 +4541,7 @@ COPY public.role (role_id, name, description) FROM stdin;
 
 
 --
--- TOC entry 3750 (class 0 OID 19042)
+-- TOC entry 3772 (class 0 OID 19042)
 -- Dependencies: 243
 -- Data for Name: school_termins; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -5061,7 +6359,7 @@ COPY public.school_termins (id, subject_id, termin, definition, class) FROM stdi
 
 
 --
--- TOC entry 3748 (class 0 OID 19035)
+-- TOC entry 3770 (class 0 OID 19035)
 -- Dependencies: 241
 -- Data for Name: subjects; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -5084,7 +6382,7 @@ COPY public.subjects (id, subject) FROM stdin;
 
 
 --
--- TOC entry 3738 (class 0 OID 18297)
+-- TOC entry 3760 (class 0 OID 18297)
 -- Dependencies: 231
 -- Data for Name: synamizer; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -6253,7 +7551,7 @@ COPY public.synamizer (id, words, words_family, status, meaning, pos) FROM stdin
 
 
 --
--- TOC entry 3743 (class 0 OID 18319)
+-- TOC entry 3765 (class 0 OID 18319)
 -- Dependencies: 236
 -- Data for Name: synonym_word; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -9681,7 +10979,7 @@ COPY public.synonym_word (word_id, synonym_id) FROM stdin;
 
 
 --
--- TOC entry 3740 (class 0 OID 18306)
+-- TOC entry 3762 (class 0 OID 18306)
 -- Dependencies: 233
 -- Data for Name: synonyms; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -13108,7 +14406,7 @@ COPY public.synonyms (id, synonym) FROM stdin;
 
 
 --
--- TOC entry 3734 (class 0 OID 18285)
+-- TOC entry 3756 (class 0 OID 18285)
 -- Dependencies: 227
 -- Data for Name: tag; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -13139,7 +14437,7 @@ COPY public.tag (name, id) FROM stdin;
 
 
 --
--- TOC entry 3736 (class 0 OID 18293)
+-- TOC entry 3758 (class 0 OID 18293)
 -- Dependencies: 229
 -- Data for Name: tag_legacy; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -13153,7 +14451,7 @@ COPY public.tag_legacy (tag_id, legacy_id) FROM stdin;
 
 
 --
--- TOC entry 3729 (class 0 OID 18146)
+-- TOC entry 3751 (class 0 OID 18146)
 -- Dependencies: 222
 -- Data for Name: termin; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -13214,32 +14512,39 @@ COPY public.termin (id, name, description, examples) FROM stdin;
 
 
 --
--- TOC entry 3731 (class 0 OID 18185)
+-- TOC entry 3753 (class 0 OID 18185)
 -- Dependencies: 224
 -- Data for Name: user_role; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.user_role (user_id, role_id, id) FROM stdin;
 1	1	1
-2	2	2
 1	2	3
 \.
 
 
 --
--- TOC entry 3728 (class 0 OID 18136)
+-- TOC entry 3750 (class 0 OID 18136)
 -- Dependencies: 221
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, email, password_hash, password_salt) FROM stdin;
-1	test	12345678	\N
-2	magzhan200508@gmail.com	123	\N
+COPY public.users (id, email, password_hash, password_salt, is_verified, confirmation_code_hash, full_name) FROM stdin;
+1	enu201309@gmail.com	ae27accde72352ea5942bbaf42c5f38680dfc67a67f085ac0fdbc4ef4b773bdc	065750d6568a1d40aabd6dba97ac697f	t	a	e
 \.
 
 
 --
--- TOC entry 3769 (class 0 OID 0)
+-- TOC entry 3797 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: activate_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.activate_types_id_seq', 2, true);
+
+
+--
+-- TOC entry 3798 (class 0 OID 0)
 -- Dependencies: 214
 -- Name: legacy_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13248,7 +14553,7 @@ SELECT pg_catalog.setval('public.legacy_id_seq', 100, true);
 
 
 --
--- TOC entry 3770 (class 0 OID 0)
+-- TOC entry 3799 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: morphemes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13257,7 +14562,7 @@ SELECT pg_catalog.setval('public.morphemes_id_seq', 195, true);
 
 
 --
--- TOC entry 3771 (class 0 OID 0)
+-- TOC entry 3800 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: my_serial; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13266,7 +14571,16 @@ SELECT pg_catalog.setval('public.my_serial', 65, true);
 
 
 --
--- TOC entry 3772 (class 0 OID 0)
+-- TOC entry 3801 (class 0 OID 0)
+-- Dependencies: 246
+-- Name: offers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.offers_id_seq', 1164, true);
+
+
+--
+-- TOC entry 3802 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: page_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13275,7 +14589,7 @@ SELECT pg_catalog.setval('public.page_id_seq', 1, false);
 
 
 --
--- TOC entry 3773 (class 0 OID 0)
+-- TOC entry 3803 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: paraphrases_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13284,7 +14598,7 @@ SELECT pg_catalog.setval('public.paraphrases_id_seq', 1099, true);
 
 
 --
--- TOC entry 3774 (class 0 OID 0)
+-- TOC entry 3804 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: quote_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13293,7 +14607,7 @@ SELECT pg_catalog.setval('public.quote_id_seq', 1, false);
 
 
 --
--- TOC entry 3775 (class 0 OID 0)
+-- TOC entry 3805 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: school_termins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13302,7 +14616,7 @@ SELECT pg_catalog.setval('public.school_termins_id_seq', 6348, true);
 
 
 --
--- TOC entry 3776 (class 0 OID 0)
+-- TOC entry 3806 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: subjects_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13311,7 +14625,7 @@ SELECT pg_catalog.setval('public.subjects_id_seq', 13, true);
 
 
 --
--- TOC entry 3777 (class 0 OID 0)
+-- TOC entry 3807 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: synamizer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13320,7 +14634,7 @@ SELECT pg_catalog.setval('public.synamizer_id_seq', 1178, true);
 
 
 --
--- TOC entry 3778 (class 0 OID 0)
+-- TOC entry 3808 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: synonyms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13329,7 +14643,7 @@ SELECT pg_catalog.setval('public.synonyms_id_seq', 3507, true);
 
 
 --
--- TOC entry 3779 (class 0 OID 0)
+-- TOC entry 3809 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: tag_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13338,7 +14652,7 @@ SELECT pg_catalog.setval('public.tag_id_seq', 1, false);
 
 
 --
--- TOC entry 3780 (class 0 OID 0)
+-- TOC entry 3810 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: user_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -13347,16 +14661,34 @@ SELECT pg_catalog.setval('public.user_role_id_seq', 1, true);
 
 
 --
--- TOC entry 3781 (class 0 OID 0)
+-- TOC entry 3811 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+SELECT pg_catalog.setval('public.users_id_seq', 4, true);
 
 
 --
--- TOC entry 3552 (class 2606 OID 18115)
+-- TOC entry 3593 (class 2606 OID 19096)
+-- Name: activate_types activate_types_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.activate_types
+    ADD CONSTRAINT activate_types_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 3595 (class 2606 OID 19094)
+-- Name: activate_types activate_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.activate_types
+    ADD CONSTRAINT activate_types_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3567 (class 2606 OID 18115)
 -- Name: legacy legacy_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13365,7 +14697,7 @@ ALTER TABLE ONLY public.legacy
 
 
 --
--- TOC entry 3572 (class 2606 OID 18355)
+-- TOC entry 3587 (class 2606 OID 18355)
 -- Name: morphemes morphemes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13374,7 +14706,16 @@ ALTER TABLE ONLY public.morphemes
 
 
 --
--- TOC entry 3554 (class 2606 OID 18124)
+-- TOC entry 3597 (class 2606 OID 19104)
+-- Name: offers offers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.offers
+    ADD CONSTRAINT offers_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3569 (class 2606 OID 18124)
 -- Name: page page_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13383,7 +14724,7 @@ ALTER TABLE ONLY public.page
 
 
 --
--- TOC entry 3570 (class 2606 OID 18318)
+-- TOC entry 3585 (class 2606 OID 18318)
 -- Name: paraphrases paraphrases_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13392,7 +14733,7 @@ ALTER TABLE ONLY public.paraphrases
 
 
 --
--- TOC entry 3556 (class 2606 OID 18134)
+-- TOC entry 3571 (class 2606 OID 18134)
 -- Name: quote quote_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13401,7 +14742,7 @@ ALTER TABLE ONLY public.quote
 
 
 --
--- TOC entry 3562 (class 2606 OID 18164)
+-- TOC entry 3577 (class 2606 OID 18164)
 -- Name: role role_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13410,7 +14751,7 @@ ALTER TABLE ONLY public.role
 
 
 --
--- TOC entry 3576 (class 2606 OID 19049)
+-- TOC entry 3591 (class 2606 OID 19049)
 -- Name: school_termins school_termins_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13419,7 +14760,7 @@ ALTER TABLE ONLY public.school_termins
 
 
 --
--- TOC entry 3574 (class 2606 OID 19040)
+-- TOC entry 3589 (class 2606 OID 19040)
 -- Name: subjects subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13428,7 +14769,7 @@ ALTER TABLE ONLY public.subjects
 
 
 --
--- TOC entry 3566 (class 2606 OID 18304)
+-- TOC entry 3581 (class 2606 OID 18304)
 -- Name: synamizer synamizer_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13437,7 +14778,7 @@ ALTER TABLE ONLY public.synamizer
 
 
 --
--- TOC entry 3568 (class 2606 OID 18311)
+-- TOC entry 3583 (class 2606 OID 18311)
 -- Name: synonyms synonyms_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13446,7 +14787,7 @@ ALTER TABLE ONLY public.synonyms
 
 
 --
--- TOC entry 3560 (class 2606 OID 18152)
+-- TOC entry 3575 (class 2606 OID 18152)
 -- Name: termin termin_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13455,7 +14796,7 @@ ALTER TABLE ONLY public.termin
 
 
 --
--- TOC entry 3564 (class 2606 OID 18201)
+-- TOC entry 3579 (class 2606 OID 18201)
 -- Name: user_role user_role_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13464,7 +14805,7 @@ ALTER TABLE ONLY public.user_role
 
 
 --
--- TOC entry 3558 (class 2606 OID 18143)
+-- TOC entry 3573 (class 2606 OID 18143)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13473,7 +14814,15 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3577 (class 2606 OID 18193)
+-- TOC entry 3600 (class 2620 OID 19110)
+-- Name: users insert_offer_trigger; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER insert_offer_trigger AFTER INSERT ON public.users FOR EACH ROW EXECUTE FUNCTION public.create_offer_trigger();
+
+
+--
+-- TOC entry 3598 (class 2606 OID 18193)
 -- Name: user_role user_role_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13482,7 +14831,7 @@ ALTER TABLE ONLY public.user_role
 
 
 --
--- TOC entry 3578 (class 2606 OID 18188)
+-- TOC entry 3599 (class 2606 OID 18188)
 -- Name: user_role user_role_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -13490,7 +14839,7 @@ ALTER TABLE ONLY public.user_role
     ADD CONSTRAINT user_role_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
--- Completed on 2023-07-03 11:59:18 +06
+-- Completed on 2023-07-10 12:31:50 +06
 
 --
 -- PostgreSQL database dump complete

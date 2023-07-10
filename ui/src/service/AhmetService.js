@@ -1,6 +1,6 @@
 import { AHMET_API, getHeader } from "@/config";
 import api from "./api";
-import { useStore } from "vuex";
+import axios from "axios";
 export const AhmetService = {
   getTreeTableNodes(parentID) {
     let param = parentID ? String(parentID) : "";
@@ -26,17 +26,93 @@ export const AhmetService = {
   },
   async saveTermin(request, access_token) {
     console.log("access_token:", access_token);
-    await api.post(AHMET_API + "/add/termin", {
-      data: request,
-      headers: getHeader(access_token),
+    console.log("getHeader(access_token):", getHeader(access_token));
+    await axios.post(
+      `${AHMET_API}/add/termin`,
+      { data: request },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
+  },
+  async saveSubject(subject, access_token) {
+    await axios.post(
+      `${AHMET_API}/add/subject`,
+      { data: subject },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
+  },
+  async register(email, password, full_name) {
+    await api.post(AHMET_API + "/register", {
+      headers: getHeader(),
+      data: { email: email, password: password, full_name: full_name },
     });
   },
-  async saveSubject(subject) {
-    const store = useStore();
-    const access_token = store.getters.getAccessToken;
-    await api.post(AHMET_API + "/add/subject", {
-      data: subject,
-      headers: getHeader(access_token),
+  async getTokenAndRoles(email, password) {
+    var response;
+    var roles = [];
+    response = await api.post(`${AHMET_API}/login/`, {
+      headers: getHeader(),
+      data: {
+        email: email,
+        password: password,
+      },
     });
+    const temp = response.data["access_token"];
+
+    console.log("temp:", temp);
+    response = await api.get(`${AHMET_API}/who_am_i/`, {
+      headers: { Authorization: `Bearer ${temp}` },
+    });
+    console.log("response:", response);
+    roles = response.data["roles"];
+    console.log("who am i returns:");
+    return { access_token: temp, roles: roles };
+  },
+  async confirm(email, code) {
+    console.log("email:", email);
+    console.log("code:", code);
+    const response = await api.post(`${AHMET_API}/confirm`, {
+      headers: getHeader(),
+      data: { email: email, code: code },
+    });
+    return response.data["message"];
+  },
+  async getOffers(access_token) {
+    const response = await axios.get(`${AHMET_API}/offers`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Access-Control-Allow-Credentials": "true",
+        "Content-Type": "application/json",
+        Accept: "*/*",
+      },
+    });
+    return response;
+  },
+  async activate(offer_id, access_token, activate_type) {
+    await axios.post(
+      `${AHMET_API}/activate`,
+      { offer_id: offer_id, activate_type: activate_type },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
   },
 };

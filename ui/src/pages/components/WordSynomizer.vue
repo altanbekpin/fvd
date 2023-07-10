@@ -84,10 +84,24 @@ export default {
       optionSynonyms: [{ synonym: "синоним жоқ", words: "" }],
       selectedSyn: null,
       overlayTarget: null,
+      clickedElHref: "",
     };
   },
 
   methods: {
+    clearArray(array) {
+      const uniqueArray = [];
+      const synonymSet = new Set();
+
+      for (const obj of array) {
+        if (!synonymSet.has(obj.synonym)) {
+          synonymSet.add(obj.synonym);
+          uniqueArray.push(obj);
+        }
+      }
+
+      return uniqueArray;
+    },
     async send_to_synomize() {
       await axios
         .post(
@@ -104,7 +118,7 @@ export default {
         });
     },
     async handleLineClick(e) {
-      const clickedElHref = e.target.getAttribute("href");
+      this.clickedElHref = e.target.getAttribute("href");
       const clickedElClass = e.target.getAttribute("class");
       const clickkedRef = e.target.getAttribute("second_part");
       const target = e.target;
@@ -117,19 +131,30 @@ export default {
         console.log("dataValue: ", dataValue);
         console.log("overlayTarget:", this.overlayTarget);
         this.handleClick(e);
-        console.log("temp_testing_div2 clicked!", clickedElHref);
+        console.log("temp_testing_div2 clicked!", this.clickedElHref);
+        this.optionSynonyms = [
+          {
+            synonym: this.clickedElHref,
+            words: this.clickedElHref,
+          },
+        ];
         await axios
           .post(
             `${AHMET_API}/search/synonyms/only`,
             {
-              value: clickedElHref,
+              value: this.clickedElHref,
               second_part: clickkedRef,
             },
             { headers: getHeader() }
           )
           .then((response) => {
-            this.optionSynonyms = response.data;
+            this.optionSynonyms = this.optionSynonyms.concat(
+              this.optionSynonyms,
+              response.data
+            );
           });
+        this.optionSynonyms = this.clearArray(this.optionSynonyms);
+        console.log("this.optionSynonyms:", this.optionSynonyms);
       } else {
         console.log("another element was clicked");
       }

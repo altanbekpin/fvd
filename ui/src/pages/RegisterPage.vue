@@ -3,6 +3,7 @@
     class="surface-0 flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden"
   >
     <div class="grid justify-content-center p-2 lg:p-0" style="min-width: 80%">
+      <Toast></Toast>
       <div
         class="col-12 xl:col-6"
         style="
@@ -61,17 +62,19 @@
               inputClass="w-full"
               inputStyle="padding:1rem"
             ></Password>
-            <!-- <label for="email1" class="block text-900 text-xl font-medium mb-2"
-              >Код</label
+            <label
+              for="fullname"
+              class="block text-900 text-xl font-medium mb-2"
+              >Аты жөні</label
             >
             <InputText
-              id="email2"
-              v-model="code"
+              id="fullname"
+              v-model="fullname"
               type="text"
               class="w-full mb-3"
-              placeholder="Логин"
+              placeholder="Аты жөні"
               style="padding: 1rem"
-            /> -->
+            />
             <div class="flex align-items-center justify-content-between mb-5">
               <div class="flex align-items-center">
                 <Checkbox
@@ -92,7 +95,7 @@
             <Button
               label="Код жіберу"
               class="w-full p-3 text-xl"
-              @click="postLogin"
+              @click="register"
             ></Button>
           </div>
         </div>
@@ -102,10 +105,8 @@
 </template>
 
 <script>
-import axios from "axios";
-//import { store } from './store.js';
 import store from "../store.js";
-import { AHMET_API } from "../config";
+import { AhmetService } from "@/service/AhmetService";
 
 export default {
   data() {
@@ -113,7 +114,7 @@ export default {
       email: "",
       password: "",
       checked: false,
-      //store
+      fullname: "",
     };
   },
   computed: {
@@ -123,43 +124,27 @@ export default {
     },
   },
   methods: {
-    async postLogin() {
-      var temp = "";
-      var response;
-      var roles = [];
-      await axios
-        .post(`${AHMET_API}/login/`, {
-          email: this.email,
-          password: this.password,
-        })
-        .then((_response) => {
-          response = _response;
-        }); //temp = response.data['access_token']})
-      //const token = logged_as.data['access_token']
-      temp = response.data["access_token"];
-
-      //console.log(temp)
-      await axios
-        .get(`${AHMET_API}/who_am_i/`, {
-          headers: { Authorization: `Bearer ${temp}` },
-        })
-        .then((response) => console.log((roles = response.data["roles"])));
-      console.log("who am i returns:");
-      if (response.status == 200) {
-        console.log("after asssigning response:");
-        console.log(store.state.roles);
+    async register() {
+      try {
+        await AhmetService.register(this.email, this.password, this.fullname);
         const data = {
           email: this.email,
           password: this.password,
-          roles: roles,
-          access_token: temp,
+          roles: [],
+          access_token: "",
+          full_name: this.fullname,
         };
         store.commit("updateUser", data);
-        console.log("outside of updateUser:");
-        console.log(store.state.user);
-        this.$router.push("/");
+        this.$router.push("/confirmcode");
+      } catch (e) {
+        console.log(e);
+        this.$toast.add({
+          severity: "error",
+          summary: "Сәтсіз",
+          detail: e,
+          life: 3000,
+        });
       }
-      //console.log(store.roles)
     },
   },
 };

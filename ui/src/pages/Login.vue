@@ -94,10 +94,11 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 //import { store } from './store.js';
 import store from "../store.js";
-import { AHMET_API } from "../config";
+// import { AHMET_API } from "../config";
+import { AhmetService } from "@/service/AhmetService";
 
 export default {
   data() {
@@ -105,7 +106,6 @@ export default {
       email: "",
       password: "",
       checked: false,
-      //store
     };
   },
   computed: {
@@ -116,55 +116,92 @@ export default {
   },
   methods: {
     async postLogin() {
-      var temp = "";
-      var response;
-      var roles = [];
       try {
-        await axios
-          .post(`${AHMET_API}/login/`, {
-            email: this.email,
-            password: this.password,
-          })
-          .then((_response) => {
-            response = _response;
-          });
-      } catch (error) {
-        this.$toast.add({
-          severity: "error",
-          summary: "Сәтсіз",
-          detail: "Қате логин немесе пароль",
-          life: 3000,
-        });
-        return;
-      }
-      temp = response.data["access_token"];
-
-      console.log("temp:", temp);
-      await axios
-        .get(`${AHMET_API}/who_am_i/`, {
-          headers: { Authorization: `Bearer ${temp}` },
-        })
-        .then((response) => console.log((roles = response.data["roles"])));
-      console.log("who am i returns:");
-      if (response.status == 200) {
+        const repo = await AhmetService.getTokenAndRoles(
+          this.email,
+          this.password
+        );
         this.$toast.add({
           severity: "info",
           summary: "Аккаунтқа кіру",
           detail: "Сәтті жүзеге асырылды",
           life: 3000,
         });
-        console.log(store.state.roles);
         const data = {
           email: this.email,
           password: this.password,
-          roles: roles,
-          access_token: temp,
+          roles: repo["roles"],
+          access_token: repo["access_token"],
+          full_name: "",
         };
         store.commit("updateUser", data);
-        console.log("outside of updateUser:");
-        console.log(store.state.user);
         this.$router.push("/");
+      } catch (e) {
+        console.log("ERROR:", e);
+        this.$toast.add({
+          severity: "error",
+          summary: "Сәтсіз",
+          detail: "Қате логин немесе пароль",
+          life: 3000,
+        });
       }
+      // var temp = "";
+      // var response;
+      // var roles = [];
+      // try {
+      //   await axios
+      //     .post(`${AHMET_API}/login/`, {
+      //       email: this.email,
+      //       password: this.password,
+      //     })
+      //     .then((_response) => {
+      //       response = _response;
+      //     });
+      // } catch (error) {
+      //   this.$toast.add({
+      //     severity: "error",
+      //     summary: "Сәтсіз",
+      //     detail: "Қате логин немесе пароль",
+      //     life: 3000,
+      //   });
+      //   return;
+      // }
+      // temp = response.data["access_token"];
+
+      // console.log("temp:", temp);
+      // await axios
+      //   .get(`${AHMET_API}/who_am_i/`, {
+      //     headers: { Authorization: `Bearer ${temp}` },
+      //   })
+      //   .then((response) => console.log((roles = response.data["roles"])));
+      // console.log("who am i returns:");
+      // if (response.status == 200) {
+      //   this.$toast.add({
+      //     severity: "info",
+      //     summary: "Аккаунтқа кіру",
+      //     detail: "Сәтті жүзеге асырылды",
+      //     life: 3000,
+      //   });
+      //   console.log(store.state.roles);
+      //   const data = {
+      //     email: this.email,
+      //     password: this.password,
+      //     roles: roles,
+      //     access_token: temp,
+      //     full_name: "",
+      //   };
+      //   store.commit("updateUser", data);
+      //   console.log("outside of updateUser:");
+      //   console.log(store.state.user);
+      //   this.$router.push("/");
+      // } else {
+      //   this.$toast.add({
+      //     severity: "error",
+      //     summary: "Ақау",
+      //     detail: "Қате логин немесе пароль",
+      //     life: 3000,
+      //   });
+      // }
       //console.log(store.roles)
     },
   },

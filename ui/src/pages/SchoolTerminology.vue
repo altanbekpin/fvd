@@ -337,7 +337,9 @@ export default {
       console.log("store:", this.store);
       console.log("store.state:", this.store.state);
       const access_token = this.store.getters.getAccessToken;
+      console.log("###############");
       try {
+        console.log("saveTermin:", access_token);
         await AhmetService.saveTermin(this.request, access_token);
         this.$toast.add({
           severity: "success",
@@ -369,14 +371,16 @@ export default {
     },
     async saveSubject() {
       try {
+        const access_token = this.store.getters.getAccessToken;
+        await AhmetService.saveSubject(this.subjectToAdd, access_token);
         this.$toast.add({
           severity: "success",
           summary: "Қабылданды",
           detail: "Жаңа пән сәтті қосылды",
           life: 3000,
         });
-        await AhmetService.saveSubject(this.subjectToAdd);
       } catch (error) {
+        console.log("ERROR:", error);
         this.$toast.add({
           severity: "error",
           summary: "Ақау",

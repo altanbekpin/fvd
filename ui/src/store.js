@@ -13,6 +13,7 @@ const store = createStore({
       password: "",
       roles: [],
       access_token: "",
+      full_name: ""
     },
     ChosenTheme: {
       theme: "bootstrap4-light-blue",

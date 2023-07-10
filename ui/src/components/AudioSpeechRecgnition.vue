@@ -1,5 +1,6 @@
 <template>
   <div class="grid">
+    <Toast></Toast>
     <Card>
       <template #title> Ахметтану интеллектуалды жүйесі </template>
       <template #content>

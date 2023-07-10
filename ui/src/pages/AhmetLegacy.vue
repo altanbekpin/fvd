@@ -170,7 +170,6 @@ import { AhmetService } from "@/service/AhmetService";
 import store from "../store.js";
 import { AHMET_API } from "../config.js";
 import axios from "axios";
-// import axios from 'axios'
 const selectedTag = ref({ name: "", id: "" });
 const nodes = ref(null);
 const loading = ref(false);
@@ -183,7 +182,7 @@ const form_Data = ref(new FormData());
 const fileID = ref("");
 const parent_id = ref("");
 const changeDialog = ref(false);
-const url = computed(() => AHMET_API + "api/upload");
+const url = computed(() => AHMET_API + "/upload");
 const tagsToAdd = [
   { name: "АҒАРТУШЫ", id: "1" },
   { name: "ҰЛТ ҰСТАЗЫ", id: "2" },
@@ -222,9 +221,10 @@ const handleFileUpload = (event) => {
   formData.append("path_to_save", path_to_save.value);
   formData.append("parent_id", parent_id.value);
   console.log("acess token", store.state.user.access_token);
+  console.log("handleFileUpload");
   fetch(`${AHMET_API}/upload`, {
     method: "POST",
-    //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
+    headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
   })
     .then((response) => {
@@ -286,7 +286,7 @@ const deleteFile = () => {
   formData.append("fileID", fileID.value);
   fetch(`${AHMET_API}/delete/file`, {
     method: "POST",
-    //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
+    headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
   });
   setFalse();
@@ -298,7 +298,7 @@ const changeFileName = () => {
   formData.append("FileName", FileName.value);
   fetch(`${AHMET_API}/change/file/name`, {
     method: "POST",
-    //headers: { Authorization: `Bearer ${store.state.user.access_token}` },
+    headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
   });
   FileName.value = "";

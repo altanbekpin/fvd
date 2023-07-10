@@ -4,7 +4,7 @@ from flask import request, jsonify
 import re
 from nltk.tokenize import sent_tokenize as st
 from db import DB
-
+from flask_jwt_extended import current_user, jwt_required
 def split_string(first_string, second_string):
     index = second_string.find(first_string)
     if index != -1:
@@ -70,7 +70,10 @@ def searchsyn():
     return synonyms
 
 @app.route('/add/tag', methods=['POST'])
+@jwt_required()
 def addTag():
+    if not DB.isUserAdmin(current_user):
+        return "don't have enough permission", 500
     definition_id = request.json['definition_id']
     file_id = request.json['file_id']
     DB.get_instance().addTag(definition_id, file_id)
@@ -78,8 +81,11 @@ def addTag():
 
 @app.route('/word/synomize/', methods=['POST'])
 def synomizing():
+    print('JSON:', jsonify(request.json))
     data = request.json['value']
     family = request.json['words_family']
+    print("data:", data)
+    print("family:", family)
     temp_families = []
     if family == "":
         found_data = DB.get_instance().findword(data)
@@ -130,7 +136,11 @@ def switch_case(argument):
     
 
 @app.route('/add/word/', methods=['POST'])
+@jwt_required()
 def addWord():
+    print("addWord")
+    if not DB.get_instance().isUserAdmin(current_user):
+        return "don't have enough permission", 500
     synonyms = request.json['synonyms']
     paraphrases = request.json['paraphrases']
     meaning = request.json['meaning']
@@ -140,38 +150,55 @@ def addWord():
     try:
         row = DB.get_instance().addWord(word, family, meaning, pos)
     except Exception as e:
-        return e, 400
+        print("ERROR 154 line:", e)
+        return str(e), 400
+    print("WORD ADDED")
+    print("row['id']:", row['id'])
     word_id = row['id']
     if len(synonyms) > 0:
         for i in synonyms:
+            print("SYNONYM:", i)
             try:
                 DB.get_instance().add_Synonyms( i, word_id)
             except Exception as e:
-                return e, 400
+                print(e)
+                return str(e), 400
     if len(paraphrases) > 0:
         for i in paraphrases:
+            print("paraphrases:".upper(), i)
             try:
                 DB.get_instance().add_Paraphrases( paraphrase=i, word_id=word_id)
             except Exception as e:
-                return e, 400
+                print(e)
+                return str(e), 400
+    print('success')
     return 'success', 200
 
 @app.route('/add/synonym/', methods=['POST'])
+@jwt_required()
 def addSynonym():
+    print("addSynonym")
+    if not DB.get_instance().isUserAdmin(current_user):
+        return "don't have enough permission", 500
     synonyms = request.json['synonyms']
     word = request.json['word']
     family = request.json['family']['family']
-    word_id = DB.get_instance().findword(word, family)
+    word_id = DB.get_instance().findword(word, family)[0].get('id')
+    print("word_id:", word_id)
     for i in synonyms:
         DB.get_instance().add_Synonyms(i, word_id)
     return 'success', 200
 
 @app.route('/add/paraphrase/', methods=['POST'])
+@jwt_required()
 def addParaphrase():
+    if not DB.get_instance().isUserAdmin(current_user):
+        return "don't have enough permission", 500
     paraphrases = request.json['paraphrases']
     word = request.json['word']
     family = request.json['family']['family']
-    word_id = DB.get_instance().findword(word, family)
+    word_id = DB.get_instance().findword(word, family)[0].get('id')
     for i in paraphrases:
         DB.get_instance().add_Paraphrases(i, word_id)
     return 'success', 200
+

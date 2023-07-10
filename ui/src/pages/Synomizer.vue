@@ -104,22 +104,13 @@ import { AHMET_API, getHeader } from "../config";
 import { useStore } from "vuex";
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
-
-// import WordSynomizer from "./components/WordSynomizer.vue";
 const selectedWord = ref();
 const inputValues = ref([]);
 const word = ref("");
 const inputWords = ref("");
 const meaning = ref("");
 const showSynAdd = ref(false);
-// const synomized_words = ref('')
 const synomized_words = ref();
-// const handleClick = (event) => {
-//   // Call your desired function here
-//   console.log("Span clicked!");
-//   // }
-//   toggle(event);
-// };
 // eslint-disable-next-line no-unused-vars
 const onSearchTap = async () => {
   console.log("onSearchTap");
@@ -143,16 +134,7 @@ const onSynonymTap = async () => {
   console.log("dataValue: ", dataValue);
   console.log("selectedSyn.value: ", selectedSyn.value.synonym);
   targetRef.value.innerText = selectedSyn.value.synonym;
-  // closeOverlayPanel();
 };
-// const op = ref();
-// const ref_event = ref();
-// const toggle = (event) => {
-//   ref_event.value = event.target;
-//   console.log("toggle: ", ref_event.value);
-//   op.value.toggle(event);
-// };
-// const targetHref = 'сайлау';
 const visible = ref(false);
 // eslint-disable-next-line no-unused-vars
 const families = ref([
@@ -165,10 +147,6 @@ const families = ref([
 const selectedSyn = ref();
 const optionSynonyms = ref([{ synonym: "синоним жоқ", words: "" }]);
 console.log(optionSynonyms.value);
-
-// const closeOverlayPanel = () => {
-//   op.value.hide();
-// };
 
 const handleSelection = async (selectedItem) => {
   console.log("Selected item:", selectedItem.value["family"]);
@@ -291,8 +269,7 @@ const addWord = () => {
   if (
     synonymInput.value != "" &&
     inputValues.value != "" &&
-    meaningInput.value != "" &&
-    (selectedFamily.value != "" || paraphraseInput.value != "")
+    meaningInput.value != ""
   ) {
     axios.post(
       `${AHMET_API}/add/word/`,
@@ -303,13 +280,33 @@ const addWord = () => {
         family: selectedFamily.value,
         paraphrases: paraphraseInput.value,
       },
-      { headers: getHeader() }
+      {
+        headers: {
+          Authorization: `Bearer ${store.getters.getAccessToken}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
     );
+    toast.add({
+      severity: "success",
+      summary: "Сәтті",
+      detail: "Ұсынысыңыз сәтті жіберілді",
+      life: 3000,
+    });
     synonymInput.value = "";
     inputValues.value = "";
     meaningInput.value = "";
     selectedFamily.value = "";
     paraphraseInput.value = "";
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Ақау",
+      detail: "Қате ұсыныс",
+      life: 3000,
+    });
   }
 };
 </script>

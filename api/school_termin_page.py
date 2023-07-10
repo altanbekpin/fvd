@@ -1,5 +1,5 @@
 from app import app
-from db import DB, UserRole
+from db import DB
 from flask import request
 import json
 from flask_jwt_extended import current_user, jwt_required
@@ -21,7 +21,11 @@ def countTermins():
     return amoung
 
 @app.route("/add/termin", methods=['POST'])
+@jwt_required()
 def addTermin():
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    if not DB.get_instance().isUserAdmin(current_user):
+        return "don't have enough permission", 500
     data = request.json['data']
     print("data:", data)
     termin = data['termin']
@@ -46,8 +50,8 @@ def get_subject_class():
 @app.route("/add/subject", methods=['POST'])
 @jwt_required()
 def addSubject():
-    roles = UserRole.query.filter_by(user_id=current_user.id).with_entities(UserRole.role_id).all()
-    print("roles:", roles)
+    if not DB.isUserAdmin(current_user):
+        return "don't have enough permission", 500
     data = request.json['data']
     subject = data['subject']
     try:

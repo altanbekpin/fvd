@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 from app import app
-
+import os, hashlib
+from sqlalchemy import func
 
 
 db = SQLAlchemy(app)
@@ -10,14 +11,15 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-        self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     def get_db_connection(self, dbname='userdb', host='db', user="postgres"):
+        
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
             )
+        self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
 
 class DatabaseOperations(DBConfig):
@@ -26,33 +28,51 @@ class DatabaseOperations(DBConfig):
             super().__init__(password)
 
         def insert_query(self, query, data=None):
+            if self.cursor.closed:
+                self.delete_instance()
+                self = self.get_instance()
             try:
                 self.cursor.execute(query, data)
-                self.connection.commit()
             except Exception as e:
                 print("ERROR:", e)
-            finally:
-                self.close_db()
-    
+                self.connection.rollback()
+        def commit_db(self):
+            self.connection.commit()
+
         def close_db(self):
+            self.commit_db()
             self.connection.close()
             self.cursor.close()
             self.delete_instance()
         def fetchone(self):
-            self.cursor.fetchone()
+            return self.cursor.fetchone()
+        
+        def fetchall(self):
+            return self.cursor.fetchall()
         
         def select_all_query(self, query, data=None):
+            if self.cursor.closed:
+                self.delete_instance()
+                self = self.get_instance()
             self.cursor.execute(query, data)
             return self.cursor.fetchall()
         
         def select_one_query(self, query, data=None):
+            if self.cursor.closed:
+                self.delete_instance()
+                self = self.get_instance()
             try:
+                print("self.cursor.closed:", self.cursor.closed)
                 self.cursor.execute(query, data)
-            except:
+            except Exception as e:
+                print("An execption occured:", str(e))
                 self.connection.rollback()
             return self.cursor.fetchone()
         
         def execute(self,query):
+            if self.cursor.closed:
+                self.delete_instance()
+                self = self.get_instance()
             self.cursor.execute(query)
 
         @classmethod
@@ -63,25 +83,55 @@ class DatabaseOperations(DBConfig):
         def get_instance(cls):
             password = app.config['DB_PASSWORD']
             if cls.instance is None:
-                print('OPENNING CONNECTION')
                 cls.instance = DB(password)
             return cls.instance
         
-        
+class StaticOperatioins:
+    @staticmethod
+    def generate_salt():
+        salt = os.urandom(16).hex()
+        return salt
+    
+    @staticmethod
+    def hash_password(password, salt):
+        password_salt = password + salt
+        password_hash = StaticOperatioins.hash_code(password_salt)
+        return password_hash
+    
+    @staticmethod
+    def hash_code(code):
+        return hashlib.sha256(str(code).encode()).hexdigest()
 
 class DB(DatabaseOperations):
+    def addWord(self, word, family, meaning, pos):
+        self.insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, status)
+        VALUES (%s, %s, %s, %s, 'омоним') RETURNING id""", (word, family, meaning, pos))
+        row_id = self.fetchone()
+        self.close_db()
+        return row_id
+    
     def add_Synonyms(self, synonym, word_id):
+        
         insert_synonyms = "INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id"
-        insert_syn_word = "INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)"
         self.insert_query(insert_synonyms, (synonym, ))
+        
         syn_id = self.fetchone()['id']
+        
+
+
+        insert_syn_word = "INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)"
         self.insert_query(insert_syn_word, (word_id, syn_id))
+        self.close_db()
 
     def add_Paraphrases(self, paraphrase, word_id):
+        
         query = "INSERT INTO paraphrases (paraphrase) VALUES (%s) RETURNING id"
         self.insert_query(query, (paraphrase, ))
+        par_id = self.fetchone()['id']
+        
         query = "INSERT INTO paraphrase_word (word_id, paraphrase_id) VALUES(%s, %s)"
-        par_id = self.insert_query(query, (word_id, par_id))
+        self.insert_query(query, (word_id, par_id))
+        self.close_db()
     
     def findsyn(self, word, synomized_count, synomized_words):
         query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s);"
@@ -137,7 +187,7 @@ class DB(DatabaseOperations):
             conditions.append("subject_id = %s")
             params.append(subject['id'])
         if word:
-            conditions.append("termin ILIKE %s OR definition ILIKE %s")
+            conditions.append("(termin ILIKE %s OR definition ILIKE %s)")
             params.append(f"{word}%")
             params.append(f"{word}%")
 
@@ -147,6 +197,7 @@ class DB(DatabaseOperations):
         query += " OFFSET %s LIMIT %s;"
 
         params.extend([first, second])
+        
         data = self.select_all_query(query, params)
         return data
 
@@ -168,23 +219,21 @@ class DB(DatabaseOperations):
     def get_download_legacy_path(self, file_id):
         results = self.select_all_query("SELECT path from legacy WHERE id = %s",[file_id])
         for row in results:
-            print("ROW:", row)
+            
             path = row.get('path')
         return path
     
     def addTag(self, definition_id, file_id):
         self.insert_query("INSERT INTO tag_legacy (tag_id, legacy_id) VALUES (%s, %s);", (definition_id, file_id))
+        self.close_db()
         
-    def addWord(self, word, family, meaning, pos):
-        self.insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, status)
-        VALUES (%s, %s, %s, %s, 'омоним') RETURNING id""", (word, family, meaning, pos))
-        row_id = self.fetchone()
-        return row_id
+    
     
     def addTermin(self, termin, subject_id, definition, school_class):
         self.insert_query("INSERT INTO school_termins (termin, definition, subject_id, class) VALUES (%s, %s, %s, %s)", (termin, definition, subject_id, school_class))
+        self.close_db()
         
-    def get_subject_id(self, subject):
+    def get_subject_id(self, subject): 
         subject_id = self.select_one_query("SELECT id FROM subjects WHERE subject = %s", (subject,))[0]
         return subject_id
     
@@ -194,6 +243,7 @@ class DB(DatabaseOperations):
 
     def add_subject(self, subject):
         self.insert_query("INSERT INTO subjects (subject) VALUES(%s)", (subject,))
+        self.close_db()
     
     def findword(self, data, family=None):
         if family is None:
@@ -216,10 +266,12 @@ class DB(DatabaseOperations):
     def addLegacy(self, key, path_to_save, filename, content_type, parent_id):
         self.execute('ALTER SEQUENCE legacy_id_seq RESTART WITH 100;')
         self.insert_query("INSERT INTO legacy (name, path, parent_id, is_file) VALUES (%s, %s, %s, %s);", (key, path_to_save + "/" + filename + '.' + content_type, parent_id, 1))
+        self.close_db()
 
     def delete_legacy(self, fileID):
         self.insert_query('DELETE FROM legacy WHERE id = %s RETURNING *;', (fileID,))
         deleted_row = self.fetchone()
+        self.close_db()
         return deleted_row
     
     def search_book(self, data):
@@ -235,9 +287,11 @@ class DB(DatabaseOperations):
         return temp
     def delete_post(self, id):
         self.insert_query("DELETE FROM termin WHERE id = %s", (id,))
+        self.close_db()
 
     def create_post(self, name, descrpition, example):
         self.insert_query("INSERT INTO termin (name, description, examples) VALUES (%s, %s, %s)", (name, descrpition, example))
+        self.close_db()
 
     def search_classification(self, search_text, rows,offset):
         found = self.select_all_query("SELECT * FROM termin WHERE name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
@@ -247,8 +301,82 @@ class DB(DatabaseOperations):
     def get_classification(self, rows,offset):
         termins = self.select_all_query("SELECT * FROM termin LIMIT %s OFFSET %s",(rows,offset,))
         return termins
-
-   
+    
+    def isUserAdmin(self, current_user):
+        results = DB.get_instance().find_user(current_user)
+        role_ids = [result[0] for result in results]
+        roles = []
+        for i in role_ids:
+            roles.append(DB.get_instance().get_role(i).name)
+        return 'admin' in roles
+    
+    def save_user(self, email, password, confirmation_code, full_name):
+        salt = StaticOperatioins.generate_salt()
+        password_hash = StaticOperatioins.hash_password(password, salt)
+        confirmation_code_hash = StaticOperatioins.hash_code(confirmation_code)
+        max_id = db.session.query(func.max(User.id)).scalar() or 0
+        new_id = max_id + 1
+        user = User(id=new_id,email=email, password_salt=salt, password_hash=password_hash, is_verified=False, confirmation_code_hash = confirmation_code_hash, full_name = full_name)
+        existing_user = self.get_user_by_email(email)
+        if not (existing_user is None):
+            is_verified = existing_user.is_verified
+            if is_verified:
+                if not self.is_offer_activated(id=user.existing_user.id):
+                    return ValueError('Сұранысыңыз әлі қабылданбады')
+                raise ValueError('Қолданушы базада бұрыннан бар!')
+            else:
+                db.session.delete(existing_user)
+                db.session.commit()
+        db.session.add(user)
+        db.session.commit()
+    def check_credentials(self, email, password):
+        user = User.query.filter_by(email=email).one_or_none()
+        if not user.is_verified:
+            return None
+        if not StaticOperatioins.hash_password(password, user.password_salt) == user.password_hash:
+            return None
+        return user
+    def get_conf_code(self, email):
+        user = self.get_user_by_email(email)
+        return user.confirmation_code_hash
+    def check_code(self, code, conf_code):
+        return StaticOperatioins.hash_code(code) == conf_code
+    def verify_user(self, email):
+        user = self.get_user_by_email(email)
+        user.is_verified = True
+        db.session.commit()
+        return user
+    def isUserExist(self, email):
+        user = self.get_user_by_email(email)
+        return user is not None
+    def get_user_by_email(self, email):
+        return User.query.filter_by(email=email).one_or_none()
+    def is_offer_activated(self, id):
+        return Offers.query.filter_by(offer_id=id).one_or_none().activated
+    def isUserActivated(self, user):
+        return Offers.query.filter_by(offer_id=user.id, activate_type=2).one_or_none().activated
+    
+    def getOffers(self):
+        self.execute('''
+            SELECT o.*, s.*, u.*
+            FROM offers o
+            LEFT JOIN synamizer s ON o.activate_type = 1 AND s.id = o.offer_id
+            LEFT JOIN users u ON o.activate_type = 2 AND u.id = o.user_id;
+        ''')
+        return self.fetchall()
+    
+    def activate_offer(self, offer_id, activate_type):
+        print("activate_type:", activate_type)
+        print("id:", offer_id)
+        try:
+            offer = Offers.query.filter_by(offer_id=offer_id, activate_type=activate_type).one_or_none()
+            if activate_type == 2:
+                userRole = UserRole(user_id=offer_id, role_id = 1)
+                db.session.add(userRole)
+            offer.activated = True
+            db.session.commit()
+        except Exception as e:
+            print("An error occurred:", str(e))
 
 
 class User(db.Model):
@@ -257,6 +385,9 @@ class User(db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     password_salt = db.Column(db.String(120), nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
+    is_verified = db.Column(db.Boolean, nullable=False, default=False)
+    full_name = db.Column(db.String(120), nullable=False)
+    confirmation_code_hash = db.Column(db.String(120))
 
 class UserRole(db.Model):
     __tablename__ = 'user_role'
@@ -269,3 +400,15 @@ class Role(db.Model):
     role_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     description = db.Column(db.String(100), unique=True, nullable=False)
+class Offers(db.Model):
+    __tablename__ = 'offers'
+    id = db.Column(db.Integer, primary_key=True)
+    offer_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
+    activate_type = db.Column(db.Integer)
+    activated = db.Column(db.Boolean, nullable=False, default=False)
+
+class ActivateTypes(db.Model):
+    __tablename__ = 'activate_types'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)

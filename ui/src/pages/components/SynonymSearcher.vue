@@ -149,7 +149,8 @@
 <script>
 // import { ref } from "vue";
 import axios from "axios";
-import { AHMET_API, getHeader } from "../../config";
+import { AHMET_API } from "../../config";
+import { useStore } from "vuex";
 export default {
   data() {
     return {
@@ -173,11 +174,17 @@ export default {
       showDialogParaphrases: false,
       sonynomToAdd: [],
       paraphraseToAdd: [],
+      selectedWord: null,
+      access_token: null,
     };
+  },
+  mounted() {
+    this.access_token = useStore().getters.getAccessToken;
   },
   methods: {
     async onChange(event, words_family) {
       var response = {};
+      console.log("onChagne:", event);
       try {
         await axios
           .post(`${AHMET_API}/word/synomize/`, {
@@ -207,6 +214,16 @@ export default {
         this.meaning = "";
         return false;
       }
+    },
+    onSelectionChange() {
+      console.log("selectedWord.value.name: ", this.selectedWord);
+      const word = this.selectedWord["words"];
+      const event = {
+        target: {
+          value: word,
+        },
+      };
+      this.onChange(event, "");
     },
     changeSynDialog() {
       this.showDialogSynonyms = !this.showDialogSynonyms;
@@ -251,7 +268,14 @@ export default {
           word: this.word,
           family: this.family,
         },
-        { headers: getHeader() }
+        {
+          headers: {
+            Authorization: `Bearer ${this.access_token}`,
+            "Access-Control-Allow-Credentials": "true",
+            "Content-Type": "application/json",
+            Accept: "*/*",
+          },
+        }
       );
     },
     async addParaphrase() {
@@ -262,7 +286,14 @@ export default {
           word: this.word,
           family: this.family,
         },
-        { headers: getHeader() }
+        {
+          headers: {
+            Authorization: `Bearer ${this.access_token}`,
+            "Access-Control-Allow-Credentials": "true",
+            "Content-Type": "application/json",
+            Accept: "*/*",
+          },
+        }
       );
     },
   },

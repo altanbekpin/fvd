@@ -1,5 +1,6 @@
 from app import app
 from flask import jsonify,send_file, request
+from flask_jwt_extended import jwt_required, current_user
 from db import DB
 import os
 @app.route('/getlegacies/', defaults={'parent_id': None}, methods=['GET'])
@@ -18,7 +19,8 @@ def download_file(file_id):
     return send_file(path, mimetype='application/pdf')
 
 @app.route('/change/file/name', methods=['POST'])
-def changeFileName():
+@jwt_required()
+def change_file_name():
     fileID = request.form.get('fileID')
     fileName = request.form.get('FileName')
     try:
@@ -36,22 +38,19 @@ def upload_file():
             'Access-Control-Allow-Headers': 'Content-Type'
         }
         return ('', 204, headers)
+    print("upload_file")
     data = request.files
     path_to_save = request.form.get('path_to_save')
     parent_id = request.form.get('parent_id')
-    
-
     for key in data.keys():
         file_storage = data.get(key)
-        #filename = file_storage.filename
         content_type = file_storage.content_type
         path_to_save = path_to_save
         content_type = content_type.split("/")[1]
         try:
-            #data[key].save(f'./{path_to_save}/' + filename)
             file_storage.filename = key
             file_storage.save(f'./{path_to_save}/' + key + '.' + content_type) 
-            DB.addLegacy(key, path_to_save, file_storage.filename, content_type, parent_id)
+            DB.get_instance().addLegacy(key, path_to_save, file_storage.filename, content_type, parent_id)
         except Exception as e:
             return 'File uploading failed', 400
         print(f"File {file_storage.filename} with content type {content_type} uploaded with key '{key}'")
@@ -59,10 +58,13 @@ def upload_file():
 
 
 @app.route('/delete/file', methods=['POST'])
+@jwt_required()
 def delete():
+    if not DB.get_instance().isUserAdmin(current_user):
+        return "don't have enough permission", 500
     fileID = request.form.get('fileID')
     try:
-        deleted_row = DB.delete_legacy(fileID)
+        deleted_row = DB.get_instance().delete_legacy(fileID)
         path = deleted_row['path']
         if os.path.exists(path):
             os.remove(path)

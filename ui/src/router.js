@@ -18,6 +18,11 @@ const routes = [
         component: () => import("./pages/Synomizer.vue"),
       },
       {
+        path: "admin",
+        name: "admin",
+        component: () => import("./pages/Admin.vue"),
+      },
+      {
         path: "schoolterminology",
         name: "schoolterminology",
         component: () => import("./pages/SchoolTerminology"),
@@ -201,6 +206,11 @@ const routes = [
     path: "/auth",
     name: "auth",
     component: () => import("./pages/AuthPage.vue"),
+  },
+  {
+    path: "/confirmcode",
+    name: "confirmcode",
+    component: () => import("./pages/Confirm.vue"),
   },
   {
     path: "/register",

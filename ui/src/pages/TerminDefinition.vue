@@ -174,25 +174,36 @@ const saveProduct = async (method) => {
   if (request.name.value === "") {
     submitted.value = true;
   } else {
-    await axios.post(`${AHMET_API}/editPost/`, request, {
-      headers: {
-        Authorization: `Bearer ${store.state.user.access_token}`,
-        "Access-Control-Allow-Credentials": "true",
-        "Content-Type": "application/json",
-        Accept: "*/*",
-      },
-    });
+    try {
+      await axios.post(`${AHMET_API}/editPost/`, request, {
+        headers: {
+          Authorization: `Bearer ${store.state.user.access_token}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      });
+      toast.add({
+        severity: "success",
+        summary: "Сәтті",
+        detail: "Жаңа термин сәтті еңгізілді",
+        life: 3000,
+      });
+    } catch (error) {
+      toast.add({
+        severity: "error",
+        summary: "Ақау",
+        detail: "Қайта істеп көріңіз",
+        life: 3000,
+      });
+    } finally {
+      loadLazyData();
+    }
     submitted.value = false;
     productDialog.value = false;
     request.name.value = "";
     request.description.value = "";
     request.example.value = "";
-    toast.add({
-      severity: "success",
-      summary: "Successful",
-      detail: "Product Created",
-      life: 3000,
-    });
   }
 };
 const confirmDeleteSelected = async (method) => {
@@ -217,7 +228,16 @@ const confirmDeleteSelected = async (method) => {
       detail: "Термин сәтті өшірілді",
       life: 3000,
     });
-  } catch (error) {}
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Ақау",
+      detail: "Қайта істеп көріңіз",
+      life: 3000,
+    });
+  } finally {
+    loadLazyData();
+  }
 
   console.log(request);
 };

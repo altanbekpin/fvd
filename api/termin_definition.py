@@ -6,14 +6,10 @@ from db import DB
 @app.route('/editPost/', methods = ['POST'])
 @jwt_required()
 def edit_post():
-    results = DB.get_instance().find_user(current_user)
-    role_ids = [result[0] for result in results]
-    roles = []
-    for i in role_ids:
-        roles.append(DB.get_instance().get_role(i).name)
-    if not isAdmin(roles):
+    if not DB.get_instance().isUserAdmin(current_user):
         return jsonify("you don't have enough permission"), 500
     data = request.json
+    print("data:", data)
     method = data.get('method').get('_value')
     if method == 'delete':
         id = str(data.get('id'))
@@ -41,6 +37,3 @@ def get_classification():
         rows = DB.get_instance().get_classification(rows,offset)
     
     return rows
-
-def isAdmin(list):
-    return 'admin' in list
