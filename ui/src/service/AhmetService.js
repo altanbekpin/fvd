@@ -64,12 +64,11 @@ export const AhmetService = {
     var response;
     var roles = [];
     response = await api.post(`${AHMET_API}/login/`, {
-      headers: getHeader(),
       data: {
         email: email,
         password: password,
       },
-    });
+    }, {headers: getHeader(),});
     const temp = response.data["access_token"];
 
     console.log("temp:", temp);
