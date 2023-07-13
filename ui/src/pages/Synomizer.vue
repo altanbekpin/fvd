@@ -70,6 +70,13 @@
           placeholder="Мағынасын жазыңыз"
           :style="{ width: '25vw' }"
         ></InputText>
+        <InputText
+          type="text"
+          v-model="exampleInput"
+          style="margin-bottom: 10px"
+          placeholder="Мысалын жазыңыз"
+          :style="{ width: '25vw' }"
+        ></InputText>
         <span style="color: grey; font-size: 13px">Синонимдер</span>
         <div style="max-width: 600px">
           <Chips v-model="synonymInput" separator="," />
@@ -97,20 +104,21 @@
 </template>
 <script setup>
 import { ref } from "vue";
-import axios from "axios";
+// import axios from "axios";
 import SynonymSearcher from "./components/SynonymSearcher.vue";
 import WordSynomizer from "./components/WordSynomizer.vue";
-import { AHMET_API, getHeader } from "../config";
+// import { AHMET_API, getHeader } from "../config";
+import { AhmetService } from "@/service/AhmetService";
 import { useStore } from "vuex";
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
 const selectedWord = ref();
 const inputValues = ref([]);
 const word = ref("");
-const inputWords = ref("");
+// const inputWords = ref("");
 const meaning = ref("");
 const showSynAdd = ref(false);
-const synomized_words = ref();
+// const synomized_words = ref();
 // eslint-disable-next-line no-unused-vars
 const onSearchTap = async () => {
   console.log("onSearchTap");
@@ -168,21 +176,21 @@ document.addEventListener("click", function (event) {
   }
 });
 // eslint-disable-next-line no-unused-vars
-const send_to_synomize = async () => {
-  await axios
-    .post(
-      `${AHMET_API}/search/word/`,
-      {
-        value: inputWords.value,
-      },
-      { headers: getHeader() }
-    )
-    .then((response) => {
-      console.log(response);
-      synomized_words.value = response.data[0];
-      synomized_counter.value = response.data[1];
-    });
-};
+// const send_to_synomize = async () => {
+//   await axios
+//     .post(
+//       `${AHMET_API}/search/word/`,
+//       {
+//         value: inputWords.value,
+//       },
+//       { headers: getHeader() }
+//     )
+//     .then((response) => {
+//       console.log(response);
+//       synomized_words.value = response.data[0];
+//       synomized_counter.value = response.data[1];
+//     });
+// };
 // eslint-disable-next-line no-unused-vars
 const onSelectionChange = () => {
   console.log("selectedWord.value.name: ", selectedWord.value.words);
@@ -209,7 +217,8 @@ const store = useStore();
 const synonymInput = ref("");
 const paraphraseInput = ref("");
 const meaningInput = ref("");
-const synomized_counter = ref("0");
+const exampleInput = ref("");
+// const synomized_counter = ref("0");
 const words = ref("");
 const family = ref();
 const synonyms = ref([{ synonym: "Табылмады" }]);
@@ -218,21 +227,13 @@ const word_id = ref("");
 const all_words = ref();
 const onChange = async (event, words_family) => {
   var response = {};
-  try {
-    await axios
-      .post(`${AHMET_API}/word/synomize/`, {
-        value: event.target.value,
-        words_family: words_family,
-      })
-      .then((_) => console.log((response = _.data)));
-  } catch (error) {
-    response = null;
-  }
-  console.log(event.target.value);
-  console.log("response word in console: ", response);
+  response = await AhmetService.onChange(event, words_family);
   if (response != null) {
     showSynAdd.value = false;
-    meaning.value = response[0]["meaning"];
+    meaning.value =
+      response[0]["meaning"] != ""
+        ? response[0]["meaning"]
+        : "Мағынасы енгізілмеген";
     word_id.value = response[0]["id"];
     family.value = { family: response[0]["words_family"] };
     words.value = response[0]["words"];
@@ -252,6 +253,7 @@ const showDialog = (data) => {
   inputValues.value = data;
   visible.value = !visible.value;
 };
+
 const addWord = () => {
   console.log("synonymInput.value: ", synonymInput.value);
   console.log("inputValues.value: ", inputValues.value);
@@ -271,30 +273,30 @@ const addWord = () => {
     inputValues.value != "" &&
     meaningInput.value != ""
   ) {
-    axios.post(
-      `${AHMET_API}/add/word/`,
-      {
-        synonyms: synonymInput.value,
-        word: inputValues.value,
-        meaning: meaningInput.value,
-        family: selectedFamily.value,
-        paraphrases: paraphraseInput.value,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${store.getters.getAccessToken}`,
-          "Access-Control-Allow-Credentials": "true",
-          "Content-Type": "application/json",
-          Accept: "*/*",
-        },
-      }
-    );
-    toast.add({
-      severity: "success",
-      summary: "Сәтті",
-      detail: "Ұсынысыңыз сәтті жіберілді",
-      life: 3000,
-    });
+    try {
+      AhmetService.addWord(
+        synonymInput,
+        inputValues,
+        meaningInput,
+        selectedFamily,
+        paraphraseInput,
+        exampleInput,
+        store
+      );
+      toast.add({
+        severity: "success",
+        summary: "Сәтті",
+        detail: "Ұсынысыңыз сәтті жіберілді",
+        life: 3000,
+      });
+    } catch (error) {
+      toast.add({
+        severity: "error",
+        summary: "Ақау",
+        detail: "Қате ұсыныс",
+        life: 3000,
+      });
+    }
     synonymInput.value = "";
     inputValues.value = "";
     meaningInput.value = "";

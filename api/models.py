@@ -105,6 +105,7 @@ class MyOwlReady:
             print(cls._onto)
 
         return cls._onto
+    
 
 
     
@@ -130,3 +131,4 @@ class MyOntology():
     class Meta:
         verbose_name = 'Жоба'
         verbose_name_plural = 'Жобалар'
+    

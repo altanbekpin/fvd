@@ -18,6 +18,11 @@ const routes = [
         component: () => import("./pages/Synomizer.vue"),
       },
       {
+        path: "adminpanel",
+        name: "adminpanel",
+        component: () => import("./pages/Dashboard.vue"),
+      },
+      {
         path: "admin",
         name: "admin",
         component: () => import("./pages/Admin.vue"),
@@ -43,11 +48,11 @@ const routes = [
         name: "asr",
         component: () => import("./components/AudioSpeechRecgnition.vue"),
       },
-      {
-        path: "dashboarsd",
-        name: "dashboard",
-        component: () => import("./components/Dashboard.vue"),
-      },
+      // {
+      //   path: "dashboarsd",
+      //   name: "dashboard",
+      //   component: () => import("./components/Dashboard.vue"),
+      // },
       {
         path: "/formlayout",
         name: "formlayout",

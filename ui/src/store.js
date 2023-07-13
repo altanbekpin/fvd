@@ -1,10 +1,6 @@
 import { createStore } from "vuex";
 import createPersistedState from "vuex-persistedstate";
 import Cookies from "js-cookie";
-//import VuexPersistence from 'vuex-persist'
-// const vuexLocal = new VuexPersistence({
-//   storage: window.localStorage,
-// });
 
 const store = createStore({
   state: {
@@ -13,7 +9,7 @@ const store = createStore({
       password: "",
       roles: [],
       access_token: "",
-      full_name: ""
+      full_name: "",
     },
     ChosenTheme: {
       theme: "bootstrap4-light-blue",

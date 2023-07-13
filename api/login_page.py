@@ -37,7 +37,6 @@ def login():
 @app.route("/who_am_i/", methods=["GET"])
 @jwt_required()
 def protected():
-    # We can now access our sqlalchemy User object via `current_user`.
     results = UserRole.query.filter_by(user_id=current_user.id).with_entities(UserRole.role_id).all()
     role_ids = [result[0] for result in results]
     roles = []

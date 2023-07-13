@@ -33,7 +33,12 @@ def is_vowel(c):
     return c in phonetic.soft_voewls or c in phonetic.hard_vowels 
 
 class Lemms:
-       
+    instance = None
+    @classmethod
+    def get_instance(cls):
+        if cls.instance is None:
+            cls.instance = Lemms()
+        return cls.instance
     def to_case(word, case_num):
         app = ""
         if case_num == 2 :
@@ -215,14 +220,11 @@ class Lemms:
         token_list = []
         lemms_list = []
         for sentence in sentences:
-            #sentence = sentence.replace("-", " ")
             lemms = []
             tok = []
             words = []
             tokens = word_tokenize(sentence)
-            print('word_tokenize:', tokens)
             for token in tokens:
-                #print(token)
                 token = token.lower()
                 if token == "оның":
                     token = "олның"
@@ -233,22 +235,20 @@ class Lemms:
                 if (token in [u'.', u',']):
                     continue
                 sttoken = token
-                if self.is_number(sttoken):
+                if Lemms.is_number(sttoken):
                     tok.append(u"".join(sttoken))
-                    lemms.append([u"".join(sttoken), self.get_pos_names(self,3),[],u"".join(sttoken), ''])
+                    lemms.append([u"".join(sttoken), self.get_pos_names(3),[],u"".join(sttoken), ''])
                     continue
                 token_found = False
                 token = token.lower()
                 while len(token) > 0:
-                    token = token[:-1] + self.change_syngor(self, token[-1:])
+                    token = token[:-1] + self.change_syngor( token[-1:])
                     cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(words) = LOWER(%s)", (token,))
                     for result in cur.fetchall():
                         if (not(token in kaz_stop_words)):
                             tok.append(u"".join(result[0]))
                             app = Septik
                             appendix = sttoken[len(token):]
-                            # print(';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;')
-                            # print('result, ' + str(result[1]))
                             words.append(Word(result[0], int(result[1]), appendix, False))
                             words[-1].GetAppendixes()
                             endings = []
@@ -258,7 +258,7 @@ class Lemms:
                                 endings.append([app.AppendixString, app.AppName, app.PosName])
                                 endsStr += app.AppName + "."
                             lemms.append(
-                                [sttoken, self.get_pos_names(self, int(result[1])), endings.copy(), result[0], endsStr])
+                                [sttoken, self.get_pos_names( int(result[1])), endings.copy(), result[0], endsStr])
                             endings.clear()
                             token_found = True
                             break
@@ -271,7 +271,7 @@ class Lemms:
             token_list.append(copy.copy(tok))
             lemms_list.append(copy.copy(lemms))
         con.close()
-        print('lemms_list: ', lemms_list)
+    
         return lemms_list
     def solve_math_task(self, sentences):
         con = DB.get_instance().get_db_connection()
@@ -287,7 +287,7 @@ class Lemms:
             
             tokens = word_tokenize(sentence)
             for token in tokens:
-                #print(token)
+                
                 token = token.lower()
                 if token == "оның":
                     token = "олның"
@@ -301,16 +301,15 @@ class Lemms:
                 sttoken = token
                 if self.is_number(sttoken):
                     tok.append(u"".join(sttoken))
-                    lemms.append([u"".join(sttoken), self.get_pos_names(self,3),[],u"".join(sttoken), ''])
+                    lemms.append([u"".join(sttoken), self.get_pos_names(3),[],u"".join(sttoken), ''])
                     words.append(Word(u"".join(sttoken),3,u'', False))
                     continue
                 token_found = False
                 token = token.lower()
                 while len(token) > 0:
-                    token = token[:-1] + self.change_syngor(self, token[-1:])
+                    token = token[:-1] + self.change_syngor( token[-1:])
                     cur.execute("Select morphem, pos from morphemes where morphem = %s", (token,))
                     for result in cur.fetchall():
-
                         if (not(token in kaz_stop_words)):
                             tok.append(u"".join(result[0]))
                             app = Septik
@@ -324,7 +323,7 @@ class Lemms:
                                 endings.append([app.AppendixString, app.AppName, app.PosName])
                                 endsStr += app.AppName + "."
                             lemms.append(
-                                [sttoken, self.get_pos_names(self, int(result[1])), endings.copy(), result[0], endsStr])
+                                [sttoken, self.get_pos_names( int(result[1])), endings.copy(), result[0], endsStr])
                             endings.clear()
                             token_found = True
                             break
@@ -348,7 +347,7 @@ class Lemms:
         query = 'SELECT id, morphem, pos FROM morphemes WHERE isModerated = 0'
         cursor.execute(query)
         for result in cursor.fetchall():
-            pos = self.get_pos_names(self, result[2])
+            pos = self.get_pos_names( result[2])
             list.append([result[0], result[1], pos])
 
         return list
@@ -387,7 +386,7 @@ class Lemms:
         query = 'SELECT * FROM morphemes ORDER BY morphem DESC'
         cursor.execute(query)
         for result in cursor.fetchall():
-            pos = self.get_pos_names(self, result[2])
+            pos = self.get_pos_names( result[2])
             list.append([result[0], result[1], pos, result[0]])
 
         arr['data'] = list

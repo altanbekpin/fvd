@@ -129,11 +129,13 @@ export default {
             { label: "Синонимайзер", icon: "pi pi-cloud", to: "/synomizer" },
           ],
         },
-
         {
           label: "Админ",
           icon: "pi pi-fw pi-home",
-          items: [{ label: "Панель", icon: "pi pi-cloud", to: "/admin" }],
+          items: [
+            { label: "Ұсыныстар", icon: "pi pi-user-plus", to: "/admin" },
+            { label: "Панель", icon: "pi pi-th-large", to: "/adminpanel" },
+          ],
           visible: this.isAdmin,
         },
         {

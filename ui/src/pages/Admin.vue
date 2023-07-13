@@ -1,6 +1,24 @@
 <template>
   <div class="card" v-if="products != null">
-    <DataView :value="products.data" paginator :rows="10">
+    <Dropdown
+      v-model="selectedStatus"
+      :options="filters"
+      optionLabel="name"
+      placeholder="Барлығын таңдау"
+      class="w-full md:w-14rem"
+      @change="onselectStatus"
+      style="margin-bottom: 10px"
+    />
+    <DataView
+      :value="products.data"
+      lazy
+      paginator
+      :rows="10"
+      dataKey="id"
+      :totalRecords="totalRecords"
+      :loading="loading"
+      @page="onPage($event)"
+    >
       <template #list="{ data }">
         <div class="col-12">
           <div
@@ -20,6 +38,20 @@
                 <div class="mb-2">{{ getOffer(data) }}</div>
                 <div class="mb-2">email: {{ data.email }}</div>
                 <div class="mb-2">есімі: {{ data.full_name }}</div>
+              </div>
+              <div
+                class="col-sm-4"
+                v-else-if="data && data.activate_type === 3"
+              >
+                <div class="mb-2">{{ getOffer(data) }}</div>
+                <div class="mb-2">Синоним: {{ data.synonym }}</div>
+              </div>
+              <div
+                class="col-sm-4"
+                v-else-if="data && data.activate_type === 4"
+              >
+                <div class="mb-2">{{ getOffer(data) }}</div>
+                <div class="mb-2">Перифраза: {{ data.paraphrase }}</div>
               </div>
             </div>
             <div class="ml-auto">
@@ -50,9 +82,21 @@ export default {
   data() {
     return {
       products: null,
+      totalRecords: 500,
+      loading: true,
+      lazyParams: {},
+      selectedStatus: "",
+      filters: [{ name: "Қабылданғандар" }, { name: "Күтудегілер" }],
     };
   },
   mounted() {
+    this.lazyParams = {
+      page: 0,
+      first: 0,
+      rows: 10,
+      pageCount: 50,
+      filters: this.selectedStatus,
+    };
     this.init();
   },
   methods: {
@@ -60,12 +104,20 @@ export default {
       console.log("Item:", item); // Log the item object
       return "";
     },
-
+    onselectStatus(event) {
+      event.value["name"];
+      this.lazyParams.filters = event.value["name"];
+      this.init();
+    },
     async init() {
       this.products = await AhmetService.getOffers(
-        store.getters.getAccessToken
+        store.getters.getAccessToken,
+        this.lazyParams
       );
-      console.log(this.products.data[0].activate_type);
+      this.totalRecords = (
+        await AhmetService.getOffersAmount(store.getters.getAccessToken)
+      )["count"];
+      // console.log(this.products.data[0].activate_type);
 
       console.log(this.products.data);
     },
@@ -87,9 +139,22 @@ export default {
           return "Жаңа сөз қосуға ұсыныс";
         case 2:
           return "Қолданушы болып тіркелуге ұсыныс";
+        case 3:
+          return "Жаңа синоним қосуға ұсыныс";
+        case 4:
+          return "Жаңа перифраза қосуға ұсыныс";
         default:
           return "Қате ұсыныс";
       }
+    },
+    onPage(event) {
+      this.lazyParams = event;
+      console.log("this.lazyParams:", this.lazyParams);
+      this.loadLazyData();
+    },
+    loadLazyData() {
+      this.loading = true;
+      this.init();
     },
     async activate(id, activate_type) {
       try {

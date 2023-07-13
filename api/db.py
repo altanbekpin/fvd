@@ -3,7 +3,8 @@ import psycopg2
 from app import app
 import os, hashlib
 from sqlalchemy import func
-
+from datetime import datetime
+# from middleware import Middleware
 
 db = SQLAlchemy(app)
 
@@ -62,18 +63,20 @@ class DatabaseOperations(DBConfig):
                 self.delete_instance()
                 self = self.get_instance()
             try:
-                print("self.cursor.closed:", self.cursor.closed)
                 self.cursor.execute(query, data)
             except Exception as e:
                 print("An execption occured:", str(e))
                 self.connection.rollback()
-            return self.cursor.fetchone()
+            try:
+                return self.cursor.fetchone()
+            except:
+                return None
         
-        def execute(self,query):
+        def execute(self,query, data = None):
             if self.cursor.closed:
                 self.delete_instance()
                 self = self.get_instance()
-            self.cursor.execute(query)
+            self.cursor.execute(query, data)
 
         @classmethod
         def delete_instance(cls):
@@ -103,39 +106,45 @@ class StaticOperatioins:
         return hashlib.sha256(str(code).encode()).hexdigest()
 
 class DB(DatabaseOperations):
-    def addWord(self, word, family, meaning, pos):
-        self.insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, status)
-        VALUES (%s, %s, %s, %s, 'омоним') RETURNING id""", (word, family, meaning, pos))
-        row_id = self.fetchone()
+    def addWord(self, word, family, meaning, pos, example, user_id):
+        self.insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, example, status)
+        VALUES (%s, %s, %s, %s, %s,'бірмағыналы') RETURNING id""", (word, family, meaning, pos, example))
+        row_id = self.fetchone()['id']
+        self.insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 1)''', (row_id, user_id))
         self.close_db()
         return row_id
     
     def add_Synonyms(self, synonym, word_id):
-        
+        print("inside add_Synonyms:")
         insert_synonyms = "INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id"
         self.insert_query(insert_synonyms, (synonym, ))
-        
         syn_id = self.fetchone()['id']
-        
-
-
+        print("syn_id:", syn_id)
         insert_syn_word = "INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)"
         self.insert_query(insert_syn_word, (word_id, syn_id))
         self.close_db()
 
     def add_Paraphrases(self, paraphrase, word_id):
-        
         query = "INSERT INTO paraphrases (paraphrase) VALUES (%s) RETURNING id"
         self.insert_query(query, (paraphrase, ))
         par_id = self.fetchone()['id']
-        
         query = "INSERT INTO paraphrase_word (word_id, paraphrase_id) VALUES(%s, %s)"
         self.insert_query(query, (word_id, par_id))
         self.close_db()
     
-    def findsyn(self, word, synomized_count, synomized_words):
-        query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s);"
-        synonym = self.select_one_query(query, (word,))
+    def findsyn(self, word, synomized_count, synomized_words, pos = None):
+        if pos is None:
+            query = '''SELECT s.synonym FROM synonyms s 
+            INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
+            INNER JOIN synamizer z ON z.id = sw.word_id 
+            INNER JOIN offers o ON o.offer_id = sw.synonym_id
+            WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s)
+            AND o.activated = true;'''
+            param = (word,)
+        else:
+            param = (word,pos)
+            query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s) AND z.pos = %s;"
+        synonym = self.select_one_query(query, param)
         if synonym == None:
             return [word, synomized_count]
         synomized_count += 1
@@ -150,8 +159,10 @@ class DB(DatabaseOperations):
             FROM synonyms s 
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
-            WHERE LOWER(TRIM(z.words)) = LOWER(%s) AND LOWER(TRIM(z.words_family)) = LOWER(%s)
-            AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);'''
+            INNER JOIN offers o ON sw.synonym_id = o.offer_id
+            WHERE LOWER(TRIM(z.words)) = LOWER(%s) AND LOWER(TRIM(z.words_family)) = LOWER(TRIM(%s))
+            AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id)
+            AND o.activated = true;'''
             data = (word,family)
             
         else:
@@ -159,10 +170,14 @@ class DB(DatabaseOperations):
             FROM synonyms s 
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
+            INNER JOIN offers o ON sw.synonym_id = o.offer_id
             WHERE LOWER(TRIM(z.words)) = LOWER(%s)
-            AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id);'''
+            AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id)
+            AND o.activated = true;'''
             data = (word,)
         synonyms = self.select_all_query(query, data)
+        if synonyms is None:
+            return synonyms
         return synonyms
     
     def getSchoolTermins(self, first, filters, word):
@@ -247,7 +262,7 @@ class DB(DatabaseOperations):
     
     def findword(self, data, family=None):
         if family is None:
-            query = 'SELECT DISTINCT id, words_family, status, meaning, words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));'
+            query = 'SELECT DISTINCT id, words_family, status, meaning, words, pos, example FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));'
             temp_families = self.select_all_query(query, (data,))
             return temp_families
         query = 'SELECT DISTINCT id, status,words_family, meaning, words FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));'
@@ -258,7 +273,12 @@ class DB(DatabaseOperations):
         return all_words
     
     def find_paraphrase_by_word(self, word):
-        paraphrase = self.select_all_query("SELECT s.paraphrase FROM paraphrases s INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(%s);", (word,))
+        paraphrase = self.select_all_query('''SELECT s.paraphrase FROM paraphrases s 
+                                           INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id 
+                                           INNER JOIN synamizer z ON z.id = sw.word_id 
+                                           INNER JOIN offers o ON o.offer_id = sw.paraphrase_id
+                                           WHERE LOWER(TRIM(z.words)) = LOWER(%s)
+                                           AND o.activated = true;''', (word,))
         return paraphrase
     def update_legacy_name(self, fileName, fileID):
         self.insert_query('UPDATE legacy SET name = %s WHERE id = %s', (fileName, fileID))
@@ -354,20 +374,36 @@ class DB(DatabaseOperations):
     def is_offer_activated(self, id):
         return Offers.query.filter_by(offer_id=id).one_or_none().activated
     def isUserActivated(self, user):
-        return Offers.query.filter_by(offer_id=user.id, activate_type=2).one_or_none().activated
+        offer =  Offers.query.filter_by(offer_id=user.id, activate_type=2).one_or_none()
+        return offer and offer.activated
     
-    def getOffers(self):
-        self.execute('''
-            SELECT o.*, s.*, u.*
-            FROM offers o
-            LEFT JOIN synamizer s ON o.activate_type = 1 AND s.id = o.offer_id
-            LEFT JOIN users u ON o.activate_type = 2 AND u.id = o.user_id;
-        ''')
+    def getOffers(self, first, rows, status):
+        if status is '':
+            self.execute('''
+                SELECT o.*, sr.*, u.*, s.synonym, p.paraphrase
+                FROM offers o
+                LEFT JOIN synamizer sr ON o.activate_type = 1 AND sr.id = o.offer_id
+                LEFT JOIN users u ON o.activate_type = 2 AND u.id = o.offer_id
+                LEFT JOIN synonyms s ON o.activate_type = 3 AND s.id = o.offer_id
+                LEFT JOIN paraphrases p ON o.activate_type = 4 AND p.id = o.offer_id
+                OFFSET %s LIMIT %s;
+            ''', (first, first + rows))
+        else:
+            activated = status == "Қабылданғандар"
+            self.execute('''
+                SELECT o.*, sr.*, u.*, s.synonym, p.paraphrase
+                FROM offers o
+                LEFT JOIN synamizer sr ON o.activate_type = 1 AND sr.id = o.offer_id
+                LEFT JOIN users u ON o.activate_type = 2 AND u.id = o.offer_id
+                LEFT JOIN synonyms s ON o.activate_type = 3 AND s.id = o.offer_id
+                LEFT JOIN paraphrases p ON o.activate_type = 4 AND p.id = o.offer_id
+                WHERE o.activated = %s
+                OFFSET %s LIMIT %s;
+            ''', (activated, first, first + rows))
+
         return self.fetchall()
     
     def activate_offer(self, offer_id, activate_type):
-        print("activate_type:", activate_type)
-        print("id:", offer_id)
         try:
             offer = Offers.query.filter_by(offer_id=offer_id, activate_type=activate_type).one_or_none()
             if activate_type == 2:
@@ -377,6 +413,48 @@ class DB(DatabaseOperations):
             db.session.commit()
         except Exception as e:
             print("An error occurred:", str(e))
+
+    def get_amount_offers(self):
+        count = self.select_one_query("SELECT COUNT(*) FROM offers;")
+        today_offers = self.select_one_query('SELECT COUNT(*) FROM offers WHERE created_at::date = CURRENT_DATE;')
+        return count, today_offers
+    
+    def get_amount_words(self):
+        words_count = self.select_one_query('SELECT COUNT(*) FROM synamizer')
+        words_count_activated = self.select_one_query('''
+                                            SELECT COUNT(*) FROM synamizer s
+                                            INNER JOIN offers o ON s.id = o.offer_id
+                                            WHERE o.activated = true AND o.activate_type = 1;''')
+
+        return words_count, words_count_activated
+    
+    def get_amount_users(self):
+        users = self.select_one_query("SELECT COUNT(*) FROM users u INNER JOIN offers o ON o.offer_id = u.id WHERE o.activated = true AND o.activate_type = 2;")
+        admins = self.select_one_query("SELECT COUNT(*) FROM users u INNER JOIN offers o ON o.offer_id = u.id INNER JOIN user_role ur ON ur.user_id = u.id WHERE o.activated = true AND ur.role_id = 2 AND o.activate_type = 2;")
+        return users['count'], admins['count']
+    
+    def get_amount_synparaphrases(self):
+        amount = self.select_one_query("SELECT ( (SELECT COUNT(*) FROM synonyms) + (SELECT COUNT(*) FROM paraphrases) ) AS amount;")
+        activated_amount = self.select_one_query('''SELECT (
+            (SELECT COUNT(*) FROM synonyms s
+            INNER JOIN offers o ON o.offer_id = s.id
+            WHERE o.activated = true AND o.activate_type = 3)
+            +
+            (SELECT COUNT(*) FROM paraphrases p
+            INNER JOIN offers o ON o.offer_id = p.id
+            WHERE o.activated = true AND o.activate_type = 4)
+            ) AS total_row_count;
+            ''')
+        amount.update(activated_amount)
+        return amount
+    
+    def get_inf_for_table(self):
+        result = self.select_all_query('''SELECT u.email, u.full_name, r.name FROM users u
+            INNER JOIN offers o ON o.offer_id = u.id
+            INNER JOIN user_role ur ON ur.user_id = u.id
+            INNER JOIN role r ON r.role_id = ur.role_id
+            WHERE o.activated = true AND o.activate_type = 2;''')
+        return result
 
 
 class User(db.Model):
@@ -407,6 +485,7 @@ class Offers(db.Model):
     user_id = db.Column(db.Integer)
     activate_type = db.Column(db.Integer)
     activated = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class ActivateTypes(db.Model):
     __tablename__ = 'activate_types'

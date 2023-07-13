@@ -22,19 +22,16 @@
         </div>
       </div>
     </div>
-    <!-- <Listbox v-model="selectedCity" :options="cities" filter optionLabel="name" class="w-full md:w-14rem" /> -->
     <Button
       label="Іздеу"
       style="padding-right: 30px; padding-left: 10px"
       @click="onSearchTap"
     ></Button>
   </div>
-  <div
-    v-if="word.valueOf() != '' && meaning.valueOf() != ''"
-    style="padding-top: 20px"
-  >
-    <div>Сөз: {{ words.valueOf() }}</div>
-    <div style="margin-bottom: 10px">Түсіндірмесі: {{ meaning }}</div>
+  <div v-if="word != '' && meaning != ''" style="padding-top: 20px">
+    <div style="margin-bottom: 5px">Сөз: {{ words }}</div>
+    <div style="margin-bottom: 5px">Түсіндірмесі: {{ meaning }}</div>
+    <div style="margin-bottom: 10px">Мысалы: {{ example }}</div>
     <div class="row">
       <div>Сөз табы:</div>
       <Listbox
@@ -151,6 +148,7 @@
 import axios from "axios";
 import { AHMET_API } from "../../config";
 import { useStore } from "vuex";
+import { AhmetService } from "@/service/AhmetService";
 export default {
   data() {
     return {
@@ -176,6 +174,7 @@ export default {
       paraphraseToAdd: [],
       selectedWord: null,
       access_token: null,
+      example: "",
     };
   },
   mounted() {
@@ -186,12 +185,11 @@ export default {
       var response = {};
       console.log("onChagne:", event);
       try {
-        await axios
-          .post(`${AHMET_API}/word/synomize/`, {
-            value: event.target.value,
-            words_family: words_family,
-          })
-          .then((_) => console.log((response = _.data)));
+        response = await AhmetService.onChange(event, words_family);
+        console.log(
+          `response[0]["example"] inside onChange:`,
+          response[0]["example"]
+        );
       } catch (error) {
         response = null;
       }
@@ -199,7 +197,14 @@ export default {
       console.log("response word in console: ", response);
       if (response != null) {
         this.showSynAdd = false;
-        this.meaning = response[0]["meaning"];
+        this.example =
+          response[0]["example"] == ""
+            ? "Мысалы енгізілмеген"
+            : response[0]["example"];
+        this.meaning =
+          response[0]["meaning"] == ""
+            ? "Мағынасы енгізілмеген"
+            : response[0]["meaning"];
         this.word_id = response[0]["id"];
         this.family = { family: response[0]["words_family"] };
         this.words = response[0]["words"];
@@ -207,13 +212,26 @@ export default {
         this.paraphrases = response[2];
         this.all_words = response[3];
         console.log("this.family: ", this.family);
-        this.families = response[4];
+        console.log("this.words:", this.word);
+        this.families = this.clearArray(response[4]);
         return true;
       } else {
         console.log("NULL");
         this.meaning = "";
         return false;
       }
+    },
+    clearArray(array) {
+      const uniqueArray = [];
+      const synonymSet = new Set();
+
+      for (const obj of array) {
+        if (!synonymSet.has(obj.words_family)) {
+          synonymSet.add(obj.words_family);
+          uniqueArray.push(obj);
+        }
+      }
+      return uniqueArray;
     },
     onSelectionChange() {
       console.log("selectedWord.value.name: ", this.selectedWord);
