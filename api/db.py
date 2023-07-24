@@ -28,39 +28,39 @@ class DatabaseOperations(DBConfig):
         def __init__(self, password) -> None:
             super().__init__(password)
 
-        def insert_query(self, query, data=None):
+        def _insert_query(self, query, data=None):
             if self.cursor.closed:
-                self.delete_instance()
+                self._delete_instance()
                 self = self.get_instance()
             try:
                 self.cursor.execute(query, data)
             except Exception as e:
                 print("ERROR:", e)
                 self.connection.rollback()
-        def commit_db(self):
+        def _commit_db(self):
             self.connection.commit()
 
-        def close_db(self):
-            self.commit_db()
+        def _close_db(self):
+            self._commit_db()
             self.connection.close()
             self.cursor.close()
-            self.delete_instance()
+            self._delete_instance()
         def fetchone(self):
             return self.cursor.fetchone()
         
         def fetchall(self):
             return self.cursor.fetchall()
         
-        def select_all_query(self, query, data=None):
+        def _select_all_query(self, query, data=None):
             if self.cursor.closed:
-                self.delete_instance()
+                self._delete_instance()
                 self = self.get_instance()
             self.cursor.execute(query, data)
             return self.cursor.fetchall()
         
-        def select_one_query(self, query, data=None):
+        def _select_one_query(self, query, data=None):
             if self.cursor.closed:
-                self.delete_instance()
+                self._delete_instance()
                 self = self.get_instance()
             try:
                 self.cursor.execute(query, data)
@@ -74,12 +74,12 @@ class DatabaseOperations(DBConfig):
         
         def execute(self,query, data = None):
             if self.cursor.closed:
-                self.delete_instance()
+                self._delete_instance()
                 self = self.get_instance()
             self.cursor.execute(query, data)
 
         @classmethod
-        def delete_instance(cls):
+        def _delete_instance(cls):
             cls.instance = None
 
         @classmethod
@@ -107,30 +107,32 @@ class StaticOperatioins:
 
 class DB(DatabaseOperations):
     def addWord(self, word, family, meaning, pos, example, user_id):
-        self.insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, example, status)
+        self._insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, example, status)
         VALUES (%s, %s, %s, %s, %s,'бірмағыналы') RETURNING id""", (word, family, meaning, pos, example))
         row_id = self.fetchone()['id']
-        self.insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 1)''', (row_id, user_id))
-        self.close_db()
+        self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 1)''', (row_id, user_id))
+        self._close_db()
         return row_id
     
-    def add_Synonyms(self, synonym, word_id):
+    def add_Synonyms(self, synonym, word_id, user_id):
         print("inside add_Synonyms:")
         insert_synonyms = "INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id"
-        self.insert_query(insert_synonyms, (synonym, ))
+        self._insert_query(insert_synonyms, (synonym, ))
         syn_id = self.fetchone()['id']
         print("syn_id:", syn_id)
         insert_syn_word = "INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)"
-        self.insert_query(insert_syn_word, (word_id, syn_id))
-        self.close_db()
+        self._insert_query(insert_syn_word, (word_id, syn_id))
+        self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 3)''', (syn_id, user_id))
+        self._close_db()
 
-    def add_Paraphrases(self, paraphrase, word_id):
+    def add_Paraphrases(self, paraphrase, word_id, user_id):
         query = "INSERT INTO paraphrases (paraphrase) VALUES (%s) RETURNING id"
-        self.insert_query(query, (paraphrase, ))
+        self._insert_query(query, (paraphrase, ))
         par_id = self.fetchone()['id']
         query = "INSERT INTO paraphrase_word (word_id, paraphrase_id) VALUES(%s, %s)"
-        self.insert_query(query, (word_id, par_id))
-        self.close_db()
+        self._insert_query(query, (word_id, par_id))
+        self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 3)''', (par_id, user_id))
+        self._close_db()
     
     def findsyn(self, word, synomized_count, synomized_words, pos = None):
         if pos is None:
@@ -138,17 +140,22 @@ class DB(DatabaseOperations):
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
             INNER JOIN offers o ON o.offer_id = sw.synonym_id
-            WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s)
+            WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(TRIM(%s))
             AND o.activated = true;'''
             param = (word,)
         else:
             param = (word,pos)
-            query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(%s) AND z.pos = %s;"
-        synonym = self.select_one_query(query, param)
+            query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(TRIM(%s)) AND z.pos = %s;"
+        print("******************")
+        print(query)
+        print(param)
+        print("******************")
+        synonym = self._select_one_query(query, param)
         if synonym == None:
             return [word, synomized_count]
         synomized_count += 1
         synomized_words.append(synonym.get('synonym'))
+        print("synonym.get('synonym'):".upper(), synonym.get('synonym'))
         return [synonym.get('synonym'), synomized_count]
         
 
@@ -160,7 +167,7 @@ class DB(DatabaseOperations):
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
             INNER JOIN offers o ON sw.synonym_id = o.offer_id
-            WHERE LOWER(TRIM(z.words)) = LOWER(%s) AND LOWER(TRIM(z.words_family)) = LOWER(TRIM(%s))
+            WHERE LOWER(TRIM(z.words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(z.words_family)) = LOWER(TRIM(%s))
             AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id)
             AND o.activated = true;'''
             data = (word,family)
@@ -171,11 +178,11 @@ class DB(DatabaseOperations):
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
             INNER JOIN offers o ON sw.synonym_id = o.offer_id
-            WHERE LOWER(TRIM(z.words)) = LOWER(%s)
+            WHERE LOWER(TRIM(z.words)) = LOWER(TRIM(%s))
             AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id)
             AND o.activated = true;'''
             data = (word,)
-        synonyms = self.select_all_query(query, data)
+        synonyms = self._select_all_query(query, data)
         if synonyms is None:
             return synonyms
         return synonyms
@@ -213,89 +220,89 @@ class DB(DatabaseOperations):
 
         params.extend([first, second])
         
-        data = self.select_all_query(query, params)
+        data = self._select_all_query(query, params)
         return data
 
         
     def countSchoolTermins(self):
-        count = self.select_one_query("SELECT COUNT(*) FROM school_termins")
+        count = self._select_one_query("SELECT COUNT(*) FROM school_termins")
         return count
     
     def getLegacies(self, parent_id):
         if parent_id == None:
             query = "SELECT id AS key, name AS label, path AS data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id IS NULL;"
-            results = self.select_all_query(query)
+            results = self._select_all_query(query)
         else: 
             query = "SELECT id as key, name as label, path as data, parent_id, is_file, concat('pi pi-fw ', CASE WHEN is_file = 1 THEN 'pi-file' ELSE 'pi-folder' END) as icon FROM legacy WHERE parent_id=%s"
             data = [parent_id]
-            results = self.select_all_query(query, data)
+            results = self._select_all_query(query, data)
         return results
     
     def get_download_legacy_path(self, file_id):
-        results = self.select_all_query("SELECT path from legacy WHERE id = %s",[file_id])
+        results = self._select_all_query("SELECT path from legacy WHERE id = %s",[file_id])
         for row in results:
             
             path = row.get('path')
         return path
     
     def addTag(self, definition_id, file_id):
-        self.insert_query("INSERT INTO tag_legacy (tag_id, legacy_id) VALUES (%s, %s);", (definition_id, file_id))
-        self.close_db()
+        self._insert_query("INSERT INTO tag_legacy (tag_id, legacy_id) VALUES (%s, %s);", (definition_id, file_id))
+        self._close_db()
         
     
     
     def addTermin(self, termin, subject_id, definition, school_class):
-        self.insert_query("INSERT INTO school_termins (termin, definition, subject_id, class) VALUES (%s, %s, %s, %s)", (termin, definition, subject_id, school_class))
-        self.close_db()
+        self._insert_query("INSERT INTO school_termins (termin, definition, subject_id, class) VALUES (%s, %s, %s, %s)", (termin, definition, subject_id, school_class))
+        self._close_db()
         
     def get_subject_id(self, subject): 
-        subject_id = self.select_one_query("SELECT id FROM subjects WHERE subject = %s", (subject,))[0]
+        subject_id = self._select_one_query("SELECT id FROM subjects WHERE subject = %s", (subject,))[0]
         return subject_id
     
     def get_subjects(self):
-        subjects = self.select_all_query("SELECT * FROM subjects")
+        subjects = self._select_all_query("SELECT * FROM subjects")
         return subjects
 
     def add_subject(self, subject):
-        self.insert_query("INSERT INTO subjects (subject) VALUES(%s)", (subject,))
-        self.close_db()
+        self._insert_query("INSERT INTO subjects (subject) VALUES(%s)", (subject,))
+        self._close_db()
     
     def findword(self, data, family=None):
         if family is None:
             query = 'SELECT DISTINCT id, words_family, status, meaning, words, pos, example FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));'
-            temp_families = self.select_all_query(query, (data,))
+            temp_families = self._select_all_query(query, (data,))
             return temp_families
         query = 'SELECT DISTINCT id, status,words_family, meaning, words FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));'
-        return self.select_all_query(query, (data, family))
+        return self._select_all_query(query, (data, family))
 
     def find_similarword(self, data):
-        all_words = self.select_all_query("SELECT DISTINCT words FROM synamizer WHERE LOWER(TRIM(words)) LIKE LOWER(TRIM(%s)) LIMIT 3;", (data + "%", ) )
+        all_words = self._select_all_query("SELECT DISTINCT words FROM synamizer WHERE LOWER(TRIM(words)) LIKE LOWER(TRIM(%s)) LIMIT 3;", (data + "%", ) )
         return all_words
     
     def find_paraphrase_by_word(self, word):
-        paraphrase = self.select_all_query('''SELECT s.paraphrase FROM paraphrases s 
+        paraphrase = self._select_all_query('''SELECT s.paraphrase FROM paraphrases s 
                                            INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id 
                                            INNER JOIN synamizer z ON z.id = sw.word_id 
                                            INNER JOIN offers o ON o.offer_id = sw.paraphrase_id
-                                           WHERE LOWER(TRIM(z.words)) = LOWER(%s)
+                                           WHERE LOWER(TRIM(z.words)) = LOWER(TRIM(%s))
                                            AND o.activated = true;''', (word,))
         return paraphrase
     def update_legacy_name(self, fileName, fileID):
-        self.insert_query('UPDATE legacy SET name = %s WHERE id = %s', (fileName, fileID))
+        self._insert_query('UPDATE legacy SET name = %s WHERE id = %s', (fileName, fileID))
 
     def addLegacy(self, key, path_to_save, filename, content_type, parent_id):
         self.execute('ALTER SEQUENCE legacy_id_seq RESTART WITH 100;')
-        self.insert_query("INSERT INTO legacy (name, path, parent_id, is_file) VALUES (%s, %s, %s, %s);", (key, path_to_save + "/" + filename + '.' + content_type, parent_id, 1))
-        self.close_db()
+        self._insert_query("INSERT INTO legacy (name, path, parent_id, is_file) VALUES (%s, %s, %s, %s);", (key, path_to_save + "/" + filename + '.' + content_type, parent_id, 1))
+        self._close_db()
 
     def delete_legacy(self, fileID):
-        self.insert_query('DELETE FROM legacy WHERE id = %s RETURNING *;', (fileID,))
+        self._insert_query('DELETE FROM legacy WHERE id = %s RETURNING *;', (fileID,))
         deleted_row = self.fetchone()
-        self.close_db()
+        self._close_db()
         return deleted_row
     
     def search_book(self, data):
-        results = self.select_all_query("SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file FROM tag t JOIN tag_legacy tl ON t.id = tl.tag_id JOIN legacy l ON l.id = tl.legacy_id WHERE t.name ILIKE %s;", ('%' + data + '%',))
+        results = self._select_all_query("SELECT l.id as key , l.name as label, l.path as data, l.parent_id, l.is_file FROM tag t JOIN tag_legacy tl ON t.id = tl.tag_id JOIN legacy l ON l.id = tl.legacy_id WHERE t.name ILIKE %s;", ('%' + data + '%',))
         return results
     
     def find_user(self,current_user):
@@ -306,20 +313,20 @@ class DB(DatabaseOperations):
         temp = Role.query.filter_by(role_id=role_id).one_or_none()
         return temp
     def delete_post(self, id):
-        self.insert_query("DELETE FROM termin WHERE id = %s", (id,))
-        self.close_db()
+        self._insert_query("DELETE FROM termin WHERE id = %s", (id,))
+        self._close_db()
 
     def create_post(self, name, descrpition, example):
-        self.insert_query("INSERT INTO termin (name, description, examples) VALUES (%s, %s, %s)", (name, descrpition, example))
-        self.close_db()
+        self._insert_query("INSERT INTO termin (name, description, examples) VALUES (%s, %s, %s)", (name, descrpition, example))
+        self._close_db()
 
     def search_classification(self, search_text, rows,offset):
-        found = self.select_all_query("SELECT * FROM termin WHERE name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
+        found = self._select_all_query("SELECT * FROM termin WHERE name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
             ('%' + search_text + '%','%' + search_text + '%','%' + search_text + '%',rows,offset))
         return found
     
     def get_classification(self, rows,offset):
-        termins = self.select_all_query("SELECT * FROM termin LIMIT %s OFFSET %s",(rows,offset,))
+        termins = self._select_all_query("SELECT * FROM termin LIMIT %s OFFSET %s",(rows,offset,))
         return termins
     
     def isUserAdmin(self, current_user):
@@ -415,13 +422,13 @@ class DB(DatabaseOperations):
             print("An error occurred:", str(e))
 
     def get_amount_offers(self):
-        count = self.select_one_query("SELECT COUNT(*) FROM offers;")
-        today_offers = self.select_one_query('SELECT COUNT(*) FROM offers WHERE created_at::date = CURRENT_DATE;')
+        count = self._select_one_query("SELECT COUNT(*) FROM offers;")
+        today_offers = self._select_one_query('SELECT COUNT(*) FROM offers WHERE created_at::date = CURRENT_DATE;')
         return count, today_offers
     
     def get_amount_words(self):
-        words_count = self.select_one_query('SELECT COUNT(*) FROM synamizer')
-        words_count_activated = self.select_one_query('''
+        words_count = self._select_one_query('SELECT COUNT(*) FROM synamizer')
+        words_count_activated = self._select_one_query('''
                                             SELECT COUNT(*) FROM synamizer s
                                             INNER JOIN offers o ON s.id = o.offer_id
                                             WHERE o.activated = true AND o.activate_type = 1;''')
@@ -429,13 +436,13 @@ class DB(DatabaseOperations):
         return words_count, words_count_activated
     
     def get_amount_users(self):
-        users = self.select_one_query("SELECT COUNT(*) FROM users u INNER JOIN offers o ON o.offer_id = u.id WHERE o.activated = true AND o.activate_type = 2;")
-        admins = self.select_one_query("SELECT COUNT(*) FROM users u INNER JOIN offers o ON o.offer_id = u.id INNER JOIN user_role ur ON ur.user_id = u.id WHERE o.activated = true AND ur.role_id = 2 AND o.activate_type = 2;")
+        users = self._select_one_query("SELECT COUNT(*) FROM users u INNER JOIN offers o ON o.offer_id = u.id WHERE o.activated = true AND o.activate_type = 2;")
+        admins = self._select_one_query("SELECT COUNT(*) FROM users u INNER JOIN offers o ON o.offer_id = u.id INNER JOIN user_role ur ON ur.user_id = u.id WHERE o.activated = true AND ur.role_id = 2 AND o.activate_type = 2;")
         return users['count'], admins['count']
     
     def get_amount_synparaphrases(self):
-        amount = self.select_one_query("SELECT ( (SELECT COUNT(*) FROM synonyms) + (SELECT COUNT(*) FROM paraphrases) ) AS amount;")
-        activated_amount = self.select_one_query('''SELECT (
+        amount = self._select_one_query("SELECT ( (SELECT COUNT(*) FROM synonyms) + (SELECT COUNT(*) FROM paraphrases) ) AS amount;")
+        activated_amount = self._select_one_query('''SELECT (
             (SELECT COUNT(*) FROM synonyms s
             INNER JOIN offers o ON o.offer_id = s.id
             WHERE o.activated = true AND o.activate_type = 3)
@@ -448,15 +455,56 @@ class DB(DatabaseOperations):
         amount.update(activated_amount)
         return amount
     
-    def get_inf_for_table(self):
-        result = self.select_all_query('''SELECT u.email, u.full_name, r.name FROM users u
+    def get_inf_for_table(self, start):
+        query= '''SELECT u.email, u.full_name, u.id, r.name FROM users u
             INNER JOIN offers o ON o.offer_id = u.id
             INNER JOIN user_role ur ON ur.user_id = u.id
             INNER JOIN role r ON r.role_id = ur.role_id
-            WHERE o.activated = true AND o.activate_type = 2;''')
+            WHERE o.activated = true AND o.activate_type = 2'''
+        data = None
+        if start != "":
+            data = (start+"%",)
+            query = query + " AND u.full_name ILIKE %s;"
+        result = self._select_all_query(query, data)
         return result
-
-
+    
+    def word_view(self, date):
+        result = self._select_one_query("SELECT COUNT(*) FROM synamizer WHERE DATE(created_at) = %s", (date,))
+        return result
+    def user_table(self):
+        users_results = self._select_all_query('''SELECT COUNT(*), u.id, u.full_name, u.email FROM synamizer s
+            INNER JOIN offers o ON o.offer_id = s.id
+            INNER JOIN users u ON o.user_id = u.id
+            WHERE o.activated = true AND o.activate_type = 1
+            AND u.id = o.user_id
+            GROUP BY u.id
+            LIMIT 6
+                        ''')
+        return users_results
+    def last_news(self):
+        results = self._select_all_query('''SELECT *
+        FROM offers o
+        INNER JOIN users u ON o.user_id = u.id
+        ORDER BY o.id DESC
+        LIMIT 2''') 
+        return results
+    
+    def delete_user(self, id):
+        print("DELETE:", id)
+        query = '''DELETE FROM offers WHERE activate_type = 2 AND offer_id = %s'''
+        self._insert_query(query, (id, ))
+        query = '''DELETE FROM user_role WHERE user_id = %s'''
+        self._insert_query(query, (id, ))
+        query = '''DELETE FROM users WHERE id = %s'''
+        self._insert_query(query, (id, ))
+        self._close_db()
+    
+    def up_user_role(self, id):
+        print('user up:', id)
+        max_id = db.session.query(func.max(UserRole.id)).scalar() or 0
+        query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 2, %s)'''
+        self._insert_query(query, (id,max_id+1))
+        self._close_db()
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)

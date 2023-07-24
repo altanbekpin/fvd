@@ -7,6 +7,7 @@ from rdflib.serializer import Serializer
 from rdflib.namespace import RDF, RDFS, OWL
 from owlready import *
 
+
 class LegacySchema(Schema):
     id = fields.Int(dump_to='ID')
     name = fields.Str(dump_to='name')
@@ -132,3 +133,4 @@ class MyOntology():
         verbose_name = 'Жоба'
         verbose_name_plural = 'Жобалар'
     
+

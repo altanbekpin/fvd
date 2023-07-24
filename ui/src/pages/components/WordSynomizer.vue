@@ -47,7 +47,7 @@
             ref="op"
             style="border: none; padding: 0"
             v-if="synomized_counter != 0"
-            :appendTo="'span#span-2.temp_testing_div2'"
+            :appendTo="'span#span-0.temp_testing_div2'"
           >
             <div class="border-inner">
               <Listbox
@@ -73,6 +73,7 @@
 <script>
 import axios from "axios";
 import { AHMET_API, getHeader } from "../../config";
+// import { AhmetService } from "../../service/AhmetService";
 
 export default {
   data() {
@@ -158,8 +159,6 @@ export default {
     onSynonymTap() {
       console.log(this.optionSynonyms);
       console.log("selectedSyn: ", this.selectedSyn);
-      const dataValue = this.overlayTarget.getAttribute("data");
-      console.log("dataValue: ", dataValue);
       console.log("selectedSyn: ", this.selectedSyn.synonym);
       this.overlayTarget.innerText = this.selectedSyn.synonym;
       this.closeOverlayPanel();
@@ -167,20 +166,6 @@ export default {
     closeOverlayPanel() {
       this.$refs.op.hide();
     },
-
-    // showOverlayPanel() {
-    //   const overlayContainer = this.$refs.overlayContainer;
-
-    //   if (!this.overlayVisible) {
-    //     const overlayPanelComponent = new Vue(OverlayPanel);
-    //     overlayPanelComponent.$mount();
-    //     overlayContainer.appendChild(overlayPanelComponent.$el);
-    //   } else {
-    //     overlayContainer.innerHTML = "";
-    //   }
-
-    //   this.overlayVisible = !this.overlayVisible;
-    // },
   },
   computed: {
     isHtml() {

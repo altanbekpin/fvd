@@ -243,7 +243,8 @@ class Lemms:
                 token = token.lower()
                 while len(token) > 0:
                     token = token[:-1] + self.change_syngor( token[-1:])
-                    cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(words) = LOWER(%s)", (token,))
+                    print("token:", token)
+                    cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s))", (token,))
                     for result in cur.fetchall():
                         if (not(token in kaz_stop_words)):
                             tok.append(u"".join(result[0]))
@@ -262,7 +263,6 @@ class Lemms:
                             endings.clear()
                             token_found = True
                             break
-
                     token = token[:len(token)-1]
                 if not(token_found):
                     if (not(sttoken in kaz_stop_words) & (sttoken != u'.')):

@@ -80,7 +80,49 @@ def get_amount_synphrases():
 def get_inf_for_table():
     if not DB.get_instance().isUserAdmin(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})   
-    result = DB.get_instance().get_inf_for_table()
+    start = literal_eval(request.args.get('start'))
+    result = DB.get_instance().get_inf_for_table(start)
     return result
 
+@app.route("/word/overview", methods=['GET'])
+@jwt_required()
+def word_overview():
+    if not DB.get_instance().isUserAdmin(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
+    dates = literal_eval(request.args.get('dates'))
+    results = []
+    for i in dates:
+        results.append(DB.get_instance().word_view(i))
+    print("dates:", dates)
+    return results
 
+@app.route("/user/table", methods=['GET'])
+@jwt_required()
+def user_table():
+    if not DB.get_instance().isUserAdmin(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
+    users_results = DB.get_instance().user_table()
+    return users_results
+
+
+@app.route('/last/news')
+@jwt_required()
+def last_news():
+    if not DB.get_instance().isUserAdmin(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
+    results = DB.get_instance().last_news()
+    return results
+
+@app.route('/manage/user', methods=['DELETE', 'PUT'])
+@jwt_required()
+def delete_user():
+    if not DB.get_instance().isUserAdmin(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
+    id = request.args.get('id')
+    if request.method == 'DELETE':
+        DB.get_instance().delete_user(id)
+        return 'success', 200
+    if request.method == 'PUT':
+        DB.get_instance().up_user_role(id)
+        return 'success', 200
+    return 'failed', 400

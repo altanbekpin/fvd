@@ -199,11 +199,51 @@ export const AhmetService = {
     });
     return response.data;
   },
-  async userInfo(access_token) {
+  async userInfo(access_token, start = "") {
     const response = await api.get(`${AHMET_API}/user/info`, {
+      params: {
+        start: JSON.stringify(start),
+      },
       headers: getHeader(access_token),
     });
-    console.log("userInfo response:", response.data);
     return response.data;
+  },
+  async wordDates(access_token, dates) {
+    const response = await api.get(`${AHMET_API}/word/overview`, {
+      params: {
+        dates: JSON.stringify(dates),
+      },
+      headers: getHeader(access_token),
+    });
+    return response;
+  },
+  async userResults(access_token) {
+    const response = await api.get(`${AHMET_API}/user/table`, {
+      headers: getHeader(access_token),
+    });
+    return response;
+  },
+  async lastNews(access_token) {
+    const response = await api.get(`${AHMET_API}/last/news`, {
+      headers: getHeader(access_token),
+    });
+    return response.data;
+  },
+  async manage_user(access_token, todo, id) {
+    if (todo == "delete") {
+      await api.delete(`${AHMET_API}/manage/user`, {
+        params: {
+          id: JSON.stringify(id),
+        },
+        headers: getHeader(access_token),
+      });
+      return;
+    }
+    await api.put(`${AHMET_API}/manage/user`, null, {
+      params: {
+        id: JSON.stringify(id),
+      },
+      headers: getHeader(access_token),
+    });
   },
 };

@@ -116,7 +116,7 @@ export default {
       );
       this.totalRecords = (
         await AhmetService.getOffersAmount(store.getters.getAccessToken)
-      )["count"];
+      )["count"]["count"];
       // console.log(this.products.data[0].activate_type);
 
       console.log(this.products.data);

@@ -213,7 +213,9 @@ export default {
         this.all_words = response[3];
         console.log("this.family: ", this.family);
         console.log("this.words:", this.word);
-        this.families = this.clearArray(response[4]);
+        console.log("this.families:", this.families);
+        this.families = response[4];
+        console.log("this.families:", this.families);
         return true;
       } else {
         console.log("NULL");

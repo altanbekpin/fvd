@@ -5,6 +5,7 @@ import re
 from nltk.tokenize import sent_tokenize as st
 from db import DB
 from flask_jwt_extended import current_user, jwt_required
+from word import Word
 def split_string(first_string, second_string):
     index = second_string.find(first_string)
     if index != -1:
@@ -56,47 +57,77 @@ def get_pos_names( pos):
 def getHtml(first_part, second_part, data_id, translated_word, family):
     return  f'<span class="temp_testing_div2" type="button" style="color: green;" href="{first_part}"  second_part="{second_part}" family="{family}" id="span-{str(data_id)}"> {translated_word}</span>'
 
+# @app.route('/search/word/', methods=['POST'])
+# def searchWord():
+#     synomized_count = 0
+#     data = request.json['value']
+#     synomized_words = []
+#     sentences = st(data) # тексттен сөйлемдерді бөліп аламыз
+#     stcs = Lemms.get_instance().get_kaz_lemms(sentences)
+#     words = re.findall(r"[\w']+|[.,!?; ]", data)
+#     second_part = ''
+#     output_words = []
+#     data_id = 0
+#     for word in words:
+#         if word not in [",", ".", "!", "?", ";"] and word.strip():
+#             isWordUpper = word[0].isupper()
+#             first_part = word.lower()
+#             family = ''
+#             sentences = st(first_part)
+#             stcs = Lemms.get_instance().get_kaz_lemms(sentences)
+#             if (not (len(stcs) == 0)) and (len(stcs[0][0]) > 2) and not(" " in first_part.strip()):
+#                 length = len(stcs[0]) - 1
+#                 family = stcs[0][0][1]
+#                 # print("family:", family)
+#                 print("#################")
+#                 print("stcs[0][0][2]:", stcs[0][0][2])
+#                 if len(stcs[0][0][2]) == 0:
+#                     print("stcs[0][length][3].lower():", stcs)
+#                     _, second_part = split_string(first_part, stcs[0][length][3])
+#                     first_part = stcs[0][length][3]
+#                     translated_word, synomized_count = DB.get_instance().findsyn(stcs[0][length][3], synomized_count, synomized_words, get_pos_names(family))
+#                     translated_word = translated_word +second_part 
+#                 else:
+#                     print("else:", stcs)
+#                     _, second_part = split_string(stcs[0][length][3].lower(), first_part)
+#                     first_part = stcs[0][length][3]
+#                     translated_word, synomized_count = DB.get_instance().findsyn(stcs[0][length][3], synomized_count, synomized_words, get_pos_names(family))
+#                     translated_word =  translated_word +second_part
+#                 print("#################")
+#             else:
+#                 translated_word, synomized_count = DB.get_instance().findsyn(first_part, synomized_count, synomized_words)
+#                 translated_word = translated_word.lower()
+#             if isWordUpper:
+#                 translated_word = translated_word.capitalize()
+#             if word != translated_word:
+#                 translated_word = getHtml(first_part, second_part, data_id, translated_word, family)
+#                 data_id += 1
+#             output_words.append(translated_word) 
+#         else:
+#             output_words.append(word)
+#     return jsonify([output_words, synomized_count, synomized_words]), 200
+
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
     synomized_count = 0
     data = request.json['value']
     synomized_words = []
-    sentences = st(data) # тексттен сөйлемдерді бөліп аламыз
-    stcs = Lemms.get_instance().get_kaz_lemms(sentences)
     words = re.findall(r"[\w']+|[.,!?; ]", data)
-    second_part = ''
     output_words = []
     data_id = 0
     for word in words:
         if word not in [",", ".", "!", "?", ";"] and word.strip():
             isWordUpper = word[0].isupper()
-            first_part = word.lower()
-            family = ''
-            sentences = st(first_part)
-            stcs = Lemms.get_instance().get_kaz_lemms(sentences)
-            if (not (len(stcs) == 0)) and (len(stcs[0][0]) > 2) and not(" " in first_part.strip()):
-                length = len(stcs[0]) - 1
-                family = stcs[0][0][1]
-                print("family:", family)
-                print(stcs)
-                if len(stcs[0][0][2]) == 0:
-                    _, second_part = split_string(first_part, stcs[0][length][3])
-                    first_part = stcs[0][length][3]
-                    translated_word, synomized_count = DB.get_instance().findsyn(stcs[0][length][3], synomized_count, synomized_words, get_pos_names(family))
-                    translated_word = translated_word +second_part 
-                else:
-                    _, second_part = split_string(stcs[0][length][3].lower(), first_part)
-                    first_part = stcs[0][length][3]
-                    translated_word, synomized_count = DB.get_instance().findsyn(stcs[0][length][3], synomized_count, synomized_words, get_pos_names(family))
-                    translated_word =  translated_word +second_part
-            else:
-                translated_word, synomized_count = DB.get_instance().findsyn(first_part, synomized_count, synomized_words)
-                translated_word = translated_word.lower()
-            if isWordUpper:
-                translated_word = translated_word.capitalize()
-            if word != translated_word:
-                translated_word = getHtml(first_part, second_part, data_id, translated_word, family)
+            word_instance = Word(word.lower(), synomized_count, synomized_words)
+            word_instance.look_for_synonym()
+            if isWordUpper and word_instance.has_synonym():
+                word_instance.capitalize_synonym()
+            if word_instance.has_synonym():
+                translated_word = getHtml(word_instance.get_first_part(), word_instance.find_extra_chars(word_instance.get_first_part(), word), data_id, word_instance.get_synonym(), word_instance.get_family())
                 data_id += 1
+            else:
+                translated_word = word
+            synomized_count = word_instance.synomized_count
             output_words.append(translated_word) 
         else:
             output_words.append(word)
@@ -203,13 +234,13 @@ def addWord():
     if len(synonyms) > 0:
         for i in synonyms:
             try:
-                DB.get_instance().add_Synonyms( synonym=i, word_id=word_id)
+                DB.get_instance().add_Synonyms( synonym=i, word_id=word_id,user_id=current_user.id)
             except Exception as e:
                 return str(e), 400
     if len(paraphrases) > 0:
         for i in paraphrases:
             try:
-                DB.get_instance().add_Paraphrases( paraphrase=i, word_id=word_id)
+                DB.get_instance().add_Paraphrases( paraphrase=i, word_id=word_id, user_id=current_user.id)
             except Exception as e:
                 return str(e), 400
     return 'success', 200
@@ -224,7 +255,7 @@ def addSynonym():
     family = request.json['family']['family']
     word_id = DB.get_instance().findword(word, family)[0].get('id')
     for i in synonyms:
-        DB.get_instance().add_Synonyms(i, word_id)
+        DB.get_instance().add_Synonyms(i, word_id, current_user.id)
     return 'success', 200
 
 @app.route('/add/paraphrase/', methods=['POST'])
@@ -237,6 +268,13 @@ def addParaphrase():
     family = request.json['family']['family']
     word_id = DB.get_instance().findword(word, family)[0].get('id')
     for i in paraphrases:
-        DB.get_instance().add_Paraphrases(i, word_id)
+        DB.get_instance().add_Paraphrases(i, word_id, current_user.id)
     return 'success', 200
+
+# @app.route("/research/",methods=['POST'])
+# def research():
+#     data = request.json['value']
+#     instance = Word(data, 0, [])
+#     instance.
+
 
