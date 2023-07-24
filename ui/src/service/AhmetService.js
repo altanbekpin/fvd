@@ -68,6 +68,7 @@ export const AhmetService = {
   async getTokenAndRoles(email, password) {
     var response;
     var roles = [];
+<<<<<<< HEAD
     response = await api.post(
       `${AHMET_API}/login/`,
       {
@@ -78,6 +79,14 @@ export const AhmetService = {
       },
       { headers: getHeader() }
     );
+=======
+    response = await api.post(`${AHMET_API}/login/`, {
+      data: {
+        email: email,
+        password: password,
+      },
+    }, {headers: getHeader(),});
+>>>>>>> origin/main
     const temp = response.data["access_token"];
 
     console.log("temp:", temp);
