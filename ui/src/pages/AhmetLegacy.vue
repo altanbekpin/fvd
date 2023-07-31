@@ -170,6 +170,8 @@ import { AhmetService } from "@/service/AhmetService";
 import store from "../store.js";
 import { AHMET_API } from "../config.js";
 import axios from "axios";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const selectedTag = ref({ name: "", id: "" });
 const nodes = ref(null);
 const loading = ref(false);
@@ -229,15 +231,32 @@ const handleFileUpload = (event) => {
   })
     .then((response) => {
       console.log("response: ", response);
+      toast.add({
+        severity: "success",
+        summary: "Қосылды",
+        detail: "Жаңа файл сәтті қосылды",
+        life: 3000,
+      });
     })
     .catch((error) => {
       console.log('There"s a issue:', error);
-    });
+      toast.add({
+        severity: "error",
+        summary: "Ақау",
+        detail: error,
+        life: 3000,
+      });
+    })
+    .finally(() => init());
   FileName.value = "";
 };
 
 onMounted(() => {
   loading.value = true;
+  init();
+  console.log(nodes.value);
+});
+const init = () => {
   AhmetService.getTreeTableNodes().then((data) => {
     console.log(data);
     loading.value = false;
@@ -250,8 +269,7 @@ onMounted(() => {
       nodes.value = legacies;
     }
   });
-  console.log(nodes.value);
-});
+};
 const onNodeExpand = (node) => {
   loading.value = true;
   AhmetService.getTreeTableNodes(node.key).then((data) => {
@@ -289,6 +307,13 @@ const deleteFile = () => {
     headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
   });
+  toast.add({
+    severity: "success",
+    summary: "Өшірілді",
+    detail: "Файл сәтті өшірілд",
+    life: 3000,
+  });
+  init();
   setFalse();
 };
 const changeFileName = () => {

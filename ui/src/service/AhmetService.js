@@ -68,7 +68,6 @@ export const AhmetService = {
   async getTokenAndRoles(email, password) {
     var response;
     var roles = [];
-<<<<<<< HEAD
     response = await api.post(
       `${AHMET_API}/login/`,
       {
@@ -79,14 +78,6 @@ export const AhmetService = {
       },
       { headers: getHeader() }
     );
-=======
-    response = await api.post(`${AHMET_API}/login/`, {
-      data: {
-        email: email,
-        password: password,
-      },
-    }, {headers: getHeader(),});
->>>>>>> origin/main
     const temp = response.data["access_token"];
 
     console.log("temp:", temp);
@@ -166,6 +157,18 @@ export const AhmetService = {
         },
       }
     );
+  },
+  async research(_value, word) {
+    const response = await api.post(
+      `${AHMET_API}/research/`,
+      {
+        value: _value,
+        word: word,
+      },
+      { headers: getHeader() }
+    );
+    console.log("RESPONSE:", response);
+    return response.data;
   },
   async onChange(event, words_family) {
     var response = {};
@@ -254,5 +257,32 @@ export const AhmetService = {
       },
       headers: getHeader(access_token),
     });
+  },
+  async delete_syn(access_token, synonym_id) {
+    const response = await api.delete(`${AHMET_API}/delete/synonym`, {
+      params: {
+        synonym_id: JSON.stringify(synonym_id),
+      },
+      headers: getHeader(access_token),
+    });
+    return response.status;
+  },
+  async delete_par(access_token, paraphrase_id) {
+    const response = await api.delete(`${AHMET_API}/delete/paraphrase`, {
+      params: {
+        paraphrase_id: JSON.stringify(paraphrase_id),
+      },
+      headers: getHeader(access_token),
+    });
+    return response.status;
+  },
+  async delete_family(access_token, word_id) {
+    const response = await api.delete(`${AHMET_API}/delete/family`, {
+      params: {
+        word_id: JSON.stringify(word_id),
+      },
+      headers: getHeader(access_token),
+    });
+    return response.status;
   },
 };

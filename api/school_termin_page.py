@@ -20,6 +20,12 @@ def countTermins():
     amoung = DB.get_instance().countSchoolTermins()
     return amoung
 
+# @app.route("/countChildrenTermins", methods=['GET'])
+# def countChildrenTermins():
+#     print("/countChildrenTermins")
+#     amoung = DB.get_instance().countSchoolTermins()
+#     return amoung
+
 @app.route("/add/termin", methods=['POST'])
 @jwt_required()
 def addTermin():

@@ -146,10 +146,6 @@ class DB(DatabaseOperations):
         else:
             param = (word,pos)
             query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(TRIM(%s)) AND z.pos = %s;"
-        print("******************")
-        print(query)
-        print(param)
-        print("******************")
         synonym = self._select_one_query(query, param)
         if synonym == None:
             return [word, synomized_count]
@@ -162,7 +158,7 @@ class DB(DatabaseOperations):
     
     def findsyn_with_family(self, word, family):
         if family != '':
-            query = ''' SELECT s.synonym, z.words 
+            query = ''' SELECT s.synonym, z.words, s.id
             FROM synonyms s 
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
@@ -280,7 +276,7 @@ class DB(DatabaseOperations):
         return all_words
     
     def find_paraphrase_by_word(self, word):
-        paraphrase = self._select_all_query('''SELECT s.paraphrase FROM paraphrases s 
+        paraphrase = self._select_all_query('''SELECT s.paraphrase, s.id FROM paraphrases s 
                                            INNER JOIN paraphrase_word sw ON s.id = sw.paraphrase_id 
                                            INNER JOIN synamizer z ON z.id = sw.word_id 
                                            INNER JOIN offers o ON o.offer_id = sw.paraphrase_id
@@ -314,6 +310,10 @@ class DB(DatabaseOperations):
         return temp
     def delete_post(self, id):
         self._insert_query("DELETE FROM termin WHERE id = %s", (id,))
+        self._close_db()
+
+    def update_post(self,id, name, descrpition, example ):
+        self._insert_query("UPDATE termin SET name = %s, description = %s, examples = %s WHERE id = %s", (name, descrpition,example, id))
         self._close_db()
 
     def create_post(self, name, descrpition, example):
@@ -387,23 +387,31 @@ class DB(DatabaseOperations):
     def getOffers(self, first, rows, status):
         if status is '':
             self.execute('''
-                SELECT o.*, sr.*, u.*, s.synonym, p.paraphrase
+                SELECT o.*, sr.*, u.*, s.synonym, p.paraphrase, sr2.words as syn_word, sr3.words as par_word
                 FROM offers o
                 LEFT JOIN synamizer sr ON o.activate_type = 1 AND sr.id = o.offer_id
                 LEFT JOIN users u ON o.activate_type = 2 AND u.id = o.offer_id
                 LEFT JOIN synonyms s ON o.activate_type = 3 AND s.id = o.offer_id
                 LEFT JOIN paraphrases p ON o.activate_type = 4 AND p.id = o.offer_id
+                LEFT JOIN synonym_word sw1 ON sw1.synonym_id = s.id
+                LEFT JOIN synamizer sr2 ON sr2.id = sw1.word_id
+                LEFT JOIN paraphrase_word pw1 ON pw1.paraphrase_id = p.id
+                LEFT JOIN synamizer sr3 ON sr3.id = pw1.word_id
                 OFFSET %s LIMIT %s;
             ''', (first, first + rows))
         else:
             activated = status == "Қабылданғандар"
             self.execute('''
-                SELECT o.*, sr.*, u.*, s.synonym, p.paraphrase
+                SELECT o.*, sr.*, u.*, s.synonym, p.paraphrase, sr2.words as syn_word, sr3.words as par_word
                 FROM offers o
                 LEFT JOIN synamizer sr ON o.activate_type = 1 AND sr.id = o.offer_id
                 LEFT JOIN users u ON o.activate_type = 2 AND u.id = o.offer_id
                 LEFT JOIN synonyms s ON o.activate_type = 3 AND s.id = o.offer_id
                 LEFT JOIN paraphrases p ON o.activate_type = 4 AND p.id = o.offer_id
+                LEFT JOIN synonym_word sw1 ON sw1.synonym_id = s.id
+                LEFT JOIN synamizer sr2 ON sr2.id = sw1.word_id
+                LEFT JOIN paraphrase_word pw1 ON pw1.paraphrase_id = p.id
+                LEFT JOIN synamizer sr3 ON sr3.id = pw1.word_id
                 WHERE o.activated = %s
                 OFFSET %s LIMIT %s;
             ''', (activated, first, first + rows))
@@ -505,6 +513,34 @@ class DB(DatabaseOperations):
         query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 2, %s)'''
         self._insert_query(query, (id,max_id+1))
         self._close_db()
+
+    def delete_syn(self, synonym_id):
+        param = (synonym_id, )
+        query = '''DELETE FROM synonyms WHERE id = %s'''
+        self._insert_query(query, param)
+        query = '''DELETE FROM synonym_word WHERE synonym_id = %s'''
+        self._insert_query(query, param)
+        query = '''DELETE FROM offers WHERE activate_type = 3 AND offer_id = %s'''
+        self._insert_query(query, param)
+        self._close_db()
+
+    def delete_par(self, paraphrase_id):
+        param = (paraphrase_id, )
+        query = '''DELETE FROM paraphrases WHERE id = %s'''
+        self._insert_query(query, param)
+        query = '''DELETE FROM paraphrase_word WHERE paraphrase_id = %s'''
+        self._insert_query(query, param)
+        query = '''DELETE FROM offers WHERE activate_type = 4 AND offer_id = %s'''
+        self._insert_query(query, param)
+        self._close_db()
+
+    def delete_family(self, word_id):
+        param = (word_id, )
+        query = '''DELETE FROM synamizer WHERE id = %s'''
+        self._insert_query(query, param)
+        self._close_db()
+
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)

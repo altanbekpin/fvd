@@ -1,3 +1,4 @@
+from ast import literal_eval
 from app import app
 from morphology_api.morphology import Lemms
 from flask import request, jsonify 
@@ -57,55 +58,18 @@ def get_pos_names( pos):
 def getHtml(first_part, second_part, data_id, translated_word, family):
     return  f'<span class="temp_testing_div2" type="button" style="color: green;" href="{first_part}"  second_part="{second_part}" family="{family}" id="span-{str(data_id)}"> {translated_word}</span>'
 
-# @app.route('/search/word/', methods=['POST'])
-# def searchWord():
-#     synomized_count = 0
-#     data = request.json['value']
-#     synomized_words = []
-#     sentences = st(data) # тексттен сөйлемдерді бөліп аламыз
-#     stcs = Lemms.get_instance().get_kaz_lemms(sentences)
-#     words = re.findall(r"[\w']+|[.,!?; ]", data)
-#     second_part = ''
-#     output_words = []
-#     data_id = 0
-#     for word in words:
-#         if word not in [",", ".", "!", "?", ";"] and word.strip():
-#             isWordUpper = word[0].isupper()
-#             first_part = word.lower()
-#             family = ''
-#             sentences = st(first_part)
-#             stcs = Lemms.get_instance().get_kaz_lemms(sentences)
-#             if (not (len(stcs) == 0)) and (len(stcs[0][0]) > 2) and not(" " in first_part.strip()):
-#                 length = len(stcs[0]) - 1
-#                 family = stcs[0][0][1]
-#                 # print("family:", family)
-#                 print("#################")
-#                 print("stcs[0][0][2]:", stcs[0][0][2])
-#                 if len(stcs[0][0][2]) == 0:
-#                     print("stcs[0][length][3].lower():", stcs)
-#                     _, second_part = split_string(first_part, stcs[0][length][3])
-#                     first_part = stcs[0][length][3]
-#                     translated_word, synomized_count = DB.get_instance().findsyn(stcs[0][length][3], synomized_count, synomized_words, get_pos_names(family))
-#                     translated_word = translated_word +second_part 
-#                 else:
-#                     print("else:", stcs)
-#                     _, second_part = split_string(stcs[0][length][3].lower(), first_part)
-#                     first_part = stcs[0][length][3]
-#                     translated_word, synomized_count = DB.get_instance().findsyn(stcs[0][length][3], synomized_count, synomized_words, get_pos_names(family))
-#                     translated_word =  translated_word +second_part
-#                 print("#################")
-#             else:
-#                 translated_word, synomized_count = DB.get_instance().findsyn(first_part, synomized_count, synomized_words)
-#                 translated_word = translated_word.lower()
-#             if isWordUpper:
-#                 translated_word = translated_word.capitalize()
-#             if word != translated_word:
-#                 translated_word = getHtml(first_part, second_part, data_id, translated_word, family)
-#                 data_id += 1
-#             output_words.append(translated_word) 
-#         else:
-#             output_words.append(word)
-#     return jsonify([output_words, synomized_count, synomized_words]), 200
+def is_person_name(word, sentence):
+    reversed_sentence = sentence[::-1]
+    index = reversed_sentence.find(word[::-1])
+    if index != -1:
+        for char in reversed_sentence[index:]:
+            if char == '.':
+                return False
+            elif char == ' ':
+                continue
+            else:
+                break
+    return word[0].isupper()
 
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
@@ -116,14 +80,18 @@ def searchWord():
     output_words = []
     data_id = 0
     for word in words:
-        if word not in [",", ".", "!", "?", ";"] and word.strip():
+        if word not in [",", ".", "!", "?", ";"] and word.strip() and not is_person_name(word, data):
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()
             if isWordUpper and word_instance.has_synonym():
                 word_instance.capitalize_synonym()
             if word_instance.has_synonym():
-                translated_word = getHtml(word_instance.get_first_part(), word_instance.find_extra_chars(word_instance.get_first_part(), word), data_id, word_instance.get_synonym(), word_instance.get_family())
+                print("*********************************")
+                print(f"{word_instance.get_first_synonym()} {word_instance.get_synonym()}")
+                print("*********************************")
+                word_instance.set_synonym(word_instance.get_synonym() + word_instance.get_trash_part())
+                translated_word = getHtml(word_instance.get_first_part(), word_instance.find_extra_chars(word_instance.get_first_part(), word), data_id, f"{word_instance.get_first_synonym()} {word_instance.get_synonym()}", word_instance.get_family())
                 data_id += 1
             else:
                 translated_word = word
@@ -142,7 +110,7 @@ def searchsyn():
     synonyms = []
     synonyms = DB.get_instance().findsyn_with_family(data, getTense(family))
     for i in range(0, len(synonyms)):
-         synonyms[i]['synonym'] = synonyms[i]['synonym'] + second_part
+         synonyms[i]['synonym'] = synonyms[i]['synonym']
     synonyms.insert(0, {"words":data, "synonym": data+second_part})
     print(synonyms)
     return synonyms
@@ -271,10 +239,46 @@ def addParaphrase():
         DB.get_instance().add_Paraphrases(i, word_id, current_user.id)
     return 'success', 200
 
-# @app.route("/research/",methods=['POST'])
-# def research():
-#     data = request.json['value']
-#     instance = Word(data, 0, [])
-#     instance.
+@app.route("/research/",methods=['POST'])
+def research():
+    data = request.json['value']
+    word = request.json['word']
+    instance = Word(data, 0, [])
+    print("instance.get_researhed_part(word):", instance.get_researhed_part(word))
+    return instance.get_researhed_part(word)
 
+@app.route("/delete/synonym", methods=['DELETE'])
+@jwt_required()
+def delete_syn():
+    synonym_id = request.args.get('synonym_id')
+    print("synonym_id:", synonym_id)
+    synonym_id = literal_eval(synonym_id)
+    print("synonym_id:", synonym_id)
+    if not DB.get_instance().isUserAdmin(current_user):
+        return "don't have enough permission", 500
+    DB.get_instance().delete_syn(synonym_id)
+    return "success", 200
 
+@app.route("/delete/paraphrase", methods=['DELETE'])
+@jwt_required()
+def delete_par():
+    paraphrase_id = request.args.get('paraphrase_id')
+    print("paraphrase_id:", paraphrase_id)
+    paraphrase_id = literal_eval(paraphrase_id)
+    print("paraphrase_id:", paraphrase_id)
+    if not DB.get_instance().isUserAdmin(current_user):
+        return "don't have enough permission", 500
+    DB.get_instance().delete_par(paraphrase_id)
+    return "success", 200
+
+@app.route("/delete/family", methods=['DELETE'])
+@jwt_required()
+def delete_family():
+    word_id = request.args.get('word_id')
+    print("word_id:", word_id)
+    word_id = literal_eval(word_id)
+    print("word_id:", word_id)
+    if not DB.get_instance().isUserAdmin(current_user):
+        return "don't have enough permission", 500
+    DB.get_instance().delete_family(word_id)
+    return "success", 200

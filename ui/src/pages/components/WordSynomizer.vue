@@ -73,7 +73,7 @@
 <script>
 import axios from "axios";
 import { AHMET_API, getHeader } from "../../config";
-// import { AhmetService } from "../../service/AhmetService";
+import { AhmetService } from "../../service/AhmetService";
 
 export default {
   data() {
@@ -86,11 +86,16 @@ export default {
       selectedSyn: null,
       overlayTarget: null,
       clickedElHref: "",
+      second_part: "",
     };
   },
 
   methods: {
+    forceRerender() {
+      this.synomized_counter = 0;
+    },
     async send_to_synomize() {
+      this.forceRerender();
       await axios
         .post(
           `${AHMET_API}/search/word/`,
@@ -122,6 +127,7 @@ export default {
         this.handleClick(e);
         console.log("temp_testing_div2 clicked!", this.clickedElHref);
         console.log("clickkedRef:", clickkedRef);
+        this.second_part = clickkedRef;
         console.log("family:", family);
         this.optionSynonyms = [
           {
@@ -156,11 +162,19 @@ export default {
       console.log("toggle: ", event.target);
       this.$refs.op.toggle(event);
     },
-    onSynonymTap() {
+    async onSynonymTap() {
+      const responsen = await AhmetService.research(
+        this.optionSynonyms[0].synonym,
+        this.selectedSyn.synonym
+      );
       console.log(this.optionSynonyms);
       console.log("selectedSyn: ", this.selectedSyn);
       console.log("selectedSyn: ", this.selectedSyn.synonym);
-      this.overlayTarget.innerText = this.selectedSyn.synonym;
+      if (this.optionSynonyms[0].synonym.includes(this.selectedSyn.synonym)) {
+        this.overlayTarget.innerText = this.optionSynonyms[0].synonym;
+      } else {
+        this.overlayTarget.innerText = responsen;
+      }
       this.closeOverlayPanel();
     },
     closeOverlayPanel() {

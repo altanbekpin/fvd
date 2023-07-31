@@ -8,8 +8,9 @@ class Finder:
         self.word = word
         self._stcs = _stcs
         self._length = _length
-    solid = ['а', 'о', 'ы', 'у']
-    soft = ['ә', 'ө', 'і', 'е', 'и', 'э']
+        self._trash_part = ""
+    solid = ['а', 'о', 'ы', 'у', 'я']
+    soft = ['ә', 'ө', 'і', 'е', 'и', 'э', 'ү']
     
     def get_addition(self, part, founded=[]):
         if self.isResearchable() and len(self._stcs[0][self._length])>3:
@@ -76,9 +77,11 @@ class Finder:
         return depence
 
     def get_suffix(self, symbol, word, founded):
+        print("symbol:", symbol)
         is_soft = self.is_soft(word)
         result = self.get_addition(symbol, founded)
-        suffix = Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe
+        # suffix = Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe
+        suffix = self.suffix_helper(symbol)
         if len(result) == 1 and result != 'а' and result != 'е':
             return result
         index = suffix.index(result)
@@ -94,6 +97,34 @@ class Finder:
         else:
             result = suffix[index-1]
         return result
+    
+    def suffix_helper(self, symbol):
+        if symbol == "AdjectivesToNoun":
+            return Suffix.AdjectivesToNoun
+        if symbol == "NamesToNoun":
+            return Suffix.NamesToNoun
+        if symbol == "MimicsToNoun":
+            return Suffix.MimicsToNoun
+        if symbol == "VerbsToNoun":
+            return Suffix.VerbsToNoun
+        if symbol == "VWFI":
+            return Suffix.VWFI
+        if symbol == "NounsToAdjective":
+            return Suffix.NounsToAdjective
+        if symbol == "VerbsToAdjective":
+            return Suffix.VerbsToAdjective
+        if symbol == "NamesToVerbs":
+            return Suffix.NamesToVerbs
+        if symbol == "VerbsToVerbs":
+            return Suffix.VerbsToVerbs
+        if symbol == "Kosemshe":
+            return Suffix.Kosemshe
+        if symbol == "Esimshe":
+            return Suffix.Esimshe
+        if symbol == "KosemsheEsimshePlusTaueldik":
+            return Suffix.KosemsheEsimshePlusTaueldik
+        if symbol == "VerbsToEsimshe":
+            return Suffix.VerbsToEsimshe
     def get_tabys(self, word):
         ending = word[-1]
         tyti = ['б', 'в', 'г' ,'д', 'к' ,'қ' ,'п' ,'с' ,'т' ,'х' ,'ц' ,'ч','ф']
@@ -121,12 +152,13 @@ class Finder:
         tate = ['б', 'в', 'г' ,'д', 'к' ,'қ' ,'п' ,'с' ,'т' ,'х' ,'ц' ,'ч','ф']
         dade = ['а', 'о', 'ы', 'і', 'е', 'я', 'ж' ,'з', 'й','и', 'м', 'н', 'ң', 'л', 'у', 'р', 'ю']
         ending = word[-1]
+        print("checking for soft:", word)
         is_soft = self.is_soft(word)
         second_form = self.get_second_form()
         if second_form == 'POSS.3SG':
             if is_soft:
-                return 'нда'
-            return 'нде' 
+                return 'нде'
+            return 'нда' 
         if ending in tate:
             if is_soft:
                 return 'те'
@@ -135,6 +167,7 @@ class Finder:
             if is_soft:
                 return 'де'
             return 'да'
+
         
         return self.get_addition('Loc')
     
@@ -214,7 +247,13 @@ class Finder:
                 soft_count += 1
             elif i in self.solid:
                 solid_count += 1
-        return soft_count > solid_count
+        return soft_count >= solid_count
+    
+    def get_trash_part(self):
+        return self._trash_part
+    
+    def set_trash_part(self, trash):
+        self._trash_part = trash
     
     def get_second_form(self):
         for i in self._stcs[0][self._length][2]:
@@ -226,11 +265,15 @@ class Finder:
         return symbol in self._stcs[0][self._length][4].split('.')
     
     def add_correct_remainder(self, remainder):
+        print("remainder:", remainder)
+        print("self.get_family:", self.get_family())
         definition = ''
         name = ''
         suffix = Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe
         if remainder in suffix:
-            definition = Suffix.CheckForDefinition(Suffix,ending=remainder, pos=Word.get_pos_names(self.get_family))
+            definition = Suffix.CheckForDefinition(Suffix,ending=remainder, pos=Word.get_pos_names(self.get_family()))
+            if definition == "":
+                definition = Suffix.CheckForDefinition2(Suffix,ending=remainder)
             name = 'жұрнақ'
         septik = Septik.Ilik +Septik.Barys + Septik.Atau + Septik.Jatys + Septik.Komektes + Septik.Shygys + Septik.Tabys
         if remainder in septik:
@@ -248,8 +291,13 @@ class Finder:
         if remainder in koptik:
             definition = Koptik.CheckForDefinition(Koptik,remainder)
             name = 'Көптік жалғау'
+        print("definition:", definition)
+        print("name:", name)
+        if(name == ""):
+            self.set_trash_part(remainder)
         self._stcs[0][self._length][2].append([remainder, definition, name])
         self._stcs[0][self._length][4] = self._stcs[0][self._length][4] + f"{definition}."
+        print("self._stcs:", self._stcs)
         
 
             
@@ -260,7 +308,7 @@ class Word(Finder):
         self.word = word.lower()
         sentences = st(word)
         self._stcs = Lemms.get_instance().get_kaz_lemms(sentences)
-        print("_stcs:", self._stcs)
+        print("self._stcs:".upper(), self._stcs)
         self._length = self.get_length()
         self.synomized_count = synomized_count
         self._synonyms = synonyms
@@ -268,6 +316,7 @@ class Word(Finder):
         self.first_part = ''
         self._synonym = ''
         self._plural = ''
+        self.first_synonym = ''
         super().__init__(self._stcs, self._length, self.word)
 
     def get_ending_first_part(self):
@@ -282,10 +331,11 @@ class Word(Finder):
         return self._search_property('POSS.1SG')
     
     suffix_symbols = ['AdjectivesToNoun', 'NamesToNoun', 'MimicsToNoun', 'VerbsToNoun', 'NounsToAdjective', 'VerbsToAdjective', 'NamesToVerbs', 'VerbsToVerbs', 'Kosemshe', 'Esimshe', 'KosemsheEsimshePlusTaueldik', 'VerbsToEsimshe']
-    def get_researhed_part(self):
+    def get_researhed_part(self, researhed_part=None):
         jiktik = ['P1SG1', 'P1PL1', 'P2SG1', 'P2SG.P1', 'P3SG']
         founded = []
-        researhed_part = self.get_first_part()
+        if researhed_part is None:
+            researhed_part = self.get_first_part()
         if self.isResearchable() and self.has_second_part:
             for i in self.get_parts():
                 if i == 'Gen':
@@ -315,7 +365,7 @@ class Word(Finder):
         jiktik = ['P1SG1', 'P1PL1', 'P2SG1', 'P2SG.P1', 'P3SG']
         founded = []
         if self.isResearchable() and self.has_second_part:
-            print("PARTS:", parts)
+            print("parts:".upper(), parts)
             for i in parts:
                 if i == 'Gen':
                     self.set_synonym(self.get_synonym() + self.get_ilik(self.get_synonym()))
@@ -342,16 +392,16 @@ class Word(Finder):
     def isResearchable(self):
         return (not (len(self._stcs) == 0)) and (len(self._stcs[0][0]) > 2) and not(" " in self.word.strip())
     def has_second_part(self) -> bool:
-        print('#################')
+        
         get_first_part = self.get_first_part().lower()
         word = self.word.lower()
-        print(get_first_part == word)
-        print('#################')
+        
+        
         return get_first_part != word
     def get_first_part(self) -> str:
         if self.isResearchable():
             self.first_part = self._stcs[0][self._length][3]
-            print("self.first_part:", self.first_part)
+            
         else:
             self.first_part = self.word
         return self.first_part.strip()
@@ -365,17 +415,31 @@ class Word(Finder):
     def get_second_part(self):
         second = ''
         if self.has_second_part():
+            print("******************************************************************")
+            print("self.get_researhed_part():",self.get_researhed_part())
+            print("******************************************************************")
             remainder = Word.find_extra_chars(self.get_researhed_part(), self.word)
             if remainder != '':
                 self.add_correct_remainder(remainder)
         return second
+    
+    def get_first_synonym(self):
+        return self.first_synonym
+
     def look_for_synonym(self):
         if self.isResearchable():
             family = self.get_family()
             first_part= self.get_first_part()
-            print("first:", first_part)
             synonym, synomized_count = DB.get_instance().findsyn(first_part, self.synomized_count, self._synonyms, Word.get_pos_names(family))
-            print("SYNONYM:", synonym)
+            if len(synonym.split(" "))>1:
+                syn_temp = synonym.split(" ")[len(synonym.split(" "))-1]
+                self.first_synonym = synonym.split(" ")[:len(synonym.split(" "))-1]
+                temp = ""
+                for i in self.first_synonym:
+                    temp = temp + " " + i
+                self.first_synonym = temp
+                synonym = syn_temp
+                print("synonym:".upper(), synonym)
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count
                 self.set_synonym(synonym.lower() + self.get_second_part())
@@ -400,7 +464,7 @@ class Word(Finder):
         return self._synonym
     
     def set_synonym(self, new_synonym):
-        print("NEW SYNONYM:", new_synonym)
+        
         self._synonym = new_synonym
 
     def capitalize_synonym(self):

@@ -146,7 +146,7 @@ export default {
           items: [
             {
               label: "Мектеп оқулықтары терминологиясы",
-              icon: "pi pi-file-word",
+              icon: "pi pi-align-left",
               to: "/schoolterminology",
             },
           ],

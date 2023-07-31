@@ -33,6 +33,11 @@ const routes = [
         component: () => import("./pages/SchoolTerminology"),
       },
       {
+        path: "/childrenterminology",
+        name: "childrenterminology",
+        component: () => import("./pages/ChildrenTerminology"),
+      },
+      {
         path: "intelect",
         name: "intelect",
         component: () => import("./pages/Intelect.vue"),

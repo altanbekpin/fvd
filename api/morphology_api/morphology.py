@@ -243,7 +243,6 @@ class Lemms:
                 token = token.lower()
                 while len(token) > 0:
                     token = token[:-1] + self.change_syngor( token[-1:])
-                    print("token:", token)
                     cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s))", (token,))
                     for result in cur.fetchall():
                         if (not(token in kaz_stop_words)):
@@ -255,7 +254,6 @@ class Lemms:
                             endings = []
                             endsStr = ""
                             for app in words[-1].Appendixes:
-
                                 endings.append([app.AppendixString, app.AppName, app.PosName])
                                 endsStr += app.AppName + "."
                             lemms.append(

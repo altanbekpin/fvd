@@ -27,16 +27,23 @@
           class="card temp"
           style="width: 500px; height: 560px; position: relative"
         >
-          <SynonymSearcher @custom-event="showDialog" />
+          <SynonymSearcher
+            @custom-event="showDialog"
+            @childEvent="showToast"
+            @add-word="showSynToast"
+          />
         </div>
       </div>
     </div>
-
     <div
       class="card temp-mobile"
       style="width: 100%; height: 100%; position: relative; min-height: 560px"
     >
-      <SynonymSearcher @custom-event="showDialog" />
+      <SynonymSearcher
+        @custom-event="showDialog"
+        @childEvent="showToast"
+        @add-word="showSynToast"
+      />
     </div>
     <Dialog
       v-model:visible="visible"
@@ -133,6 +140,40 @@ const onSearchTap = async () => {
   showSynAdd.value = true;
   console.log("showSynAdd.value: ", showSynAdd.value);
   return;
+};
+const showSynToast = (event) => {
+  if (event) {
+    toast.add({
+      severity: "success",
+      summary: "Қабылданды",
+      detail: "Сәтті жүзеге асырылды",
+      life: 3000,
+    });
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Ақау",
+      detail: "Операция жүзеге асырылмады",
+      life: 3000,
+    });
+  }
+};
+const showToast = (data) => {
+  if (data == "success") {
+    toast.add({
+      severity: "success",
+      summary: "Қабылданды",
+      detail: "Сәтті жүзеге асырылды",
+      life: 3000,
+    });
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Ақау",
+      detail: "Операция жүзеге асырылмады",
+      life: 3000,
+    });
+  }
 };
 // eslint-disable-next-line no-unused-vars
 const onSynonymTap = async () => {

@@ -106,8 +106,42 @@ class Suffix(Appendix):
         if (self.AppName != ""):
             self.AppendixString = ending
         return self.AppName
+    
+    def CheckForDefinition2(self, ending):
+        if ending in self.AdjectivesToNoun:
+            self.AppName = "AdjectivesToNoun"
+        if ending in self.NamesToNoun:
+            self.AppName = "NamesToNoun"
+        if ending in self.MimicsToNoun:
+            self.AppName = "MimicsToNoun"
+        if ending in self.VerbsToNoun:
+            self.AppName = "VerbsToNoun"
+        if ending in self.NounsToAdjective:
+            self.AppName = "NounsToAdjective"
+        if ending in self.VerbsToAdjective:
+            self.AppName = "VerbsToAdjective"
+        if ending in self.NamesToVerbs:
+            self.AppName = "NamesToVerbs"
+        if ending in self.VerbsToVerbs:
+            self.AppName = "VerbsToVerbs"
+        if ending in self.Kosemshe:
+            self.AppName = "Kosemshe"
+        if ending in self.Esimshe:
+            self.AppName = "Esimshe"
+        if ending in self.KosemsheEsimshePlusTaueldik:
+            self.AppName = "KosemsheEsimshePlusTaueldik"
+        if ending in self.VerbsToEsimshe:
+            self.AppName = "VerbsToEsimshe"
+        if (self.AppName != ""):
+            self.AppendixString = ending
+        return self.AppName
+    
     def CheckForDefinition(self, pos, ending):
         #print("SELF POS SUFFIX=", pos)
+        print("##########################")
+        print("POS:", pos)
+        print("ending:", ending)
+        print("##########################")
         if (pos == self.POS_VERB):
             for ve in self.VerbsToEsimshe:
                 if ve == ending:
