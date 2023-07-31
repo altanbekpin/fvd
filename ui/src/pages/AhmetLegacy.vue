@@ -290,7 +290,7 @@ const onNodeExpand = (node) => {
 const path_to_download = ref("");
 const showFile = ref(false);
 const getFile = (fileID) => {
-  path_to_download.value = "http://localhost:5001/legacy/download/" + fileID;
+  path_to_download.value = `${AHMET_API}/legacy/download/` + fileID;
   console.log(fileID);
   showFile.value = true;
   // axios
