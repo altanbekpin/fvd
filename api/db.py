@@ -272,10 +272,14 @@ class DB(DatabaseOperations):
     
     def findword(self, data, family=None):
         if family is None:
-            query = 'SELECT DISTINCT id, words_family, status, meaning, words, pos, example FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s));'
+            query = '''SELECT DISTINCT s.id, words_family, status, meaning, words, pos, example FROM synamizer s
+                INNER JOIN offers o ON offer_id = s.id
+                WHERE LOWER(TRIM(s.words)) = LOWER(TRIM(%s)) AND o.activated = true;'''
             temp_families = self._select_all_query(query, (data,))
             return temp_families
-        query = 'SELECT DISTINCT id, status,words_family, meaning, words FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(words_family)) = LOWER(TRIM(%s));'
+        query = '''SELECT DISTINCT s.id, status,words_family, meaning, words FROM synamizer s
+        INNER JOIN offers o ON o.offer_id = s.id
+        WHERE LOWER(TRIM(s.words)) = LOWER(TRIM(%s)) AND LOWER(TRIM(s.words_family)) = LOWER(TRIM(%s)) AND o.activated = true;'''
         return self._select_all_query(query, (data, family))
 
     def find_similarword(self, data):
