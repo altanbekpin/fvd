@@ -149,6 +149,11 @@ export default {
               icon: "pi pi-align-left",
               to: "/schoolterminology",
             },
+            {
+              label: "Кіші сынып оқулықтары терминологиясы",
+              icon: "pi pi-align-left",
+              to: "/childrenterminology",
+            },
           ],
         },
         {

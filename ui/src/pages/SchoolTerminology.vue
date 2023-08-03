@@ -43,15 +43,6 @@
         <template #body="{ data }">
           {{ data.termin }}
         </template>
-        <!-- <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-              placeholder="Search by name"
-            />
-          </template> -->
       </Column>
       <Column
         header="Түсіндірмесі"
@@ -61,15 +52,6 @@
         <template #body="{ data }">
           <span>{{ data.definition }}</span>
         </template>
-        <!-- <template #filter="{ filterModel, filterCallback }">
-            <InputText
-              v-model="filterModel.value"
-              type="text"
-              @input="filterCallback()"
-              class="p-column-filter"
-              placeholder="Search by country"
-            />
-          </template> -->
       </Column>
       <Column
         header="Пән"
@@ -82,16 +64,6 @@
           <span>{{ data.subject }}</span>
         </template>
         <template #filter="{ filterModel, filterCallback }">
-          <!-- <Dropdown
-            v-model="filterModel.value"
-            @change="filterCallback()"
-            :options="subjects"
-            placeholder="Пән тандаңыз"
-            optionLabel="subject"
-            class="p-column-filter"
-            style="min-width: 12rem"
-            :showClear="true"
-          > -->
           <Dropdown
             @change="filterCallback()"
             v-model="filterModel.value"
@@ -101,39 +73,6 @@
           >
           </Dropdown>
         </template>
-        <!-- <template #body="{ data }">
-            <div class="flex align-items-center gap-2">
-              <img
-                :alt="data.representative.name"
-                :src="`https://primefaces.org/cdn/primevue/images/avatar/${data.representative.image}`"
-                style="width: 32px"
-              />
-              <span>{{ data.representative.name }}</span>
-            </div>
-          </template>
-          <template #filter="{ filterModel, filterCallback }">
-            <MultiSelect
-              v-model="filterModel.value"
-              @change="filterCallback()"
-              :options="representatives"
-              optionLabel="name"
-              placeholder="Any"
-              class="p-column-filter"
-              style="min-width: 14rem"
-              :maxSelectedLabels="1"
-            >
-              <template #option="slotProps">
-                <div class="flex align-items-center gap-2">
-                  <img
-                    :alt="slotProps.option.name"
-                    :src="`https://primefaces.org/cdn/primevue/images/avatar/${slotProps.option.image}`"
-                    style="width: 32px"
-                  />
-                  <span>{{ slotProps.option.name }}</span>
-                </div>
-              </template>
-            </MultiSelect>
-          </template> -->
       </Column>
       <Column
         field="class"
@@ -146,16 +85,6 @@
           <span>{{ data.class }}</span>
         </template>
         <template #filter="{ filterModel, filterCallback }">
-          <!-- <Dropdown
-            v-model="filterModel.value"
-            @change="filterCallback()"
-            :options="classes"
-            placeholder="Сынып тандаңыз"
-            class="p-column-filter"
-            style="min-width: 12rem"
-            :showClear="true"
-          >
-          </Dropdown> -->
           <Dropdown
             @change="filterCallback()"
             v-model="filterModel.value"

@@ -1,4 +1,4 @@
-<template>
+<template lang="">
   <div class="card">
     <div style="font-size: 20px; margin-right: 450px; margin-left: 50px">
       Мектеп пәндерінің терминдер жинағы
@@ -15,7 +15,6 @@
       dataKey="id"
       filterDisplay="row"
       :totalRecords="totalRecords"
-      :loading="loading"
       @page="onPage($event)"
       @sort="onSort($event)"
       @filter="onFilter($event)"
@@ -37,8 +36,16 @@
           </span>
         </div>
       </template>
-      <template #empty> No customers found. </template>
-      <template #loading> Loading customers data. Please wait. </template>
+      <template #empty
+        ><div class="centered-content">
+          <AnimationComp />
+        </div>
+      </template>
+      <template #loading>
+        <div class="centered-content">
+          <AnimationComp />
+        </div>
+      </template>
       <Column field="termin" header="Термин" style="min-width: 12rem">
         <template #body="{ data }">
           {{ data.termin }}
@@ -220,19 +227,27 @@ export default {
     console.log("subjects:", this.subjects);
     this.loadLazyData();
   },
+
   watch: {
     "filters.global.value": function (newValue) {
+      // Call your function here
       this.lazyParams.word = newValue;
       this.loadLazyData();
     },
   },
   methods: {
+    async delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    },
     async loadLazyData() {
       this.loading = true;
-      const count = await AhmetService.countSchoolTermins();
+      this.customers = null;
+      const count = await AhmetService.countChildrenTermins();
       console.log("count:", count);
       this.totalRecords = count["data"]["count"];
       console.log("this.totalRecords:", this.totalRecords);
+      this.lazyParams.isChildren = true;
+      await this.delay(2000);
       const object = await AhmetService.getSchoolTermins({
         data: this.lazyParams,
       });
@@ -324,5 +339,12 @@ export default {
 <style scoped>
 .input-span {
   margin-left: auto;
+}
+.centered-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100%; /* Set an appropriate height if necessary */
 }
 </style>

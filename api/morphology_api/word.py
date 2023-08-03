@@ -30,6 +30,15 @@ class Word:
             if (app.AppName == "Kosemshe"):
                 return True
         return False
+    def IsTuyiqEtistik(self):
+        if (self.CurrentPOS != Suffix.POS_VERB):
+            return False
+        if (len(self.Appendixes) == 0):
+            return False
+        for app in self.Appendixes:
+            if (app.AppName == "VerbsToVerbs") and app.AppendixString == 'у':
+                return True
+        return False
     def GetAppendixes(self):
         appendix = Ending
         if (len(self.AppendixPart) == 0):
@@ -63,7 +72,7 @@ class Word:
             return
         appendixPart = self.AppendixPart
         while (len(appendixPart) > 0):
-            if (self.CurrentPOS in [Suffix.POS_NOUN, Suffix.POS_ADJECTIVE, Suffix.POS_PRONOUN, Suffix.POS_NUMERAL] or (self.CurrentPOS == Suffix.POS_VERB and self.IsEsimshe())):
+            if (self.CurrentPOS in [Suffix.POS_NOUN, Suffix.POS_ADJECTIVE, Suffix.POS_PRONOUN, Suffix.POS_NUMERAL] or (self.CurrentPOS == Suffix.POS_VERB and (self.IsEsimshe() or self.IsTuyiqEtistik()))):
                 appendix = Koptik
                 appendix.AppName = ""
                 appendix.AppendixString = ""

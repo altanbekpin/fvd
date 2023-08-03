@@ -11,7 +11,8 @@ def getTermins():
     first = data['first']
     filters = data["filters"]
     word = data.get("word", "")
-    schoolTermins = DB.get_instance().getSchoolTermins(first, filters, word)
+    isChildren = data.get("isChildren", "")
+    schoolTermins = DB.get_instance().getSchoolTermins(first, filters, word, isChildren)
     return schoolTermins
 
 @app.route("/countTermins", methods=['GET'])
@@ -20,11 +21,11 @@ def countTermins():
     amoung = DB.get_instance().countSchoolTermins()
     return amoung
 
-# @app.route("/countChildrenTermins", methods=['GET'])
-# def countChildrenTermins():
-#     print("/countChildrenTermins")
-#     amoung = DB.get_instance().countSchoolTermins()
-#     return amoung
+@app.route("/countChildrenTermins", methods=['GET'])
+def countChildrenTermins():
+    print("/countChildrenTermins")
+    amoung = DB.get_instance().countSchoolTermins(isChildren=True)
+    return amoung
 
 @app.route("/add/termin", methods=['POST'])
 @jwt_required()

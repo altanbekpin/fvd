@@ -18,8 +18,14 @@ export const AhmetService = {
       getHeader()
     );
   },
+
   async countSchoolTermins() {
     return await api.get(AHMET_API + "/countTermins", { headers: getHeader() });
+  },
+  async countChildrenTermins() {
+    return await api.get(AHMET_API + "/countChildrenTermins", {
+      headers: getHeader(),
+    });
   },
   async getSubjects() {
     return await api.get(AHMET_API + "/get/class/subject", {

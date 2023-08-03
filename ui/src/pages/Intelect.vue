@@ -91,9 +91,9 @@ export default {
   async mounted() {
     this.getJson(`${AHMET_API}/getontology/ask/`);
     const self = this;
+    this.loading = true;
     window.DoSubmit = async function (text) {
       console.log(text);
-      this.loading = true;
       self.textController = text;
       var reqbody = {
         question: text,
@@ -106,8 +106,8 @@ export default {
       console.log(temp.data);
       self.OntoInner = temp.data;
       self.textController = text;
-      this.loading = false;
     };
+    this.loading = false;
     console.log(this.OntNames.length);
   },
   watch: {

@@ -309,11 +309,7 @@ const addWord = () => {
     });
     return;
   }
-  if (
-    synonymInput.value != "" &&
-    inputValues.value != "" &&
-    meaningInput.value != ""
-  ) {
+  if (inputValues.value != "" && selectedFamily.value != "") {
     try {
       AhmetService.addWord(
         synonymInput,
@@ -343,6 +339,7 @@ const addWord = () => {
     meaningInput.value = "";
     selectedFamily.value = "";
     paraphraseInput.value = "";
+    exampleInput.value = "";
   } else {
     toast.add({
       severity: "error",

@@ -12,6 +12,7 @@
         />
       </div>
       <div
+        v-show="loading == false"
         class="card"
         style="
           width: 100%;
@@ -67,6 +68,18 @@
           </OverlayPanel>
         </div>
       </div>
+      <Skeleton
+        v-show="loading"
+        style="
+          width: 100%;
+          margin-top: 10px;
+          margin-bottom: 10px;
+          overflow: hidden;
+          height: 130px;
+          max-height: 130px;
+          padding-bottom: 40px;
+        "
+      ></Skeleton>
     </div>
   </div>
 </template>
@@ -87,6 +100,7 @@ export default {
       overlayTarget: null,
       clickedElHref: "",
       second_part: "",
+      loading: false,
     };
   },
 
@@ -95,6 +109,7 @@ export default {
       this.synomized_counter = 0;
     },
     async send_to_synomize() {
+      this.loading = true;
       this.forceRerender();
       await axios
         .post(
@@ -109,6 +124,7 @@ export default {
           this.synomized_words = response.data[0];
           this.synomized_counter = response.data[1];
         });
+      this.loading = false;
     },
     async handleLineClick(e) {
       this.clickedElHref = e.target.getAttribute("href");

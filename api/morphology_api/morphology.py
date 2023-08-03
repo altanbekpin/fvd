@@ -169,6 +169,14 @@ class Lemms:
         if symbol == u'ю':
             return u'й'
         return symbol
+    def change_syngor_reverse(self, symbol):
+        if symbol == 'к':
+            return u'г'
+        if symbol == 'қ':
+            return u'ғ'
+        if symbol == 'п':
+            return u'б'
+        return symbol
 
     def get_pos_names(self, pos):
         PosName = ""
@@ -241,7 +249,7 @@ class Lemms:
                     continue
                 token_found = False
                 token = token.lower()
-                while len(token) > 0:
+                while len(token) > 0 and not(token_found):
                     token = token[:-1] + self.change_syngor( token[-1:])
                     cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s))", (token,))
                     for result in cur.fetchall():
@@ -251,6 +259,8 @@ class Lemms:
                             appendix = sttoken[len(token):]
                             words.append(Word(result[0], int(result[1]), appendix, False))
                             words[-1].GetAppendixes()
+                            print(token)
+                            print(appendix)
                             endings = []
                             endsStr = ""
                             for app in words[-1].Appendixes:

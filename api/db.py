@@ -183,7 +183,7 @@ class DB(DatabaseOperations):
             return synonyms
         return synonyms
     
-    def getSchoolTermins(self, first, filters, word):
+    def getSchoolTermins(self, first, filters, word,isChildren=False):
         second = first + 10
         school_class = filters["class"]["value"]
         subject = filters['subject']["value"]
@@ -200,6 +200,9 @@ class DB(DatabaseOperations):
         if school_class:
             conditions.append("class = %s")
             params.append(school_class)
+        
+        if not school_class and isChildren:
+            conditions.append("class <= 4")
 
         if subject:
             conditions.append("subject_id = %s")
@@ -209,19 +212,24 @@ class DB(DatabaseOperations):
             params.append(f"{word}%")
             params.append(f"{word}%")
 
+
+
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
         query += " OFFSET %s LIMIT %s;"
 
         params.extend([first, second])
-        
+        print("QUERY:", query)
         data = self._select_all_query(query, params)
         return data
 
         
-    def countSchoolTermins(self):
-        count = self._select_one_query("SELECT COUNT(*) FROM school_termins")
+    def countSchoolTermins(self, isChildren=False):
+        if isChildren:
+            count = self._select_one_query("SELECT COUNT(*)FROM school_termins WHERE class <= 4")
+        else:
+            count = self._select_one_query("SELECT COUNT(*) FROM school_termins")
         return count
     
     def getLegacies(self, parent_id):
@@ -237,7 +245,6 @@ class DB(DatabaseOperations):
     def get_download_legacy_path(self, file_id):
         results = self._select_all_query("SELECT path from legacy WHERE id = %s",[file_id])
         for row in results:
-            
             path = row.get('path')
         return path
     

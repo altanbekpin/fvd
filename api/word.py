@@ -1,5 +1,5 @@
 
-from morphology_api.morphology import Lemms
+from morphology_api.morphology import Lemms, is_soft
 from nltk.tokenize import sent_tokenize as st
 from db import DB
 from morphology_api.appendix import Suffix, Septik, Jiktik, Taueldik, Koptik
@@ -148,28 +148,19 @@ class Finder:
         
         return self.get_addition('Acc')
         
-    def get_jatys(self, word):
-        tate = ['б', 'в', 'г' ,'д', 'к' ,'қ' ,'п' ,'с' ,'т' ,'х' ,'ц' ,'ч','ф']
-        dade = ['а', 'о', 'ы', 'і', 'е', 'я', 'ж' ,'з', 'й','и', 'м', 'н', 'ң', 'л', 'у', 'р', 'ю']
-        ending = word[-1]
-        print("checking for soft:", word)
+    def get_jatys(self, word, founded):
+        symbol = 'Loc'
+        Jatys = Septik.Jatys
+        result = self.get_addition(symbol, founded)
         is_soft = self.is_soft(word)
-        second_form = self.get_second_form()
-        if second_form == 'POSS.3SG':
-            if is_soft:
-                return 'нде'
-            return 'нда' 
-        if ending in tate:
-            if is_soft:
-                return 'те'
-            return 'та'
-        if ending in dade:
-            if is_soft:
-                return 'де'
-            return 'да'
-
-        
-        return self.get_addition('Loc')
+        if (is_soft and self.is_soft(result) or ((not is_soft) and (not self.is_soft(result)))):
+            return result
+        index = Jatys.index(result)
+        if is_soft:
+            result = Jatys[index+1]
+        else:
+            result = Jatys[index-1]
+        return result
     
     def get_shygys(self, word):
         nannen = ['м','н', 'ң']
@@ -349,7 +340,7 @@ class Word(Finder):
                 elif i == 'Acc':
                     researhed_part += self.get_tabys(researhed_part)
                 elif i == 'Loc':
-                    researhed_part += self.get_jatys(researhed_part)
+                    researhed_part += self.get_jatys(researhed_part, [])
                 elif i == 'Abl':
                     researhed_part += self.get_shygys(researhed_part)
                 elif i == 'Inst':
@@ -366,28 +357,36 @@ class Word(Finder):
         founded = []
         if self.isResearchable() and self.has_second_part:
             print("parts:".upper(), parts)
+            synonym = self.get_synonym()
+            #if len(parts) >0 and parts[0]:
+            app = ""
             for i in parts:
                 if i == 'Gen':
-                    self.set_synonym(self.get_synonym() + self.get_ilik(self.get_synonym()))
+                   app += self.get_ilik(self.get_synonym())
                 elif i == 'PL':
-                    self.set_synonym(self.get_synonym() + self.get_plural(self.get_synonym()))
+                    app+= self.get_plural(self.get_synonym())
                 elif 'POSS' in i:
-                    self.set_synonym(self.get_synonym() + self.get_taueldy(self.get_depence(), self.get_synonym()))
+                    app+= self.get_taueldy(self.get_depence(), self.get_synonym())
                 elif i == 'Dir':
-                    self.set_synonym(self.get_synonym() + self.get_barys(self.get_synonym(), 'Dir', founded))
+                    app+= self.get_barys(self.get_synonym(), 'Dir', founded)
                 elif i == 'Acc':
-                    self.set_synonym(self.get_synonym()+self.get_tabys(self.get_synonym()))
+                    app+= self.get_tabys(self.get_synonym())
                 elif i == 'Loc':
-                    self.set_synonym(self.get_synonym()+self.get_jatys(self.get_synonym()))
+                    app+= self.get_jatys(self.get_synonym(), [])
                 elif i == 'Abl':
-                    self.set_synonym(self.get_synonym()+self.get_shygys(self.get_synonym()))
+                    app+= self.get_shygys(self.get_synonym())
                 elif i == 'Inst':
-                    self.set_synonym(self.get_synonym()+self.get_komektes(self.get_synonym()))
+                    app+= self.get_komektes(self.get_synonym())
                 elif i in jiktik:
-                    self.set_synonym(self.get_synonym()+self.get_jiktik(self.get_synonym(), i))
+                    app+= self.get_jiktik(self.get_synonym(), i)
                 elif i in self.suffix_symbols:
-                    self.set_synonym(self.get_synonym()+self.get_suffix(i, self.get_synonym(), founded))
-
+                    app+= self.get_suffix(i, self.get_synonym(), founded)
+                if parts.index(i) == 0 and len(app)>0:
+                    if synonym[-1] in ['к', 'қ','п'] and is_soft(app[0]):
+                        synonym = synonym[:-1] + Lemms.change_syngor_reverse(Lemms,synonym[-1])
+                        print(synonym[-1] + "QQQQQQQQQ")
+                self.set_synonym(synonym + app)
+            
     # def add_parts_to_word(self, word):
     def isResearchable(self):
         return (not (len(self._stcs) == 0)) and (len(self._stcs[0][0]) > 2) and not(" " in self.word.strip())
@@ -414,13 +413,13 @@ class Word(Finder):
 
     def get_second_part(self):
         second = ''
-        if self.has_second_part():
-            print("******************************************************************")
-            print("self.get_researhed_part():",self.get_researhed_part())
-            print("******************************************************************")
-            remainder = Word.find_extra_chars(self.get_researhed_part(), self.word)
-            if remainder != '':
-                self.add_correct_remainder(remainder)
+        # if self.has_second_part():
+        #     print("******************************************************************")
+        #     print("self.get_researhed_part():",self.get_researhed_part())
+        #     print("******************************************************************")
+        #     remainder = Word.find_extra_chars(self.get_researhed_part(), self.word)
+        #     if remainder != '':
+        #         self.add_correct_remainder(remainder)
         return second
     
     def get_first_synonym(self):
@@ -464,7 +463,6 @@ class Word(Finder):
         return self._synonym
     
     def set_synonym(self, new_synonym):
-        
         self._synonym = new_synonym
 
     def capitalize_synonym(self):
