@@ -80,7 +80,7 @@ def searchWord():
     output_words = []
     data_id = 0
     for word in words:
-        if word not in [",", ".", "!", "?", ";"] and word.strip() and not is_person_name(word, data):
+        if word not in [",", ".", "!", "?", ";", "-"] and word.strip() and not is_person_name(word, data):
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()
@@ -107,8 +107,14 @@ def searchsyn():
     data = request.json['value']
     second_part = request.json['second_part']
     family = request.json['family']
+    secondary = request.json['secondary']
+    print("secondary:", secondary)
     synonyms = []
     synonyms = DB.get_instance().findsyn_with_family(data, getTense(family))
+    print("synonyms:", synonyms)
+    if len(synonyms) == 0:
+        synonyms = DB.get_instance().findsyn_with_family(secondary, '')
+        print("synonyms2:", synonyms)
     for i in range(0, len(synonyms)):
          synonyms[i]['synonym'] = synonyms[i]['synonym']
     synonyms.insert(0, {"words":data, "synonym": data+second_part})
@@ -155,6 +161,14 @@ def synomizing():
         found_data[0]['words_family'] = family
         synonyms = DB.get_instance().findsyn_with_family(word, family)
     paraphrase = DB.get_instance().find_paraphrase_by_word(word)
+    if found_data[0].get('temp_word') is not None:
+        temp = found_data[0]['words']
+        found_data[0]['words'] = found_data[0].get('temp_word')
+        for key, val in enumerate(synonyms):
+            print("val['synonym']:", val['synonym'])
+            if val['synonym'] == found_data[0].get('temp_word'):
+                synonyms[key]['synonym'] = temp
+                print(synonyms[key])
     return jsonify([found_data[0], synonyms, paraphrase, all_words, all_families])
 
 def switch_case(argument):

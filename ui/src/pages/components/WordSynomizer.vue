@@ -157,6 +157,7 @@ export default {
             {
               value: this.clickedElHref,
               second_part: clickkedRef,
+              secondary: this.overlayTarget.innerText,
               family: family,
             },
             { headers: getHeader() }

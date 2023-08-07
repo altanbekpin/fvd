@@ -39,19 +39,21 @@ class Word:
             if (app.AppName == "VerbsToVerbs") and app.AppendixString == 'у':
                 return True
         return False
-    def GetAppendixes(self):
+    def GetAppendixes(self): #осы қолданылып тұр Мағжанда
         appendix = Ending
         if (len(self.AppendixPart) == 0):
             return
         appendixPart = self.AppendixPart
         # алдымен жұрнақтарды қарап аламыз
+        appendixlast = ""
         while (len(appendixPart) > 0):
             appendix = Suffix
             appendix.AppName = ""
             appendix.AppendixString = ""
             #print("app=" + appendixPart)
-            if (appendix.CheckForDefinition(Suffix,self.CurrentPOS, appendixPart) != ""):
+            if (appendix.CheckForDefinition(Suffix,self.CurrentPOS, appendixPart, appendixlast) != ""):
                 self.Appendixes.append(Suffix(appendix.AppendixString, appendix.AppName, appendix.ToString()))
+                appendixlast = appendixPart
                 appendixPart = self.AppendixPart[len(appendixPart):]
                 self.AppendixPart = appendixPart
                 if ("Kosemshe" in appendix.AppName):

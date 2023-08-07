@@ -148,7 +148,18 @@ class DB(DatabaseOperations):
             query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(TRIM(%s)) AND z.pos = %s;"
         synonym = self._select_one_query(query, param)
         if synonym == None:
-            return [word, synomized_count]
+            query = '''SELECT DISTINCT ON (s.words_family)
+                            s.words AS synonym
+                        FROM synonym_word sw
+                        INNER JOIN synamizer s ON sw.word_id = s.id
+                        INNER JOIN synonyms ss ON ss.id = sw.synonym_id
+                        INNER JOIN offers o ON o.offer_id = s.id
+                        WHERE LOWER(TRIM(ss.synonym)) = LOWER(TRIM(%s)) AND o.activated = true
+                        ORDER BY s.words_family, s.id;
+                        '''
+            synonym = self._select_one_query(query, param)
+            if synonym == None:
+                return [word, synomized_count]
         synomized_count += 1
         synomized_words.append(synonym.get('synonym'))
         print("synonym.get('synonym'):".upper(), synonym.get('synonym'))
@@ -158,7 +169,7 @@ class DB(DatabaseOperations):
     
     def findsyn_with_family(self, word, family):
         if family != '':
-            query = ''' SELECT s.synonym, z.words, s.id
+            query = '''SELECT s.synonym, z.words, s.id
             FROM synonyms s 
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
@@ -167,7 +178,6 @@ class DB(DatabaseOperations):
             AND sw.word_id IN (SELECT word_id FROM synonym_word WHERE synonym_id = sw.synonym_id)
             AND o.activated = true;'''
             data = (word,family)
-            
         else:
             query = '''SELECT s.synonym, z.words 
             FROM synonyms s 
@@ -276,6 +286,24 @@ class DB(DatabaseOperations):
                 INNER JOIN offers o ON offer_id = s.id
                 WHERE LOWER(TRIM(s.words)) = LOWER(TRIM(%s)) AND o.activated = true;'''
             temp_families = self._select_all_query(query, (data,))
+            if len(temp_families) == 0:
+                query = '''SELECT DISTINCT ON (s.words_family)
+                            s.id,
+                            s.words_family,
+                            s.status,
+                            s.meaning,
+                            s.words,
+                            s.pos,
+                            s.example
+                        FROM synonym_word sw
+                        INNER JOIN synamizer s ON sw.word_id = s.id
+                        INNER JOIN synonyms ss ON ss.id = sw.synonym_id
+                        INNER JOIN offers o ON o.offer_id = s.id
+                        WHERE LOWER(TRIM(ss.synonym)) = LOWER(TRIM(%s)) AND o.activated = true
+                        ORDER BY s.words_family, s.id;'''
+                temp_families = self._select_all_query(query, (data,))
+                temp_families[0]['temp_word'] = data.strip()
+                print(temp_families[0])
             return temp_families
         query = '''SELECT DISTINCT s.id, status,words_family, meaning, words FROM synamizer s
         INNER JOIN offers o ON o.offer_id = s.id

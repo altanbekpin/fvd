@@ -9,7 +9,7 @@ class Finder:
         self._stcs = _stcs
         self._length = _length
         self._trash_part = ""
-    solid = ['а', 'о', 'ы', 'у', 'я']
+    solid = ['а', 'о', 'ы', 'у', 'я', 'ұ']
     soft = ['ә', 'ө', 'і', 'е', 'и', 'э', 'ү']
     
     def get_addition(self, part, founded=[]):
@@ -80,16 +80,24 @@ class Finder:
         print("symbol:", symbol)
         is_soft = self.is_soft(word)
         result = self.get_addition(symbol, founded)
-        # suffix = Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe
+        print("result:", result)
+        print("word:", word)
         suffix = self.suffix_helper(symbol)
-        if len(result) == 1 and result != 'а' and result != 'е':
-            return result
         index = suffix.index(result)
         noise = self.solid + self.soft
+        if symbol == "VerbsToVerbs":
+            if result in Suffix.YryqsyzEtis:
+                if word[-1] in self.solid or word[-1] in self.soft:
+                    return 'л'
+                if self.is_soft(word):
+                    return 'іл'
+                return 'ыл'
         if (word[-1] in noise) and (result[0] in noise):
             for i in range(index, len(suffix)):
                 if suffix[i][0] not in noise:
                     return suffix[i]
+        if len(result) == 1 and result != 'а' and result != 'е':
+            return result
         if (is_soft and self.is_soft(result) or ((not is_soft) and (not self.is_soft(result)))) and result != word[-1]:
             return result
         if is_soft:
@@ -211,6 +219,8 @@ class Finder:
         
         
     def get_plural(self, word):
+        if word.strip() == "":
+            return ""
         ending = word.strip()[-1]
         consonantsounds = ['л', 'м', 'н', 'ң', 'з']
         tarter = ['п', 'ф', 'к', 'қ', 'т', 'с', 'ш', 'щ', 'х', 'ц', 'ч' ,'һ']
@@ -227,7 +237,6 @@ class Finder:
              if self.is_soft(word):
                 return 'дер'
              return 'дар'
-        
         return ''
         
     def is_soft(self, word):
@@ -238,7 +247,7 @@ class Finder:
                 soft_count += 1
             elif i in self.solid:
                 solid_count += 1
-        return soft_count >= solid_count
+        return soft_count > solid_count
     
     def get_trash_part(self):
         return self._trash_part
@@ -362,25 +371,25 @@ class Word(Finder):
             app = ""
             for i in parts:
                 if i == 'Gen':
-                   app += self.get_ilik(self.get_synonym())
+                   app += self.get_ilik(synonym)
                 elif i == 'PL':
-                    app+= self.get_plural(self.get_synonym())
+                    app+= self.get_plural(synonym)
                 elif 'POSS' in i:
-                    app+= self.get_taueldy(self.get_depence(), self.get_synonym())
+                    app+= self.get_taueldy(self.get_depence(), synonym)
                 elif i == 'Dir':
-                    app+= self.get_barys(self.get_synonym(), 'Dir', founded)
+                    app+= self.get_barys(synonym, 'Dir', founded)
                 elif i == 'Acc':
-                    app+= self.get_tabys(self.get_synonym())
+                    app+= self.get_tabys(synonym)
                 elif i == 'Loc':
-                    app+= self.get_jatys(self.get_synonym(), [])
+                    app+= self.get_jatys(synonym, [])
                 elif i == 'Abl':
-                    app+= self.get_shygys(self.get_synonym())
+                    app+= self.get_shygys(synonym)
                 elif i == 'Inst':
-                    app+= self.get_komektes(self.get_synonym())
+                    app+= self.get_komektes(synonym)
                 elif i in jiktik:
-                    app+= self.get_jiktik(self.get_synonym(), i)
+                    app+= self.get_jiktik(synonym, i)
                 elif i in self.suffix_symbols:
-                    app+= self.get_suffix(i, self.get_synonym(), founded)
+                    app+= self.get_suffix(i, synonym, founded)
                 if parts.index(i) == 0 and len(app)>0:
                     if synonym[-1] in ['к', 'қ','п'] and is_soft(app[0]):
                         synonym = synonym[:-1] + Lemms.change_syngor_reverse(Lemms,synonym[-1])
@@ -430,7 +439,14 @@ class Word(Finder):
             family = self.get_family()
             first_part= self.get_first_part()
             synonym, synomized_count = DB.get_instance().findsyn(first_part, self.synomized_count, self._synonyms, Word.get_pos_names(family))
+            synonym = synonym.strip()
             if len(synonym.split(" "))>1:
+                print("synonym:".upper(), synonym)
+                print("*************")
+                for i in synonym:
+                    print(i)
+                print("*************")
+                print("len(synonym.split(" ")):", len(synonym.split(" ")))
                 syn_temp = synonym.split(" ")[len(synonym.split(" "))-1]
                 self.first_synonym = synonym.split(" ")[:len(synonym.split(" "))-1]
                 temp = ""
@@ -438,7 +454,6 @@ class Word(Finder):
                     temp = temp + " " + i
                 self.first_synonym = temp
                 synonym = syn_temp
-                print("synonym:".upper(), synonym)
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count
                 self.set_synonym(synonym.lower() + self.get_second_part())
