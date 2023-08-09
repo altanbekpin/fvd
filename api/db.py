@@ -579,6 +579,14 @@ class DB(DatabaseOperations):
         self._insert_query(query, param)
         self._close_db()
 
+    def get_morpghology_data(self):
+        query = '''SELECT words FROM (
+            SELECT words FROM synamizer
+            UNION
+            SELECT synonym AS words FROM synonyms
+        ) AS combined_words;'''
+        data = self._select_all_query(query)
+        return data
 
 class User(db.Model):
     __tablename__ = 'users'

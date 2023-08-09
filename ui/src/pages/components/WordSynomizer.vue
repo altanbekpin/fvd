@@ -48,7 +48,6 @@
             ref="op"
             style="border: none; padding: 0"
             v-if="synomized_counter != 0"
-            :appendTo="'span#span-0.temp_testing_div2'"
           >
             <div class="border-inner">
               <Listbox

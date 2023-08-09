@@ -58,7 +58,9 @@ def get_pos_names( pos):
 def getHtml(first_part, second_part, data_id, translated_word, family):
     return  f'<span class="temp_testing_div2" type="button" style="color: green;" href="{first_part}"  second_part="{second_part}" family="{family}" id="span-{str(data_id)}"> {translated_word}</span>'
 
-def is_person_name(word, sentence):
+def is_person_name(word, sentence, is_first):
+    if is_first:
+        return False
     reversed_sentence = sentence[::-1]
     index = reversed_sentence.find(word[::-1])
     if index != -1:
@@ -73,23 +75,21 @@ def is_person_name(word, sentence):
 
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
+    print("/search/word/")
     synomized_count = 0
     data = request.json['value']
     synomized_words = []
     words = re.findall(r"[\w']+|[.,!?; ]", data)
     output_words = []
     data_id = 0
-    for word in words:
-        if word not in [",", ".", "!", "?", ";", "-"] and word.strip() and not is_person_name(word, data):
+    for index, word in enumerate(words):
+        if word not in [",", ".", "!", "?", ";", "-"] and word.strip() and not is_person_name(word, data, index == 0):
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()
             if isWordUpper and word_instance.has_synonym():
                 word_instance.capitalize_synonym()
             if word_instance.has_synonym():
-                print("*********************************")
-                print(f"{word_instance.get_first_synonym()} {word_instance.get_synonym()}")
-                print("*********************************")
                 word_instance.set_synonym(word_instance.get_synonym() + word_instance.get_trash_part())
                 translated_word = getHtml(word_instance.get_first_part(), word_instance.find_extra_chars(word_instance.get_first_part(), word), data_id, f"{word_instance.get_first_synonym()} {word_instance.get_synonym()}", word_instance.get_family())
                 data_id += 1
@@ -115,9 +115,10 @@ def searchsyn():
     if len(synonyms) == 0:
         synonyms = DB.get_instance().findsyn_with_family(secondary, '')
         print("synonyms2:", synonyms)
+    else:
+        synonyms.insert(0, {"words":data, "synonym": data+second_part})
     for i in range(0, len(synonyms)):
          synonyms[i]['synonym'] = synonyms[i]['synonym']
-    synonyms.insert(0, {"words":data, "synonym": data+second_part})
     print(synonyms)
     return synonyms
 

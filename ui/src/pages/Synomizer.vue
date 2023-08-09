@@ -119,28 +119,8 @@ import { AhmetService } from "@/service/AhmetService";
 import { useStore } from "vuex";
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
-const selectedWord = ref();
 const inputValues = ref([]);
-const word = ref("");
 // const inputWords = ref("");
-const meaning = ref("");
-const showSynAdd = ref(false);
-// const synomized_words = ref();
-// eslint-disable-next-line no-unused-vars
-const onSearchTap = async () => {
-  console.log("onSearchTap");
-  const selectedItem = ref({ family: "" });
-  selectedItem.value["family"];
-  const synWasFound = await handleSelection(selectedItem);
-  if (synWasFound) {
-    console.log("showSynAdd.value: ", showSynAdd.value);
-    showSynAdd.value = false;
-  }
-  inputValues.value = word.value;
-  showSynAdd.value = true;
-  console.log("showSynAdd.value: ", showSynAdd.value);
-  return;
-};
 const showSynToast = (event) => {
   if (event) {
     toast.add({
@@ -175,74 +155,22 @@ const showToast = (data) => {
     });
   }
 };
-// eslint-disable-next-line no-unused-vars
-const onSynonymTap = async () => {
-  console.log(optionSynonyms.value);
-  console.log("selectedSyn.value: ", selectedSyn.value);
-  const dataValue = targetRef.value.getAttribute("data");
-  console.log("dataValue: ", dataValue);
-  console.log("selectedSyn.value: ", selectedSyn.value.synonym);
-  targetRef.value.innerText = selectedSyn.value.synonym;
-};
 const visible = ref(false);
-// eslint-disable-next-line no-unused-vars
-const families = ref([
-  { family: "етістік" },
-  { family: "зат есім" },
-  { family: "сын есім" },
-  { family: "сан есім" },
-]);
 
-const selectedSyn = ref();
 const optionSynonyms = ref([{ synonym: "синоним жоқ", words: "" }]);
 console.log(optionSynonyms.value);
-
-const handleSelection = async (selectedItem) => {
-  console.log("Selected item:", selectedItem.value["family"]);
-  const event = {
-    target: {
-      value: word.value,
-    },
-  };
-  return await onChange(event, selectedItem.value["family"]);
-};
-const targetRef = ref(null);
 document.addEventListener("click", function (event) {
   console.log("tapped");
   var listBox = document.querySelector(".listbox"); // Select the ListBox element
+  console.log("finished1");
 
   // Check if the click event occurred outside the ListBox
   if (listBox && !listBox.contains(event.target)) {
+    console.log("finished2");
     listBox.style.display = "none"; // Hide the ListBox
   }
+  console.log("finished");
 });
-// eslint-disable-next-line no-unused-vars
-// const send_to_synomize = async () => {
-//   await axios
-//     .post(
-//       `${AHMET_API}/search/word/`,
-//       {
-//         value: inputWords.value,
-//       },
-//       { headers: getHeader() }
-//     )
-//     .then((response) => {
-//       console.log(response);
-//       synomized_words.value = response.data[0];
-//       synomized_counter.value = response.data[1];
-//     });
-// };
-// eslint-disable-next-line no-unused-vars
-const onSelectionChange = () => {
-  console.log("selectedWord.value.name: ", selectedWord.value.words);
-  word.value = selectedWord.value.words;
-  const event = {
-    target: {
-      value: word.value,
-    },
-  };
-  onChange(event, "");
-};
 const selectedFamily = ref();
 const word_family = ref([
   { name: "зат есім", code: 1 },
@@ -259,36 +187,6 @@ const synonymInput = ref("");
 const paraphraseInput = ref("");
 const meaningInput = ref("");
 const exampleInput = ref("");
-// const synomized_counter = ref("0");
-const words = ref("");
-const family = ref();
-const synonyms = ref([{ synonym: "Табылмады" }]);
-const paraphrases = ref([{ paraphrase: "Табылмады" }]);
-const word_id = ref("");
-const all_words = ref();
-const onChange = async (event, words_family) => {
-  var response = {};
-  response = await AhmetService.onChange(event, words_family);
-  if (response != null) {
-    showSynAdd.value = false;
-    meaning.value =
-      response[0]["meaning"] != ""
-        ? response[0]["meaning"]
-        : "Мағынасы енгізілмеген";
-    word_id.value = response[0]["id"];
-    family.value = { family: response[0]["words_family"] };
-    words.value = response[0]["words"];
-    synonyms.value = response[1];
-    paraphrases.value = response[2];
-    all_words.value = response[3];
-    console.log("family.value: ", family.value);
-    return true;
-  } else {
-    console.log("NULL");
-    meaning.value = "";
-    return false;
-  }
-};
 // eslint-disable-next-line no-unused-vars
 const showDialog = (data) => {
   inputValues.value = data;
@@ -352,8 +250,7 @@ const addWord = () => {
 </script>
 <style setup>
 .card-container {
-  height: 300px; /* Set the desired height for the container */
-  /* Enable vertical scrolling */
+  height: 300px;
 }
 .row {
   display: flex;
@@ -373,13 +270,6 @@ const addWord = () => {
 .temp-mobile {
   display: none;
 }
-/* .card ::v-deep .swticher {
-  background-color: #324068;
-  border-color: #324068;
-} */
-/* .dropDown{
-    align-items: center;
-} */
 .dropDown {
   border-radius: 100px;
 }
@@ -391,6 +281,7 @@ const addWord = () => {
   }
   .bounder {
     height: 100%;
+    width: 100%;
   }
   .temp-mobile {
     display: block;
@@ -408,5 +299,9 @@ const addWord = () => {
   border: none;
   margin: 0;
   padding: 0;
+}
+.bounder {
+  height: 100%;
+  width: 100%;
 }
 </style>

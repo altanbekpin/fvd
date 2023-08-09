@@ -45,7 +45,7 @@ class Suffix(Appendix):
     # Жедел өткен шақ
     VWFI = ["ды", "ді", "ты", "ті"]
 	# зат есімнен сын есім
-    NounsToAdjective = ["лы", "лі", "ды", "ді", "ты", "ті", "лық", "лік", "тық", "тік", "сыз", "сіз", "қы", "кі", "ғы", "гі", "шыл", "шіл","","лей", "дай", "дей", "тай", "тей", "шаң", "шең", "и", "қой", "қор", "паз"]
+    NounsToAdjective = ["лы", "лі", "ды", "ді", "ты", "ті", "лық", "лік", "тық", "тік", "сыз", "сіз", "қы", "кі", "ғы", "гі", "шыл", "шіл","лай","лей", "дай", "дей", "тай", "тей", "шаң", "шең", "и", "қой", "қор", "паз"]
 	# етістіктен сын есім
     VerbsToAdjective = [
 
@@ -139,11 +139,6 @@ class Suffix(Appendix):
     
     def CheckForDefinition(self, pos, ending, lastappendix =''):
         #print("SELF POS SUFFIX=", pos)
-        print("##########################")
-        print("POS:", pos)
-        print("ending:", ending)
-        print("la", lastappendix)
-        print("##########################")
         if (pos == self.POS_VERB and self.AppName =="" and lastappendix != 'у'):
             for ve in self.VerbsToEsimshe:
                 if ve == ending and self.AppName == "":

@@ -1,4 +1,3 @@
-import copy
 from .appendix import Appendix, Suffix, Ending, Koptik, Jiktik, Taueldik, Septik, MOOD
 class Word:
     Root = ""

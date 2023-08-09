@@ -9,19 +9,22 @@ kaz_stop_words = []
 import copy
 from nltk.tokenize import word_tokenize
 from pprint import pprint
-
+from Morphological_analyser_based_on_CSE.Morf_analysis_for_Kazakh import GodsHelp
 from numpy import true_divide
-
+# from appendix import *
+from .appendix import *
 from .ilsmodels import Task
-from .appendix import Septik, Ending, Appendix
+from .appendix import Septik
 from .phonetic import phonetic
-import json
 import re
-import sqlite3
 from .word import Word
-import psycopg2
 from db import *
 
+def clear_word(input_string):
+    pattern = r'\*(.*?)<'
+    matches = re.findall(pattern, input_string)
+    new_array = [input_string.split('+')[0]]+matches
+    return new_array
 
 
 def is_soft(word) : 
@@ -221,7 +224,73 @@ class Lemms:
         elif pos == 9:
             PosName = "Үстеу"
         return PosName
-
+    
+    @staticmethod
+    def get_pos_names_custom(pos):
+        if pos is None:
+            return pos
+        if pos == "N":
+            return 1
+        elif pos == "Adj":
+            return 2
+        elif pos == "NUM":
+            return 3
+        elif pos == "Prnn":
+            return 4
+        elif pos == "V":
+            return 5
+        elif pos == "Onmt":
+            return 6
+        elif pos == "INTERJ":
+            return 7
+        elif pos == "FW":
+            return 8
+        elif pos == "ADV":
+            return 9
+        
+    def get_kaz_lemms_test(self, sentences, length):
+        main_list = self.get_kaz_lemms(sentences)
+        if main_list[0][0][1] == -1:
+            return main_list
+        print(main_list)
+        main_list[0][0][2] = []
+        print("sentences[0]:", sentences[0])
+        morph_reult = GodsHelp.morphogay(sentences[0])
+        print("morph_reult:", morph_reult)
+        list_of_parts = clear_word(morph_reult)
+        pos = Lemms.get_pos_names_custom(main_list[0][0][1])
+        main_list[0][length][3] = list_of_parts[0]
+        main_list[0][length][4] = ""
+        endings = list_of_parts[1:]
+        print("endings:", endings)
+        for ending in endings:
+            definition = ""
+            name = ""
+            if ending in Jiktik.FirstStepSingular + Jiktik.FirstStepPlural + Jiktik.SecondStepSingular + Jiktik.SecondStepFormal + Jiktik.ThirdStep:
+                definition = Jiktik.CheckForDefinition(Jiktik, ending)
+                name = 'Жіктік жалғау'
+            elif ending in Septik.Ilik +Septik.Barys + Septik.Atau + Septik.Jatys + Septik.Komektes + Septik.Shygys + Septik.Tabys:
+                definition = Septik.CheckForDefinition(Septik, ending)
+                name = 'Cептік'
+            elif ending in Taueldik.FirstStepSingular + Taueldik.FirstStepPlural + Taueldik.SecondStepSingular + Taueldik.SecondStepPlural + Taueldik.ThirdStep:
+                definition = Taueldik.CheckForDefinition(Taueldik, ending)
+                name = 'Тәуелдік жалғау'
+            elif ending in Koptik.koptik:
+                print("I'm here")
+                print("ending:", ending)
+                definition = Koptik.CheckForDefinition(Koptik, ending)
+                print("definition:", definition)
+                name = 'Көптік жалғау'
+            elif ending in Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe:
+                definition = Suffix.CheckForDefinition(Suffix,ending=ending, pos=pos)
+                if definition == "":
+                    definition = Suffix.CheckForDefinition2(Suffix,ending=ending)
+                name = 'жұрнақ'
+            main_list[0][length][2].append([ending, definition, name])
+            main_list[0][length][4] = main_list[0][length][4] +  f"{definition}."
+        print("main_list:", main_list)
+        return main_list
+            
     def get_kaz_lemms(self, sentences):
         con = DB.get_instance().get_db_connection()
         cur = con.cursor()
@@ -279,7 +348,6 @@ class Lemms:
             token_list.append(copy.copy(tok))
             lemms_list.append(copy.copy(lemms))
         con.close()
-    
         return lemms_list
     def solve_math_task(self, sentences):
         con = DB.get_instance().get_db_connection()
