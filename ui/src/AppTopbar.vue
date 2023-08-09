@@ -9,7 +9,7 @@
     >
       <i class="pi pi-bars"></i>
     </button>
-    <span>{{ $t("common.title") }}</span>
+    <span class="mobile-text">{{ $t("common.title") }}</span>
 
     <ul class="layout-topbar-menu hidden lg:flex origin-top">
       <li>
@@ -428,6 +428,16 @@ export default {
 };
 </script>
 <style scoped>
+span.mobile-text {
+  font-size: 16px; /* Adjust the base font size as needed */
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  span.mobile-text {
+    font-size: 8px; /* Adjust the font size for mobile devices */
+  }
+}
 .pi-usericon {
   margin-right: 20px;
   margin-left: 20px;

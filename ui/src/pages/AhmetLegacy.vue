@@ -4,12 +4,6 @@
       <template #header>
         <div class="row">
           <div class="text-left">Атауы</div>
-          <!-- <div class="text-right" style="margin-left: 700px;">
-                    <div class="p-input-icon-left">
-                        <i class="pi pi-search"></i>
-                        <InputText v-model=filters.global placeholder="Іздеу" @keyup="onFilter()" />
-                    </div>
-                </div> -->
         </div>
       </template>
       <Column headerStyle="width:3rem" :expander="true"> </Column>
@@ -27,8 +21,6 @@
             "
             class="flex flex-wrap gap-2"
           >
-            <!-- style="margin-right: 300px;" -->
-            <!-- :style="{width: '10vw', marginRight: '10px'}"  -->
             <Button
               type="button"
               icon="pi pi-download"
@@ -87,15 +79,12 @@
       </span>
       <div style="margin-top: 10px">
         <form @submit.prevent="uploadFile">
-          <!-- <input type="file" @change="handleFileChange" style="margin-top: 10px;"> -->
-          <!-- <FileUpload mode="basic" name="demo[]" url="http://kazlangres.enu.kz/v1/api/upload" :maxFileSize="1000000000000" @upload="onUpload" style="margin-top: 10px;" /> -->
           <FileUpload
             :name="FileName"
             :url="url"
             :formData="form_Data"
             @upload="handleFileUpload"
           ></FileUpload>
-          <!-- <Button type="submit" style="margin-top: 10px;">Жүктеу</Button> -->
         </form>
       </div>
     </Dialog>
@@ -250,7 +239,6 @@ const handleFileUpload = (event) => {
     .finally(() => init());
   FileName.value = "";
 };
-
 onMounted(() => {
   loading.value = true;
   init();

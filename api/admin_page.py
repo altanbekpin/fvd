@@ -10,7 +10,6 @@ def getOffers():
     if not DB.get_instance().isUserAdmin(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     lazy_event_str = request.args.get('lazyEvent')
-    print("lazy_event_str:", lazy_event_str)
     lazy_event = literal_eval(lazy_event_str)
     first = lazy_event['first']
     rows = lazy_event['rows']
@@ -93,7 +92,6 @@ def word_overview():
     results = []
     for i in dates:
         results.append(DB.get_instance().word_view(i))
-    print("dates:", dates)
     return results
 
 @app.route("/user/table", methods=['GET'])
