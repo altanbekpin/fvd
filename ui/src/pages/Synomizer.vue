@@ -7,7 +7,7 @@
     <hr height="20px" />
     <div class="row">
       <div>
-        <span style="font-size: 12px; width: 500px">
+        <span style="font-size: 12px">
           Мәтін синонимайзері қазақ тілінде енгізілген мәтіндегі сөздерді
           синонимдермен алмастыруға көмектеседі. Мәтіндегі сөз синонимдермен
           ауыстырылса жасыл түспен белгіленіп көрсетіледі. Синонимайзер арқылы
@@ -15,10 +15,7 @@
           үшін белгіленген сөздің үстінен басып, көрсетілген синонимдер ішінен
           мағынасына сай сөзді таңдап, түзете аласыз
         </span>
-        <div
-          class="card main-card"
-          style="width: 100%; height: 500px; margin-top: 20px"
-        >
+        <div class="card main-card" style="height: 500px; margin-top: 20px">
           <WordSynomizer></WordSynomizer>
         </div>
       </div>
@@ -281,7 +278,7 @@ const addWord = () => {
   }
   .bounder {
     height: 100%;
-    width: 100%;
+    width: 500px;
   }
   .temp-mobile {
     display: block;
@@ -302,6 +299,5 @@ const addWord = () => {
 }
 .bounder {
   height: 100%;
-  width: 100%;
 }
 </style>

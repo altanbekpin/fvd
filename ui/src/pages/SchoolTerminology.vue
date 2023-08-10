@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="card">
+  <div class="card" style="min-width: 500px">
     <div style="font-size: 20px; margin-right: 450px; margin-left: 50px">
       Мектеп пәндерінің терминдер жинағы
     </div>

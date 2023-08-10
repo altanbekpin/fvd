@@ -1,85 +1,83 @@
 <template>
   <div>
-    <div>
-      <Textarea rows="15" cols="55" v-model="inputWords" style="width: 100%" />
-      <div class="row texts" style="margin-top: 30px">
-        <div>Символдар саны = {{ inputWords.length }}</div>
-        <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
-        <Button
-          label="Өңдеу"
-          style="margin-left: 80px"
-          @click="send_to_synomize"
-        />
-      </div>
+    <Textarea rows="15" cols="55" v-model="inputWords" style="width: 100%" />
+    <div class="row texts" style="margin-top: 30px">
+      <div>Символдар саны = {{ inputWords.length }}</div>
+      <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
+      <Button
+        label="Өңдеу"
+        style="margin-left: 80px"
+        @click="send_to_synomize"
+      />
+    </div>
+    <div
+      v-show="loading == false"
+      class="card"
+      style="
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        height: 130px;
+        max-height: 130px;
+        padding-bottom: 40px;
+      "
+    >
       <div
-        v-show="loading == false"
-        class="card"
         style="
           width: 100%;
-          margin-top: 10px;
-          margin-bottom: 10px;
-          overflow: hidden;
-          height: 130px;
-          max-height: 130px;
-          padding-bottom: 40px;
+          overflow-y: auto;
+          padding-right: 10px;
+          max-height: 100px;
+          height: 100px;
         "
       >
-        <div
-          style="
-            width: 100%;
-            overflow-y: auto;
-            padding-right: 10px;
-            max-height: 100px;
-            height: 100px;
-          "
-        >
-          <div class="word-container">
-            <span v-for="(word, index) in synomized_words" :key="index">
-              <span
-                v-if="isHtml(word)"
-                v-html="word"
-                @click="handleLineClick"
-              ></span>
-              <span v-else>{{ word }}</span>
-            </span>
-          </div>
-
-          <OverlayPanel
-            ref="op"
-            style="border: none; padding: 0"
-            v-if="synomized_counter != 0"
-          >
-            <div class="border-inner">
-              <Listbox
-                v-model="selectedSyn"
-                :options="optionSynonyms"
-                optionLabel="synonym"
-                class="w-full"
-                style="
-                  border: none;
-                  margin: 0;
-                  max-height: 80px;
-                  overflow-y: auto;
-                "
-                @change="onSynonymTap"
-              />
-            </div>
-          </OverlayPanel>
+        <div class="word-container">
+          <span v-for="(word, index) in synomized_words" :key="index">
+            <span
+              v-if="isHtml(word)"
+              v-html="word"
+              @click="handleLineClick"
+            ></span>
+            <span v-else>{{ word }}</span>
+          </span>
         </div>
+
+        <OverlayPanel
+          ref="op"
+          style="border: none; padding: 0"
+          v-if="synomized_counter != 0"
+        >
+          <div class="border-inner">
+            <Listbox
+              v-model="selectedSyn"
+              :options="optionSynonyms"
+              optionLabel="synonym"
+              class="w-full"
+              style="
+                border: none;
+                margin: 0;
+                max-height: 80px;
+                overflow-y: auto;
+              "
+              @change="onSynonymTap"
+            />
+          </div>
+        </OverlayPanel>
       </div>
-      <Skeleton
-        v-show="loading"
-        style="
-          width: 100%;
-          margin-top: 10px;
-          margin-bottom: 10px;
-          overflow: hidden;
-          height: 130px;
-          max-height: 130px;
-          padding-bottom: 40px;
-        "
-      ></Skeleton>
     </div>
+    <Skeleton
+      v-show="loading"
+      style="
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        height: 130px;
+        max-height: 130px;
+        padding-bottom: 40px;
+      "
+    ></Skeleton>
   </div>
 </template>
 <script>

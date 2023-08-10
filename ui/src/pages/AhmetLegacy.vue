@@ -1,5 +1,5 @@
 <template>
-  <div class="card flex justify-content-center">
+  <div class="card flex justify-content-center" style="min-width: 500px">
     <TreeTable :value="nodes" @node-expand="onNodeExpand">
       <template #header>
         <div class="row">

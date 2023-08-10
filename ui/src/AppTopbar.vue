@@ -1,14 +1,15 @@
 <template>
   <div class="layout-topbar">
-    <router-link to="/" class="layout-topbar-logo">
-      <img alt="Logo" :src="topbarImage()" />
-    </router-link>
     <button
       class="p-link layout-menu-button layout-topbar-button"
       @click="onMenuToggle"
+      style="margin-left: 20px; margin-left: 20px"
     >
       <i class="pi pi-bars"></i>
     </button>
+    <router-link to="/" class="layout-topbar-logo" style="margin-left: 10px">
+      <img alt="Logo" :src="topbarImage()" class="logo-image" />
+    </router-link>
     <span class="mobile-text">{{ $t("common.title") }}</span>
 
     <ul class="layout-topbar-menu hidden lg:flex origin-top">
@@ -22,7 +23,11 @@
         />
       </li>
     </ul>
-    <Button icon="pi pi-user" @click="$router.push('/auth')" />
+    <Button
+      icon="pi pi-user"
+      @click="$router.push('/auth')"
+      style="min-width: 30px; margin-left: 5px"
+    />
     <Toast />
     <ConfirmPopup group="demo">
       <template #message="slotProps">
@@ -37,6 +42,7 @@
       @click="showTemplate($event)"
       icon="pi pi-sign-out"
       style="
+        min-width: 30px;
         margin-left: 10px;
         background-color: red;
         color: white;
@@ -436,6 +442,13 @@ span.mobile-text {
 @media (max-width: 768px) {
   span.mobile-text {
     font-size: 8px; /* Adjust the font size for mobile devices */
+  }
+  .logo-image {
+    height: 10px;
+    width: 50px;
+  }
+  .layout-topbar {
+    height: 6rem;
   }
 }
 .pi-usericon {

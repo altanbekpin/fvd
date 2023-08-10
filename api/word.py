@@ -25,7 +25,17 @@ class Finder:
         if self.isResearchable():
             return self._stcs[0][0][1]
         return ''
-
+    def get_buyryk(self, word):
+        ending = self.get_addition("Imprv", [])
+        endings = ["йын","йін", "сын","сін", "ейін",  "ңыз",   "ңіз", "ыңыз","іңіз",]
+        index = endings.index(ending)
+        is_soft = self.is_soft(word)
+        if (is_soft and self.is_soft(ending)) or (not is_soft and not self.is_soft(ending)):
+            return ending
+        if is_soft:
+            return endings[index+1]
+        else:
+            return endings[index-1]
     def get_ilik(self, word):
         ending = word[-1]
         tyntin = ['б', 'в', 'г', 'д', 'к', 'қ', 'п', 'с', 'т', 'х', 'ц', 'ч']
@@ -65,15 +75,35 @@ class Finder:
 
 
     def get_taueldy(self, depence, word):
+        print("word:", word)
+        print("depence:", depence)
         additions = [ "м", "ым", "ім", "ымыз", "іміз", "ң", "ың", "ің", "ңыз", "ыңыз", "іңіз", "сы", "сі", "ы", "і"]
         is_soft = self.is_soft(word)
-        if word[-1] in self.soft + self.solid and depence not in self.soft + self.solid:
-            return depence
-        if (is_soft and self.is_soft(depence) or ((not is_soft) and (not self.is_soft(depence)))):
-            return depence
+        print("is_soft:", is_soft)
+        print("is_soft(depence):", self.is_soft(depence))
         index = additions.index(depence)
-        if is_soft:
-            depence = additions[index+1]
+        if (word[-1] in self.soft + self.solid + ["я"] and depence[0] in self.soft + self.solid):
+            
+            i = 0
+            while(index+i != len(additions)-1):
+                i += 1
+                depence = additions[index+i]
+                if (is_soft and self.is_soft(depence) or ((not is_soft) and (not self.is_soft(depence)))):
+                    return depence
+        print("DEPENCE:".upper(), depence)
+        if (word[-1] in self.soft + self.solid + ["я"] and depence[0] in self.soft + self.solid):
+            i = 0
+            print("HEREEE")
+            while(index-i != -1):
+                i += 1
+                depence = additions[index-i]
+                print("depence:", depence)
+                if (is_soft and self.is_soft(depence) or ((not is_soft) and (not self.is_soft(depence)))):
+                    return depence
+        print("I;m here")
+        if not(is_soft and self.is_soft(depence) or ((not is_soft) and (not self.is_soft(depence)))):
+            if is_soft:
+                depence = additions[index+1]
         else:
             depence = additions[index-1]
         return depence
@@ -84,10 +114,6 @@ class Finder:
         suffix = self.suffix_helper(symbol)
         index = suffix.index(result)
         noise = self.solid + self.soft
-        if word[-1] in ['л']:
-            if is_soft:
-                return "де"
-            return "да"
         if symbol == "VerbsToVerbs":
             if result in Suffix.YryqsyzEtis:
                 if word[-1] in self.solid or word[-1] in self.soft:
@@ -371,6 +397,8 @@ class Word(Finder):
             app = ""
             synonym = self.get_synonym()
             for i in parts:
+                if i == "Imprv":
+                    app += self.get_buyryk(self.get_synonym() )
                 if i == 'Gen':
                    app += self.get_ilik(self.get_synonym())
                 elif i == 'PL':

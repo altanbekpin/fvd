@@ -1,9 +1,9 @@
 <template>
-  <div class="card" v-if="products">
+  <div class="card" v-if="products" style="min-width: 55rem">
     <div v-if="store.getters.getRoles.includes('admin')">
       <Toolbar
         class="mb-4"
-        style="border-color: white; background-color: white"
+        style="border-color: white; background-color: white; min-width: 50rem"
       >
         <template #start>
           <Button
@@ -31,7 +31,6 @@
         </template>
       </Toolbar>
     </div>
-
     <DataTable
       :value="products"
       lazy

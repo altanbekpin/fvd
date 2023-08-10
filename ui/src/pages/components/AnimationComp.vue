@@ -38,7 +38,6 @@ export default {
 
 <style>
 .lottie-container {
-  width: 600px;
   height: 600px;
 }
 </style>

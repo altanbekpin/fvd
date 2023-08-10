@@ -5,13 +5,21 @@
         <p1>Тезарус</p1>
       </div>
       <Listbox
+        v-if="OntNames.length != 0"
         v-model="selectedOnto"
         :options="OntNames"
         optionLabel="name"
         class="w-full listbox-scrollable"
       />
+      <div v-else class="skeleton-container">
+        <Skeleton class="mb-2"></Skeleton>
+        <Skeleton width="10rem" class="mb-2"></Skeleton>
+        <Skeleton width="5rem" class="mb-2"></Skeleton>
+        <Skeleton height="2rem" class="mb-2"></Skeleton>
+        <Skeleton width="10rem" height="4rem"></Skeleton>
+      </div>
     </div>
-    <div class="card col">
+    <div class="card col" style="min-width: 400px">
       <div class="card-header">
         <p1>Іздеу</p1>
       </div>
@@ -93,6 +101,7 @@ export default {
     const self = this;
     this.loading = true;
     window.DoSubmit = async function (text) {
+      self.loading = true;
       console.log(text);
       self.textController = text;
       var reqbody = {
@@ -106,6 +115,7 @@ export default {
       console.log(temp.data);
       self.OntoInner = temp.data;
       self.textController = text;
+      self.loading = false;
     };
     this.loading = false;
     console.log(this.OntNames.length);
@@ -200,5 +210,15 @@ export default {
 }
 .input-field {
   border-radius: 10px;
+}
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 25px; /* Adjust the left margin */
+  margin-right: 25px; /* Adjust the right margin */
+}
+
+.skeleton-container .mb-2 {
+  margin-bottom: 1rem; /* Add margin between each element */
 }
 </style>
