@@ -79,11 +79,13 @@ def searchWord():
     synomized_count = 0
     data = request.json['value']
     synomized_words = []
-    words = re.findall(r"[\w']+|[.,!?; ]", data)
+    print("data:", data)
+    words = re.findall(r"[\w']+|[.,!?;() ]", data)
+    print("words:", words)
     output_words = []
     data_id = 0
     for index, word in enumerate(words):
-        if word not in [",", ".", "!", "?", ";", "-"] and word.strip() and not is_person_name(word, data, index == 0):
+        if word not in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] and word.strip() and not is_person_name(word, data, index == 0):
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()

@@ -276,10 +276,7 @@ class Lemms:
                 definition = Taueldik.CheckForDefinition(Taueldik, ending)
                 name = 'Тәуелдік жалғау'
             elif ending in Koptik.koptik:
-                print("I'm here")
-                print("ending:", ending)
                 definition = Koptik.CheckForDefinition(Koptik, ending)
-                print("definition:", definition)
                 name = 'Көптік жалғау'
             elif ending in Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe:
                 definition = Suffix.CheckForDefinition(Suffix,ending=ending, pos=pos)

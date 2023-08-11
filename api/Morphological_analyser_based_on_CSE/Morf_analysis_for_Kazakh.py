@@ -21,7 +21,6 @@ def stemming_with_lexicon(text_fn, affixes_fn, stopwords_fn, stems_fn, stop_stem
         return sorted_affixes
 
     def stem(word, affixeslst, sfile_name):
-
 # добавить with
         # sfile_name  = os.path.join(os.path.dirname(__file__), sfile_name)
         # stop_stem_file = open(sfile_name, 'r', encoding="utf-8")
