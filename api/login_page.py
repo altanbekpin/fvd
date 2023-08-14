@@ -27,7 +27,7 @@ def login():
     if not DB.get_instance().isUserExist(email):
         return jsonify("Тіркелмеген"), 401
     user = DB.get_instance().check_credentials(email, password)
-    if user is None:
+    if user is None: 
         return jsonify("Қате логин немесе пароль"), 400
     if not DB.get_instance().isUserActivated(user):
         return jsonify(message="Сіздің тіркелу сұранысыңыз қабылданбаған"), 400

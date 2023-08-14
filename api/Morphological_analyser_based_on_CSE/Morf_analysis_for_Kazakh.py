@@ -151,7 +151,6 @@ def stemming_with_lexicon(text_fn, affixes_fn, stopwords_fn, stems_fn, stop_stem
 
   
     affixes = sorting_affixes(affixes_fn)
-    #print(affixes)
 
     stem_text = stemming(text_fn, affixes, stopwords_fn, stems_fn)
     #print("\n")
@@ -170,8 +169,7 @@ def stemming_with_lexicon(text_fn, affixes_fn, stopwords_fn, stems_fn, stop_stem
     
 def segmentation(text, affixes_fn):
     text_fseg = re.findall(r'\w+\~\w+', text)
-    #print(text_fseg)
-    
+    print("text_fseg:", text_fseg)
     seg_affixes = {}
     for word in text_fseg:
         stem = re.findall(r'\w+\~', word)
@@ -191,7 +189,7 @@ def segmentation(text, affixes_fn):
     #print(seg_affixes)
     
     seg_text = text.replace('~', '+ ')
-    #print(seg_text)
+    print("seg_text:", seg_text)
     
     for i in seg_affixes.keys():
         affix0 = str(i)
@@ -214,7 +212,7 @@ class GodsHelp():
         data = db.DB.get_instance().get_morpghology_data()
         words_array = [item['words'] for item in data]
         # text_file_name = "text.txt" #or # input("Name of the text file: ") #"text.txt"
-        affixes_file_name = "Endings.xls" #or # input("Name of the affix file: ") #"affixes.xls"
+        affixes_file_name = "modified_file.xls" #or # input("Name of the affix file: ") #"affixes.xls"
         stopwords_file_name = "stop_words.txt" #or # input("Name of the stop-words file: ") #"stop_words.txt"
         stems_file_name = "stems.txt" #or #input("Name of the vocabulary of correct stems: ") #"truestems.txt"
         text = stemming_with_lexicon(text, affixes_file_name, stopwords_file_name, stems_file_name, words_array)

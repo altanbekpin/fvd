@@ -147,7 +147,11 @@ class DB(DatabaseOperations):
             param = (word,pos)
             query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(TRIM(%s)) AND z.pos = %s;"
         synonym = self._select_one_query(query, param)
-        if synonym == None:
+        print("SYNFIND")
+        print(synonym)
+        print(word)
+        if synonym is None or synonym.get("synonym") == word:
+            print("SYNONYM IS NONE")
             query = '''SELECT DISTINCT ON (s.words_family)
                             s.words AS synonym
                         FROM synonym_word sw
@@ -155,10 +159,11 @@ class DB(DatabaseOperations):
                         INNER JOIN synonyms ss ON ss.id = sw.synonym_id
                         INNER JOIN offers o ON o.offer_id = s.id
                         WHERE LOWER(TRIM(ss.synonym)) = LOWER(TRIM(%s)) AND o.activated = true
-                        ORDER BY s.words_family, s.id;
+                        ORDER BY s.words_family, s.id
+                        OFFSET 2;
                         '''
             synonym = self._select_one_query(query, param)
-            if synonym == None:
+            if synonym == None or synonym.get("synonym") == word:
                 return [word, synomized_count]
         synomized_count += 1
         synomized_words.append(synonym.get('synonym'))

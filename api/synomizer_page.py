@@ -89,9 +89,10 @@ def searchWord():
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()
+            print("word_instance.is_correct():", word_instance.is_correct())
             if isWordUpper and word_instance.has_synonym():
                 word_instance.capitalize_synonym()
-            if word_instance.has_synonym():
+            if word_instance.has_synonym() and word_instance.is_correct():
                 word_instance.set_synonym(word_instance.get_synonym() + word_instance.get_trash_part())
                 translated_word = getHtml(word_instance.get_first_part(), word_instance.find_extra_chars(word_instance.get_first_part(), word), data_id, f"{word_instance.get_first_synonym()} {word_instance.get_synonym()}", word_instance.get_family())
                 data_id += 1
@@ -200,13 +201,9 @@ def switch_case(argument):
 def addWord():
     if not DB.get_instance().isUserAdmin(current_user):
         return "don't have enough permission", 500
-    print("add word")
-    print("user:", current_user.id)
     synonyms = request.json['synonyms']
-    print("synonyms:", synonyms)
     example = request.json['example']
     paraphrases = request.json['paraphrases']
-    print("paraphrases:", paraphrases)
     meaning = request.json['meaning']
     word = request.json['word']
     family = request.json['family']['name']
