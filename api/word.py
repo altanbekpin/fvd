@@ -615,6 +615,8 @@ class Word(Finder):
         return get_first_part != word
     def is_correct(self):
         app = ""
+        if self._stcs[0][0][1] == -1:
+            return False
         for i in self._stcs[0][0][2]:
             app += i[0]
         return self.get_first_part() + app == self.word
