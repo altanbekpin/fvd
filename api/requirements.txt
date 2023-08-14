@@ -46,3 +46,5 @@ rdflib
 owlready
 flask_mail
 xlrd
+xlutils
+xlwt
