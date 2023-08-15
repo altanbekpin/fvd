@@ -73,6 +73,21 @@ def is_person_name(word, sentence, is_first):
                 break
     return word[0].isupper()
 
+
+def replace_usa(text, pattern):
+    # Define a regular expression pattern to match "United States of America"
+    pattern = r'\bpattern\b'
+
+    # Use the re.sub function to replace occurrences of the pattern with "USA"
+    replaced_text = re.sub(pattern, 'USA', text)
+
+    return replaced_text
+
+input_text = "United States of America is the most powerful country"
+output_text = replace_usa(input_text)
+print(output_text)
+
+
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
     print("/search/word/")

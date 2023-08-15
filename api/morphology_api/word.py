@@ -43,30 +43,6 @@ class Word:
         if (len(self.AppendixPart) == 0):
             return
         appendixPart = self.AppendixPart
-        # алдымен жұрнақтарды қарап аламыз
-        appendixlast = ""
-        while (len(appendixPart) > 0):
-            appendix = Suffix
-            appendix.AppName = ""
-            appendix.AppendixString = ""
-            #print("app=" + appendixPart)
-            if (appendix.CheckForDefinition(Suffix,self.CurrentPOS, appendixPart, appendixlast) != ""):
-                self.Appendixes.append(Suffix(appendix.AppendixString, appendix.AppName, appendix.ToString()))
-                appendixlast = appendixPart
-                appendixPart = self.AppendixPart[len(appendixPart):]
-                self.AppendixPart = appendixPart
-                if ("Kosemshe" in appendix.AppName):
-                    break
-                if ("ToNoun" in appendix.AppName):
-                    self.CurrentPOS = Suffix.POS_NOUN
-                if ("ToAdjective" in appendix.AppName):
-                    self.CurrentPOS = Suffix.POS_ADJECTIVE
-                if ("ToVerbs" in appendix.AppName or "VWFI" in appendix.AppName):
-                    self.CurrentPOS = Suffix.POS_VERB
-                if ("ToVerbs" in appendix.AppName):
-                    self.CurrentPOS = Suffix.POS_VERB
-            else:
-                appendixPart = appendixPart[:-1]
 
         # енді жалғауларға көштік
         if (len(self.AppendixPart) == 0):
@@ -141,6 +117,30 @@ class Word:
                             appendixPart = self.AppendixPart.replace(appendixPart, "")
                             continue
             appendixPart = appendixPart[:-1]
+        # алдымен жұрнақтарды қарап аламыз
+        appendixlast = ""
+        while (len(appendixPart) > 0):
+            appendix = Suffix
+            appendix.AppName = ""
+            appendix.AppendixString = ""
+            #print("app=" + appendixPart)
+            if (appendix.CheckForDefinition(Suffix,self.CurrentPOS, appendixPart, appendixlast) != ""):
+                self.Appendixes.append(Suffix(appendix.AppendixString, appendix.AppName, appendix.ToString()))
+                appendixlast = appendixPart
+                appendixPart = self.AppendixPart[len(appendixPart):]
+                self.AppendixPart = appendixPart
+                if ("Kosemshe" in appendix.AppName):
+                    break
+                if ("ToNoun" in appendix.AppName):
+                    self.CurrentPOS = Suffix.POS_NOUN
+                if ("ToAdjective" in appendix.AppName):
+                    self.CurrentPOS = Suffix.POS_ADJECTIVE
+                if ("ToVerbs" in appendix.AppName or "VWFI" in appendix.AppName):
+                    self.CurrentPOS = Suffix.POS_VERB
+                if ("ToVerbs" in appendix.AppName):
+                    self.CurrentPOS = Suffix.POS_VERB
+            else:
+                appendixPart = appendixPart[:-1]
         self.CorrectAnalyze()
     def CorrectAnalyze(self): 
         if len(self.Appendixes) > 1:
