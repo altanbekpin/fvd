@@ -12,13 +12,13 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):
-        
+    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
+            port=5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -505,6 +505,16 @@ class DB(DatabaseOperations):
         query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 2, %s)'''
         self._insert_query(query, (id,max_id+1))
         self._close_db()
+    def get_last_sentence(self):
+        results = self._select_all_query('''SELECT id
+        FROM tagged_sentence 
+        ORDER BY id DESC
+        LIMIT 1''') 
+        if results:  # Проверяем, есть ли результат
+            return results[0][0]  # Возвращаем ID
+        else:
+            return -1
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)

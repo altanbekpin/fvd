@@ -6,6 +6,7 @@ import rdflib
 from rdflib.serializer import Serializer
 from rdflib.namespace import RDF, RDFS, OWL
 from owlready import *
+from app import app
 
 
 class LegacySchema(Schema):
@@ -35,11 +36,8 @@ class MyOwlReady:
     def __init__(self):
         if not MyOwlReady.__instance:
             print(" __init__ method called..")
-
             _turkOnto = rdflib.Graph()
             _turkOnto.parse ('owl/Akhmettanu.owl')
-            
-
         else:
             print("Instance already created:", self.getInstance())
             print(self.Onto)
@@ -122,8 +120,8 @@ class MyOntology():
 
         f.write(self.text)
         f.close()
-        s = MyOwlReady()
-        s.ReloadTurkOnto()
+        app.s = MyOwlReady()
+        app.s.ReloadTurkOnto()
     
 
 

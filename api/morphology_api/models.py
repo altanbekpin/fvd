@@ -11,6 +11,7 @@ import rdflib
 from rdflib.serializer import Serializer
 from rdflib.namespace import RDF, RDFS, OWL
 from owlready import *
+from app import app
 
 OT_Class = 0
 OT_Individ = 1
@@ -117,8 +118,8 @@ class MyOntology(models.Model):
 
         f.write(self.text)
         f.close()
-        s = MyOwlReady()
-        s.ReloadTurkOnto()
+        #app.s = MyOwlReady()
+        app.s.ReloadTurkOnto()
     def GetJson(self,lang):
         res=''
         self.savetofile()

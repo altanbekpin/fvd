@@ -6,8 +6,7 @@ import json
 def getontology(lang):
     from models import MyOwlReady
     print("/getontology/<lang>/")
-    s = MyOwlReady()
-    owls = s.GetJson(lang=lang)
+    owls = app.s.GetJson(lang=lang)
     return jsonify(owls)
 
 @app.route('/getontology/ask/', methods=['POST'])
@@ -59,9 +58,7 @@ def send_question():
     
     question = temp['question']
     lang = 'kz'
-
-    g = MyOwlReady().TurkOnto
-
+    g = app.s.TurkOnto
     s= ''
     quest = '''
         PREFIX kazont: <http://www.semanticweb.org/kazontolgy#>
