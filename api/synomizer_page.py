@@ -87,19 +87,19 @@ def searchWord():
     data_id = 0
     bringed_words = []
     neededindexes = []
-    # sozTirkesi = []
-    # index = 0
-    # while (index<len(words)):
-    #     index +=1
-    #     if (words[index-1] in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] 
-    #     or len(sozTirkesi)>2):
-    #         wordForSearch = " ".join(sozTirkesi)
-    #         ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
-    #         sozTirkesi = []
-    #         continue
-    #     if words[index-1] != " ":
-    #         findIndex = index
-    #         sozTirkesi.append(words[index-1])
+    sozTirkesi = []
+    index = 0
+    while (index<len(words)):
+        index +=1
+        if (words[index-1] in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] 
+        or len(sozTirkesi)>2):
+            wordForSearch = " ".join(sozTirkesi)
+            ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
+            sozTirkesi = []
+            continue
+        if words[index-1] != " ":
+            findIndex = index
+            sozTirkesi.append(words[index-1])
         
 
     # print("+++++++++++++++++++++++++++++++++++++++++++++")
