@@ -504,13 +504,14 @@ class Word(Finder):
         print("researhed_part:", researhed_part)
         return researhed_part
 
-    def has_duplicate_elements(self, reference_list, target_list):
+    def count_matching_elements(self, list1, list2):
         count = 0
-        for item in target_list:
-            if reference_list.count(item) >= 2:
-                count += 1
-            if count >= 2:
-                return True
+        for item1 in list1:
+            for item2 in list2:
+                if item1 == item2:
+                    count += 1
+                    if count >= 2:
+                        return True  # Early exit if we find at least two matches
         return False
 
     def add_parts_to_synonym(self):
@@ -529,8 +530,8 @@ class Word(Finder):
         is_synonym_soft = self.is_soft(synonym)
         researcheableParts= ["Imprv",'Gen','PL','Dir', 'Acc','Loc','Abl','Inst'] + jiktik + self.suffix_symbols
         print("parts:", parts)
-        print(self.has_duplicate_elements(['Dir', 'Acc','Loc','Abl','Inst'], parts))
-        if self.has_duplicate_elements(['Dir', 'Acc','Loc','Abl','Inst'], parts):
+        print(self.count_matching_elements(['Dir', 'Acc','Loc','Abl','Inst'], parts))
+        if self.count_matching_elements(['Dir', 'Acc','Loc','Abl','Inst'], parts):
             print("SCR")
             self.set_synonym("")
             return
