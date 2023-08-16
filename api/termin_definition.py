@@ -12,13 +12,19 @@ def edit_post():
     print("data:", data)
     method = data.get('method').get('_value')
     if method == 'delete':
-        id = str(data.get('id'))
-        DB.get_instance().delete_post(id)
+        for id in data.get('id'):
+            DB.get_instance().delete_post(id)
     elif method == 'create':
         name = data.get('name').get('_value')
         descrpition = data.get('description').get('_value')
         example = data.get('example').get('_value')
         DB.get_instance().create_post(name, descrpition, example)
+    elif method == "update":
+        id = data.get('id').get('_value')
+        name = data.get('name').get('_value')
+        descrpition = data.get('description').get('_value')
+        example = data.get('example').get('_value')
+        DB.get_instance().update_post(id, name, descrpition, example)
     return jsonify('successful'), 200
 
 @app.route('/classification/', methods=['POST'])

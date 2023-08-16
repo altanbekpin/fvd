@@ -49,27 +49,36 @@
             <span class="button" id="21">ТАРИХШЫ</span>
           </li>
         </ul>
-        <div class="card">
-          <div class="row" style="justify-content: space-between">
-            <!-- <Button  type="button" icon="pi pi-file" @click="searchBook" rounded/> -->
-            <div class="row">
-              <i class="pi pi-file"></i>
-              <div style="margin-left: 15px">
-                {{ this.label }}
-              </div>
-            </div>
-            <Button
-              type="button"
-              icon="pi pi-download"
-              @click="searchBook"
-              rounded
-            />
-          </div>
-        </div>
       </template>
     </Card>
   </div>
   <!-- #optiongroup="slotProps" -->
+  <Dialog
+    v-model:visible="showDialog"
+    :style="{ width: '450px', maxHeight: '80vh' }"
+    :header="selectedWord"
+    :modal="true"
+    class="p-fluid"
+  >
+    <div class="scrollable-content">
+      <div v-for="data in repo" :key="data.id" class="card">
+        <div class="row" style="justify-content: space-between">
+          <div class="row">
+            <i class="pi pi-file"></i>
+            <div style="margin-left: 15px">
+              {{ data.label }}
+            </div>
+          </div>
+          <Button
+            type="button"
+            icon="pi pi-download"
+            @click="searchBook(data.key)"
+            rounded
+          />
+        </div>
+      </div>
+    </div>
+  </Dialog>
 </template>
 
 <script>
@@ -87,25 +96,37 @@ export default {
     // Select the buttons and add event listeners
     const buttons = document.querySelectorAll(".button");
     buttons.forEach((button) => {
-      button.addEventListener("click", () => {
+      button.addEventListener("click", async () => {
         this.selectedWord = button.innerText;
         console.log(`${this.selectedWord} button clicked`);
-        axios
+        await axios
           .post(`${AHMET_API}/search/book/file/`, {
             global: this.selectedWord,
           })
           .then((resp) => {
-            console.log(`response ${resp.data[0].label} `);
-            this.label = resp.data[0].label;
-            this.key = resp.data[0].key;
+            this.repo = resp.data;
+            // this.label = resp.data[0].label;
+            // this.key = resp.data[0].key;
           });
+        if (this.repo == null || this.repo.length < 1) {
+          this.$toast.add({
+            severity: "error",
+            summary: "Табылмады",
+            detail: "Тегтер табылмады",
+            life: 3000,
+          });
+        } else {
+          this.showDialog = true;
+        }
       });
     });
   },
   data() {
     return {
       vad: vad,
+      repo: null,
       audioContext: null,
+      showDialog: false,
       stateText: "s",
       valueText: "v",
       mediaRecorderGlob: null,
@@ -129,8 +150,8 @@ export default {
     };
   },
   methods: {
-    searchBook() {
-      AhmetService.getFile(this.key);
+    searchBook(key) {
+      AhmetService.getFile(key);
     },
     getJson() {
       axios
@@ -332,9 +353,12 @@ export default {
   background-color: #fff;
   text-decoration: none;
 }
-/* Style the links when hovered */
 .button:hover {
   background-color: #f5f5f5;
   border-color: #adadad;
+}
+.scrollable-content {
+  max-height: calc(80vh - 100px);
+  overflow-y: auto;
 }
 </style>

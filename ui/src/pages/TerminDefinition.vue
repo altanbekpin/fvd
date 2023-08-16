@@ -1,9 +1,9 @@
 <template>
-  <div class="card" v-if="products">
+  <div class="card" v-if="products" style="min-width: 55rem">
     <div v-if="store.getters.getRoles.includes('admin')">
       <Toolbar
         class="mb-4"
-        style="border-color: white; background-color: white"
+        style="border-color: white; background-color: white; min-width: 50rem"
       >
         <template #start>
           <Button
@@ -17,13 +17,20 @@
             label="Өшіру"
             icon="pi pi-trash"
             severity="danger"
+            class="mr-2"
             @click="confirmDeleteSelected('delete')"
+            :disabled="!selectedProducts || !selectedProducts.length"
+          />
+          <Button
+            label="Өзгерту"
+            icon="pi pi-trash"
+            severity="danger"
+            @click="openChangeDialog"
             :disabled="!selectedProducts || !selectedProducts.length"
           />
         </template>
       </Toolbar>
     </div>
-
     <DataTable
       :value="products"
       lazy
@@ -126,7 +133,7 @@
           label="Сақтау"
           icon="pi pi-check"
           text
-          @click="saveProduct('create')"
+          @click="editProduct('create')"
         />
       </template>
     </Dialog>
@@ -167,10 +174,13 @@ const request = {
   example: ref(""),
   description: ref(""),
   method: ref(""),
+  id: ref(""),
 };
 const selectedProducts = ref();
-const saveProduct = async (method) => {
-  request.method.value = method;
+const editProduct = async (method) => {
+  if (request.method.value === "") {
+    request.method.value = method;
+  }
   if (request.name.value === "") {
     submitted.value = true;
   } else {
@@ -204,16 +214,17 @@ const saveProduct = async (method) => {
     request.name.value = "";
     request.description.value = "";
     request.example.value = "";
+    selectedProducts.value = null;
   }
 };
 const confirmDeleteSelected = async (method) => {
   console.log(method);
-  const id = selectedProducts.value[0]["id"];
-  const request = {
-    method: { _value: method },
-    id: id,
-  };
   try {
+    const id = selectedProducts.value.map((obj) => obj["id"]);
+    const request = {
+      method: { _value: method },
+      id: id,
+    };
     await axios.post(`${AHMET_API}/editPost/`, request, {
       headers: {
         Authorization: `Bearer ${store.state.user.access_token}`,
@@ -237,6 +248,7 @@ const confirmDeleteSelected = async (method) => {
     });
   } finally {
     loadLazyData();
+    selectedProducts.value = null;
   }
 
   console.log(request);
@@ -244,7 +256,23 @@ const confirmDeleteSelected = async (method) => {
 const dt = ref();
 const loading = ref(false);
 const totalRecords = ref(0);
-
+const openChangeDialog = () => {
+  if (selectedProducts.value.length > 1) {
+    toast.add({
+      severity: "error",
+      summary: "Тым көп",
+      detail: "Тек бір термин өзгертуге болады",
+      life: 3000,
+    });
+    return;
+  }
+  request.id.value = selectedProducts.value[0]["id"];
+  request.name.value = selectedProducts.value[0]["name"];
+  request.description.value = selectedProducts.value[0]["description"];
+  request.example.value = selectedProducts.value[0]["examples"];
+  request.method.value = "update";
+  productDialog.value = true;
+};
 const lazyParams = ref({});
 const filters = ref({
   global: { value: "", matchMode: "contains" },

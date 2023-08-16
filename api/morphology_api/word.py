@@ -1,4 +1,3 @@
-import copy
 from .appendix import Appendix, Suffix, Ending, Koptik, Jiktik, Taueldik, Septik, MOOD
 class Word:
     Root = ""
@@ -30,40 +29,27 @@ class Word:
             if (app.AppName == "Kosemshe"):
                 return True
         return False
-    def GetAppendixes(self):
+    def IsTuyiqEtistik(self):
+        if (self.CurrentPOS != Suffix.POS_VERB):
+            return False
+        if (len(self.Appendixes) == 0):
+            return False
+        for app in self.Appendixes:
+            if (app.AppName == "VerbsToVerbs") and app.AppendixString == 'у':
+                return True
+        return False
+    def GetAppendixes(self): #осы қолданылып тұр Мағжанда
         appendix = Ending
         if (len(self.AppendixPart) == 0):
             return
         appendixPart = self.AppendixPart
-        # алдымен жұрнақтарды қарап аламыз
-        while (len(appendixPart) > 0):
-            appendix = Suffix
-            appendix.AppName = ""
-            appendix.AppendixString = ""
-            #print("app=" + appendixPart)
-            if (appendix.CheckForDefinition(Suffix,self.CurrentPOS, appendixPart) != ""):
-                self.Appendixes.append(Suffix(appendix.AppendixString, appendix.AppName, appendix.ToString()))
-                appendixPart = self.AppendixPart[len(appendixPart):]
-                self.AppendixPart = appendixPart
-                if ("Kosemshe" in appendix.AppName):
-                    break
-                if ("ToNoun" in appendix.AppName):
-                    self.CurrentPOS = Suffix.POS_NOUN
-                if ("ToAdjective" in appendix.AppName):
-                    self.CurrentPOS = Suffix.POS_ADJECTIVE
-                if ("ToVerbs" in appendix.AppName or "VWFI" in appendix.AppName):
-                    self.CurrentPOS = Suffix.POS_VERB
-                if ("ToVerbs" in appendix.AppName):
-                    self.CurrentPOS = Suffix.POS_VERB
-            else:
-                appendixPart = appendixPart[:-1]
 
         # енді жалғауларға көштік
         if (len(self.AppendixPart) == 0):
             return
         appendixPart = self.AppendixPart
         while (len(appendixPart) > 0):
-            if (self.CurrentPOS in [Suffix.POS_NOUN, Suffix.POS_ADJECTIVE, Suffix.POS_PRONOUN, Suffix.POS_NUMERAL] or (self.CurrentPOS == Suffix.POS_VERB and self.IsEsimshe())):
+            if (self.CurrentPOS in [Suffix.POS_NOUN, Suffix.POS_ADJECTIVE, Suffix.POS_PRONOUN, Suffix.POS_NUMERAL] or (self.CurrentPOS == Suffix.POS_VERB and (self.IsEsimshe() or self.IsTuyiqEtistik()))):
                 appendix = Koptik
                 appendix.AppName = ""
                 appendix.AppendixString = ""
@@ -131,6 +117,30 @@ class Word:
                             appendixPart = self.AppendixPart.replace(appendixPart, "")
                             continue
             appendixPart = appendixPart[:-1]
+        # алдымен жұрнақтарды қарап аламыз
+        appendixlast = ""
+        while (len(appendixPart) > 0):
+            appendix = Suffix
+            appendix.AppName = ""
+            appendix.AppendixString = ""
+            #print("app=" + appendixPart)
+            if (appendix.CheckForDefinition(Suffix,self.CurrentPOS, appendixPart, appendixlast) != ""):
+                self.Appendixes.append(Suffix(appendix.AppendixString, appendix.AppName, appendix.ToString()))
+                appendixlast = appendixPart
+                appendixPart = self.AppendixPart[len(appendixPart):]
+                self.AppendixPart = appendixPart
+                if ("Kosemshe" in appendix.AppName):
+                    break
+                if ("ToNoun" in appendix.AppName):
+                    self.CurrentPOS = Suffix.POS_NOUN
+                if ("ToAdjective" in appendix.AppName):
+                    self.CurrentPOS = Suffix.POS_ADJECTIVE
+                if ("ToVerbs" in appendix.AppName or "VWFI" in appendix.AppName):
+                    self.CurrentPOS = Suffix.POS_VERB
+                if ("ToVerbs" in appendix.AppName):
+                    self.CurrentPOS = Suffix.POS_VERB
+            else:
+                appendixPart = appendixPart[:-1]
         self.CorrectAnalyze()
     def CorrectAnalyze(self): 
         if len(self.Appendixes) > 1:

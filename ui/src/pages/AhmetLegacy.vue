@@ -1,15 +1,9 @@
 <template>
-  <div class="card flex justify-content-center">
+  <div class="card flex justify-content-center" style="min-width: 500px">
     <TreeTable :value="nodes" @node-expand="onNodeExpand">
       <template #header>
         <div class="row">
           <div class="text-left">Атауы</div>
-          <!-- <div class="text-right" style="margin-left: 700px;">
-                    <div class="p-input-icon-left">
-                        <i class="pi pi-search"></i>
-                        <InputText v-model=filters.global placeholder="Іздеу" @keyup="onFilter()" />
-                    </div>
-                </div> -->
         </div>
       </template>
       <Column headerStyle="width:3rem" :expander="true"> </Column>
@@ -27,8 +21,6 @@
             "
             class="flex flex-wrap gap-2"
           >
-            <!-- style="margin-right: 300px;" -->
-            <!-- :style="{width: '10vw', marginRight: '10px'}"  -->
             <Button
               type="button"
               icon="pi pi-download"
@@ -87,15 +79,12 @@
       </span>
       <div style="margin-top: 10px">
         <form @submit.prevent="uploadFile">
-          <!-- <input type="file" @change="handleFileChange" style="margin-top: 10px;"> -->
-          <!-- <FileUpload mode="basic" name="demo[]" url="http://kazlangres.enu.kz/v1/api/upload" :maxFileSize="1000000000000" @upload="onUpload" style="margin-top: 10px;" /> -->
           <FileUpload
             :name="FileName"
             :url="url"
             :formData="form_Data"
             @upload="handleFileUpload"
           ></FileUpload>
-          <!-- <Button type="submit" style="margin-top: 10px;">Жүктеу</Button> -->
         </form>
       </div>
     </Dialog>
@@ -167,9 +156,12 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { AhmetService } from "@/service/AhmetService";
+
 import store from "../store.js";
-import { AHMET_API } from "../config.js";
+import { AHMET_API, getHeader } from "../config.js";
 import axios from "axios";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const selectedTag = ref({ name: "", id: "" });
 const nodes = ref(null);
 const loading = ref(false);
@@ -206,11 +198,35 @@ const tagsToAdd = [
   { name: "ДЕМОГРАФ", id: "20" },
   { name: "ТАРИХШЫ", id: "21" },
 ];
-const addTag = () => {
-  axios.post(`${AHMET_API}/add/tag`, {
-    file_id: fileID.value,
-    definition_id: selectedTag.value.id,
-  });
+const addTag = async () => {
+  try {
+    await axios.post(
+      `${AHMET_API}/add/tag`,
+      {
+        file_id: fileID.value,
+        definition_id: selectedTag.value.id,
+      },
+      {
+        // headers: getHeader(useStore().getters.getAccessToken),
+        headers: getHeader(store.getters.getAccessToken),
+      }
+    );
+    toast.add({
+      severity: "success",
+      summary: "Қосылды",
+      detail: "Жаңа тег сәтті қосылды",
+      life: 3000,
+    });
+  } catch (e) {
+    toast.add({
+      severity: "error",
+      summary: "Ақау",
+      detail: "Тег қосылмады",
+      life: 3000,
+    });
+  } finally {
+    isDialogForTagsVisible.value = false;
+  }
 };
 
 const handleFileUpload = (event) => {
@@ -229,15 +245,31 @@ const handleFileUpload = (event) => {
   })
     .then((response) => {
       console.log("response: ", response);
+      toast.add({
+        severity: "success",
+        summary: "Қосылды",
+        detail: "Жаңа файл сәтті қосылды",
+        life: 3000,
+      });
     })
     .catch((error) => {
       console.log('There"s a issue:', error);
-    });
+      toast.add({
+        severity: "error",
+        summary: "Ақау",
+        detail: error,
+        life: 3000,
+      });
+    })
+    .finally(() => init());
   FileName.value = "";
 };
-
 onMounted(() => {
   loading.value = true;
+  init();
+  console.log(nodes.value);
+});
+const init = () => {
   AhmetService.getTreeTableNodes().then((data) => {
     console.log(data);
     loading.value = false;
@@ -250,8 +282,7 @@ onMounted(() => {
       nodes.value = legacies;
     }
   });
-  console.log(nodes.value);
-});
+};
 const onNodeExpand = (node) => {
   loading.value = true;
   AhmetService.getTreeTableNodes(node.key).then((data) => {
@@ -272,7 +303,7 @@ const onNodeExpand = (node) => {
 const path_to_download = ref("");
 const showFile = ref(false);
 const getFile = (fileID) => {
-  path_to_download.value = "http://localhost:5001/legacy/download/" + fileID;
+  path_to_download.value = `${AHMET_API}/legacy/download/` + fileID;
   console.log(fileID);
   showFile.value = true;
   // axios
@@ -289,6 +320,13 @@ const deleteFile = () => {
     headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
   });
+  toast.add({
+    severity: "success",
+    summary: "Өшірілді",
+    detail: "Файл сәтті өшірілд",
+    life: 3000,
+  });
+  init();
   setFalse();
 };
 const changeFileName = () => {

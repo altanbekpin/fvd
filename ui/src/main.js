@@ -39,6 +39,10 @@ import Checkbox from "primevue/checkbox";
 import Chip from "primevue/chip";
 import Chips from "primevue/chips";
 import SynonymSearcher from "./pages/components/SynonymSearcher.vue";
+import { defineAsyncComponent } from "vue";
+const AnimationComp = defineAsyncComponent(() =>
+  import("./pages/components/AnimationComp.vue")
+);
 import WordSynomizer from "./pages/components/WordSynomizer.vue";
 import ColorPicker from "primevue/colorpicker";
 import Column from "primevue/column";
@@ -183,6 +187,7 @@ app.component("Checkbox", Checkbox);
 app.component("Chip", Chip);
 app.component("Chips", Chips);
 app.component("SynonymSearcher", SynonymSearcher);
+app.component("AnimationComp", AnimationComp);
 app.component("WordSynomizer", WordSynomizer);
 app.component("ColorPicker", ColorPicker);
 app.component("Column", Column);

@@ -5,13 +5,21 @@
         <p1>Тезарус</p1>
       </div>
       <Listbox
+        v-if="OntNames.length != 0"
         v-model="selectedOnto"
         :options="OntNames"
         optionLabel="name"
         class="w-full listbox-scrollable"
       />
+      <div v-else class="skeleton-container">
+        <Skeleton class="mb-2"></Skeleton>
+        <Skeleton width="10rem" class="mb-2"></Skeleton>
+        <Skeleton width="5rem" class="mb-2"></Skeleton>
+        <Skeleton height="2rem" class="mb-2"></Skeleton>
+        <Skeleton width="10rem" height="4rem"></Skeleton>
+      </div>
     </div>
-    <div class="card col">
+    <div class="card col" style="min-width: 400px">
       <div class="card-header">
         <p1>Іздеу</p1>
       </div>
@@ -36,7 +44,14 @@
             />
           </div>
         </div>
-        <div v-html="this.OntoInner" ref="myElement"></div>
+        <div v-if="loading">
+          <Skeleton class="mb-2"></Skeleton>
+          <Skeleton width="10rem" class="mb-2"></Skeleton>
+          <Skeleton width="5rem" class="mb-2"></Skeleton>
+          <Skeleton height="2rem" class="mb-2"></Skeleton>
+          <Skeleton width="10rem" height="4rem"></Skeleton>
+        </div>
+        <div v-else v-html="this.OntoInner" ref="myElement"></div>
       </div>
     </div>
 
@@ -55,6 +70,7 @@ export default {
       selectedOnto: "",
       OntoInner: "",
       textController: "",
+      loading: false,
     };
   },
   methods: {
@@ -65,6 +81,7 @@ export default {
         .then((response) => (this.OntNames = response.data));
     },
     async searchFunc() {
+      this.loading = true;
       var reqbody = {
         question: this.textController,
       };
@@ -74,6 +91,7 @@ export default {
       });
 
       this.OntoInner = temp.data;
+      this.loading = false;
     },
     // async DoSubmit(text){
     // }
@@ -81,7 +99,9 @@ export default {
   async mounted() {
     this.getJson(`${AHMET_API}/getontology/ask/`);
     const self = this;
+    this.loading = true;
     window.DoSubmit = async function (text) {
+      self.loading = true;
       console.log(text);
       self.textController = text;
       var reqbody = {
@@ -95,7 +115,9 @@ export default {
       console.log(temp.data);
       self.OntoInner = temp.data;
       self.textController = text;
+      self.loading = false;
     };
+    this.loading = false;
     console.log(this.OntNames.length);
   },
   watch: {
@@ -103,6 +125,7 @@ export default {
     //     console.log(newValue[0])
     // },
     async selectedOnto() {
+      this.loading = true;
       console.log(this.selectedOnto["name"]);
       this.textController = this.selectedOnto["name"];
       var reqbody = {
@@ -115,6 +138,7 @@ export default {
       });
       console.log(temp.data);
       this.OntoInner = temp.data;
+      this.loading = false;
     },
     OntoInner(newValue) {
       console.log(newValue);
@@ -179,11 +203,22 @@ export default {
   display: flex;
   flex-direction: column;
   margin-left: 15px;
+  margin-right: 15px;
 }
 .p-input-icon-left {
   margin-bottom: 1rem; /* Add some spacing between the search input and the Listbox */
 }
 .input-field {
   border-radius: 10px;
+}
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 25px; /* Adjust the left margin */
+  margin-right: 25px; /* Adjust the right margin */
+}
+
+.skeleton-container .mb-2 {
+  margin-bottom: 1rem; /* Add margin between each element */
 }
 </style>

@@ -37,18 +37,17 @@ class Suffix(Appendix):
     POS_ADVERB = 9 # Үстеу
     AdjectivesToNoun = [ "лық", "лік"]
 	# есімдерден зат есім тудырушы
-    NamesToNoun = ["шы", "ші", "дық", "дік", "тық", "тік", "лас", "лес", "дас", "дес", "тас", "тес", "ша", "ше", "шық", "шік", "шылық", "шілік"]
+    NamesToNoun = ["шы", "ші","дық", "дік", "тық", "тік", "лас", "лес", "дас", "дес", "тас", "тес", "ша", "ше", "шық", "шік", "шылық", "шілік"]
 	# еліктеуіштерден зат есім тудырушы
     MimicsToNoun = ["ыл", "іл", "л"]
 	# етістіктен зат есім тудырушы
-    VerbsToNoun = ["ма", "ме", "ба", "бе", "па", "пе", "ыс", "іс", "с", "к", "қ", "гі", "ақ", "ек", "ғыш", "гіш", "қыш", "кіш", "ыш", "іш", "уыш", "уіш", "ман", "мен"] # //ым", "ім", "м"]
+    VerbsToNoun = ["ма", "ме", "ба", "бе", "па", "пе", "ыс", "іс", "с", "қ", "к","ғы", "гі", "ақ", "ек", "ғыш", "гіш", "қыш", "кіш", "ыш", "іш", "уыш", "уіш", "ман", "мен"] # //ым", "ім", "м"]
     # Жедел өткен шақ
     VWFI = ["ды", "ді", "ты", "ті"]
 	# зат есімнен сын есім
-    NounsToAdjective = ["лы", "лі", "ды", "ді", "ты", "ті", "лық", "лік", "тық", "тік", "сыз", "сіз", "қы", "кі", "ғы", "гі", "шыл", "шіл", "дай", "дей", "тай", "тей", "шаң", "шең", "и", "қой", "қор", "паз"]
+    NounsToAdjective = ["лы", "лі", "ды", "ді", "ты", "ті", "лық", "лік", "тық", "тік", "сыз", "сіз", "қы", "кі", "ғы", "гі", "шыл", "шіл","лай","лей", "дай", "дей", "тай", "тей", "шаң", "шең", "и", "қой", "қор", "паз", 'тын','тін']
 	# етістіктен сын есім
     VerbsToAdjective = [
-
     #"қ", "к", "ық", "ік",
         "қақ", "ғақ", "гек", "кек","ақ", "ек",
         "қыш", "кіш", "ғыш", "гіш", "қы", "гі", "ғылықты", "кілікті",
@@ -64,7 +63,7 @@ class Suffix(Appendix):
     ]
 	# есімдерден етістік тудырушы жұрнақтар
     NamesToVerbs = [
-        "лан", "лен", "лас", "лес", "дас", "дес", "тас", "тес", "лат", "лет", "дат", "дет", "тат", "тет", " ар", "ер", "р", "ай", "ей", "ақ", "ік", #"тан", "тен", "дан", "ден", "а", "е", " й", "ла", "ле", "да", "де", "та", "те"
+        "лан", "лен", "лас", "лес", "дас", "дес", "тас", "тес", "лат", "лет", "дат", "дет", "тат", "тет", " ар", "ер", "р", "ай", "ей", "ақ", "ік","та", "те", "ла", "ле", "да", "де", #"тан", "тен", "дан", "ден", "а", "е", " й", "та", "те", "ла", "ле"
     ]
 	# етістіктен етістік тудырушы жұрнақтар
     VerbsToVerbs = [
@@ -73,12 +72,13 @@ class Suffix(Appendix):
         "ғанша", "генше", "қанша", "кенше", "майынша", "мейінше", "қан", "кен", "ған", "ген", "ар", "ер", "р", "с",
         "тын", "тін", "ушы", "уші", "мақ", "мек", "бақ", "бек", "пақ", "пек", "у"
     ]
+    YryqsyzEtis = ["ын", "ін", "н", "ыл", "іл", "л"]
     Kosemshe = ["а", "е", "й", "ып", "іп", "п", "ғалы", "гелі", "қалы", "келі"]
     Esimshe = ["ған", "ген", "қан", "кен", "ар", "ер", "р", "с", "тын", "тін", "ушы", "уші", "мақ", "мек", "бақ", "бек", "пақ", "пек"]
     KosemsheEsimshePlusTaueldik = ["амыз", "еміз", "ймыз", "йміз"]
     VerbsToEsimshe = ["қан", "кен", "ған", "ген", "атын", "етін", "йтын", "йтін", " ар", "ер", "р", "с", "тын", "тін", "ушы", "уші", "мақ", "мек", "бақ", "бек", "пақ", "пек"]
 
-    def CheckForDefinition(self, ending):
+    def CheckForDefinition(self, ending): 
         if ending in self.AdjectivesToNoun:
             self.AppName = "AdjectivesToNoun"
         if ending in self.NamesToNoun:
@@ -87,14 +87,14 @@ class Suffix(Appendix):
             self.AppName = "MimicsToNoun"
         if ending in self.VerbsToNoun:
             self.AppName = "VerbsToNoun"
+        if ending in self.VerbsToVerbs:
+            self.AppName = "VerbsToVerbs"
         if ending in self.NounsToAdjective:
             self.AppName = "NounsToAdjective"
         if ending in self.VerbsToAdjective:
             self.AppName = "VerbsToAdjective"
         if ending in self.NamesToVerbs:
             self.AppName = "NamesToVerbs"
-        if ending in self.VerbsToVerbs:
-            self.AppName = "VerbsToVerbs"
         if ending in self.Kosemshe:
             self.AppName = "Kosemshe"
         if ending in self.Esimshe:
@@ -106,52 +106,96 @@ class Suffix(Appendix):
         if (self.AppName != ""):
             self.AppendixString = ending
         return self.AppName
-    def CheckForDefinition(self, pos, ending):
+    
+    def CheckForDefinition2(self, ending):
+        if ending in self.AdjectivesToNoun:
+            self.AppName = "AdjectivesToNoun"
+        if ending in self.NamesToNoun:
+            self.AppName = "NamesToNoun"
+        if ending in self.MimicsToNoun:
+            self.AppName = "MimicsToNoun"
+        if ending in self.VerbsToNoun:
+            self.AppName = "VerbsToNoun"
+        if ending in self.NounsToAdjective:
+            self.AppName = "NounsToAdjective"
+        if ending in self.VerbsToVerbs:
+            self.AppName = "VerbsToVerbs"
+        if ending in self.VerbsToAdjective:
+            self.AppName = "VerbsToAdjective"
+        if ending in self.NamesToVerbs:
+            self.AppName = "NamesToVerbs"
+        if ending in self.Kosemshe:
+            self.AppName = "Kosemshe"
+        if ending in self.Esimshe:
+            self.AppName = "Esimshe"
+        if ending in self.KosemsheEsimshePlusTaueldik:
+            self.AppName = "KosemsheEsimshePlusTaueldik"
+        if ending in self.VerbsToEsimshe:
+            self.AppName = "VerbsToEsimshe"
+        if (self.AppName != ""):
+            self.AppendixString = ending
+        return self.AppName
+    
+    def CheckForDefinition(self, pos, ending, lastappendix =''):
         #print("SELF POS SUFFIX=", pos)
-        if (pos == self.POS_VERB):
+        if (pos == self.POS_VERB and self.AppName =="" and lastappendix != 'у'):
             for ve in self.VerbsToEsimshe:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "VerbsToEsimshe"
+                    break
             for ve in self.Kosemshe:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "Kosemshe"
+                    break
             for ve in self.VerbsToVerbs:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "VerbsToVerbs"
+                    break
             for ve in self.VerbsToNoun:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "VerbsToNoun"
+                    break
             for ve in self.VerbsToAdjective:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "VerbsToAdjective"
+                    break
             for ve in self.VWFI:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "VWFI"
-        if (pos == self.POS_NOUN):
+                    break
+        if (pos == self.POS_NOUN or (pos == self.POS_VERB and lastappendix == 'у')):
+            print("HERE")
             for ve in self.NamesToNoun:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "NamesToNoun"
+                    break
             for ve in self.NamesToVerbs:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "NamesToVerbs"
+                    break
             for ve in self.NounsToAdjective:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "NounsToAdjective"
+                    break
         if (pos == self.POS_MIMIC):
             for ve in self.MimicsToNoun:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "MimicsToNoun"
+                    break
         if (pos == self.POS_ADJECTIVE):
             for ve in self.AdjectivesToNoun:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "AdjectivesToNoun"
+                    break
         if (pos == self.POS_NUMERAL):
             for ve in self.NamesToNoun:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "NamesToNoun"
+                    break
             for ve in self.NamesToVerbs:
-                if ve == ending:
+                if ve == ending and self.AppName == "":
                     self.AppName = "NamesToVerbs"
+                    break
         if (self.AppName != ""):
             self.AppendixString = ending
         return self.AppName
@@ -202,7 +246,7 @@ class Septik(Ending):
     Ilik = ["ның", "нің", "дың", "дің", "тың", "тің"]
     Barys = ["ға", "ге", "қа", "ке", "на", "не", "а", "е"]
     Tabys = ["ны", "ні", "ды", "ді", "ты", "ті", "н"]
-    Jatys = ["да", "де", "та", "те", "нда", "нде"]
+    Jatys = ["дағы", "дегі", "таға", "тегі", "да", "де", "та", "те", "нда", "нде", ]
     Shygys = ["нан", "нен", "дан", "ден", "тан", "тен"]
     Komektes = ["мен", "бен", "пен", "пенен", "менен", "бенен"]
 

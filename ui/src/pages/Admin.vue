@@ -43,14 +43,18 @@
                 class="col-sm-4"
                 v-else-if="data && data.activate_type === 3"
               >
-                <div class="mb-2">{{ getOffer(data) }}</div>
+                <div class="mb-2">
+                  "{{ data.syn_word }}" сөзіне {{ getOffer(data) }}
+                </div>
                 <div class="mb-2">Синоним: {{ data.synonym }}</div>
               </div>
               <div
                 class="col-sm-4"
                 v-else-if="data && data.activate_type === 4"
               >
-                <div class="mb-2">{{ getOffer(data) }}</div>
+                <div class="mb-2">
+                  "{{ data.par_word }}" сөзіне {{ getOffer(data) }}
+                </div>
                 <div class="mb-2">Перифраза: {{ data.paraphrase }}</div>
               </div>
             </div>
@@ -140,9 +144,9 @@ export default {
         case 2:
           return "Қолданушы болып тіркелуге ұсыныс";
         case 3:
-          return "Жаңа синоним қосуға ұсыныс";
+          return "жаңа синоним қосуға ұсыныс";
         case 4:
-          return "Жаңа перифраза қосуға ұсыныс";
+          return "жаңа перифраза қосуға ұсыныс";
         default:
           return "Қате ұсыныс";
       }

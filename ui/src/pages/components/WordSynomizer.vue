@@ -1,79 +1,89 @@
 <template>
   <div>
-    <div>
-      <Textarea rows="15" cols="55" v-model="inputWords" style="width: 100%" />
-      <div class="row texts" style="margin-top: 30px">
-        <div>Символдар саны = {{ inputWords.length }}</div>
-        <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
-        <Button
-          label="Өңдеу"
-          style="margin-left: 80px"
-          @click="send_to_synomize"
-        />
-      </div>
+    <Textarea rows="15" cols="55" v-model="inputWords" style="width: 100%" />
+    <div class="row texts" style="margin-top: 30px">
+      <div>Символдар саны = {{ inputWords.length }}</div>
+      <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
+      <Button
+        label="Өңдеу"
+        style="margin-left: 80px"
+        @click="send_to_synomize"
+      />
+    </div>
+    <div
+      v-show="loading == false"
+      class="card"
+      style="
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        height: 130px;
+        max-height: 130px;
+        padding-bottom: 40px;
+      "
+    >
       <div
-        class="card"
         style="
           width: 100%;
-          margin-top: 10px;
-          margin-bottom: 10px;
-          overflow: hidden;
-          height: 130px;
-          max-height: 130px;
-          padding-bottom: 40px;
+          overflow-y: auto;
+          padding-right: 10px;
+          max-height: 100px;
+          height: 100px;
         "
       >
-        <div
-          style="
-            width: 100%;
-            overflow-y: auto;
-            padding-right: 10px;
-            max-height: 100px;
-            height: 100px;
-          "
-        >
-          <div class="word-container">
-            <span v-for="(word, index) in synomized_words" :key="index">
-              <span
-                v-if="isHtml(word)"
-                v-html="word"
-                @click="handleLineClick"
-              ></span>
-              <span v-else>{{ word }}</span>
-            </span>
-          </div>
-
-          <OverlayPanel
-            ref="op"
-            style="border: none; padding: 0"
-            v-if="synomized_counter != 0"
-            :appendTo="'span#span-0.temp_testing_div2'"
-          >
-            <div class="border-inner">
-              <Listbox
-                v-model="selectedSyn"
-                :options="optionSynonyms"
-                optionLabel="synonym"
-                class="w-full"
-                style="
-                  border: none;
-                  margin: 0;
-                  max-height: 80px;
-                  overflow-y: auto;
-                "
-                @change="onSynonymTap"
-              />
-            </div>
-          </OverlayPanel>
+        <div class="word-container">
+          <span v-for="(word, index) in synomized_words" :key="index">
+            <span
+              v-if="isHtml(word)"
+              v-html="word"
+              @click="handleLineClick"
+            ></span>
+            <span v-else>{{ word }}</span>
+          </span>
         </div>
+
+        <OverlayPanel
+          ref="op"
+          style="border: none; padding: 0"
+          v-if="synomized_counter != 0"
+        >
+          <div class="border-inner">
+            <Listbox
+              v-model="selectedSyn"
+              :options="optionSynonyms"
+              optionLabel="synonym"
+              class="w-full"
+              style="
+                border: none;
+                margin: 0;
+                max-height: 80px;
+                overflow-y: auto;
+              "
+              @change="onSynonymTap"
+            />
+          </div>
+        </OverlayPanel>
       </div>
     </div>
+    <Skeleton
+      v-show="loading"
+      style="
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        height: 130px;
+        max-height: 130px;
+        padding-bottom: 40px;
+      "
+    ></Skeleton>
   </div>
 </template>
 <script>
 import axios from "axios";
 import { AHMET_API, getHeader } from "../../config";
-// import { AhmetService } from "../../service/AhmetService";
+import { AhmetService } from "../../service/AhmetService";
 
 export default {
   data() {
@@ -86,11 +96,18 @@ export default {
       selectedSyn: null,
       overlayTarget: null,
       clickedElHref: "",
+      second_part: "",
+      loading: false,
     };
   },
 
   methods: {
+    forceRerender() {
+      this.synomized_counter = 0;
+    },
     async send_to_synomize() {
+      this.loading = true;
+      this.forceRerender();
       await axios
         .post(
           `${AHMET_API}/search/word/`,
@@ -104,6 +121,7 @@ export default {
           this.synomized_words = response.data[0];
           this.synomized_counter = response.data[1];
         });
+      this.loading = false;
     },
     async handleLineClick(e) {
       this.clickedElHref = e.target.getAttribute("href");
@@ -122,6 +140,7 @@ export default {
         this.handleClick(e);
         console.log("temp_testing_div2 clicked!", this.clickedElHref);
         console.log("clickkedRef:", clickkedRef);
+        this.second_part = clickkedRef;
         console.log("family:", family);
         this.optionSynonyms = [
           {
@@ -135,6 +154,7 @@ export default {
             {
               value: this.clickedElHref,
               second_part: clickkedRef,
+              secondary: this.overlayTarget.innerText,
               family: family,
             },
             { headers: getHeader() }
@@ -156,11 +176,19 @@ export default {
       console.log("toggle: ", event.target);
       this.$refs.op.toggle(event);
     },
-    onSynonymTap() {
+    async onSynonymTap() {
+      const responsen = await AhmetService.research(
+        this.optionSynonyms[0].synonym,
+        this.selectedSyn.synonym
+      );
       console.log(this.optionSynonyms);
       console.log("selectedSyn: ", this.selectedSyn);
       console.log("selectedSyn: ", this.selectedSyn.synonym);
-      this.overlayTarget.innerText = this.selectedSyn.synonym;
+      if (this.optionSynonyms[0].synonym.includes(this.selectedSyn.synonym)) {
+        this.overlayTarget.innerText = this.optionSynonyms[0].synonym;
+      } else {
+        this.overlayTarget.innerText = responsen;
+      }
       this.closeOverlayPanel();
     },
     closeOverlayPanel() {

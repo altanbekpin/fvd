@@ -33,9 +33,9 @@ def change_file_name():
 def upload_file():
     if request.method == 'OPTIONS' or len(request.form.keys()) == 0:
         headers = {
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': 'http://localhost:8080',  # Adjust the origin accordingly
             'Access-Control-Allow-Methods': 'POST',
-            'Access-Control-Allow-Headers': 'Content-Type'
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',  # Add 'Authorization' to the list
         }
         return ('', 204, headers)
     print("upload_file")

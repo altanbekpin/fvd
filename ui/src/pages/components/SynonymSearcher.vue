@@ -43,47 +43,92 @@
         listStyle="max-height:100px"
         @change="handleSelection"
       />
-      <div
-        class="centered-card"
-        style="width: 10px; height: 10px"
-        @click="showDialog"
-      >
-        <i class="pi pi-plus" style="font-size: 1rem"></i>
+      <div class="row">
+        <div
+          class="centered-card"
+          style="width: 10px; height: 10px"
+          @click="showDialog"
+        >
+          <i class="pi pi-plus" style="font-size: 1rem"></i>
+        </div>
+        <div
+          v-if="isUserAdmin"
+          class="centered-card"
+          style="width: 10px; height: 10px"
+          @click="
+            (showDeleteDialog = true),
+              (showDeleteWord = true),
+              (showDeleteParaphrases = false),
+              (showDeleteSynonyms = false)
+          "
+        >
+          <i class="pi pi-trash" style="font-size: 1rem"></i>
+        </div>
       </div>
     </div>
     <div class="row" style="margin-top: 10px">
       <div>синонимдері:</div>
       <Listbox
-        v-model="j"
+        v-model="selectedSyn"
         :options="synonyms"
         optionLabel="synonym"
         class="w-full md:w-14rem"
         listStyle="max-height:100px"
       />
-      <div
-        class="centered-card"
-        style="width: 10px; height: 10px"
-        @click="changeSynDialog"
-      >
-        <i class="pi pi-plus" style="font-size: 1rem"></i>
+      <div class="row">
+        <div
+          class="centered-card"
+          style="width: 10px; height: 10px"
+          @click="changeSynDialog"
+        >
+          <i class="pi pi-plus" style="font-size: 1rem"></i>
+        </div>
+        <div
+          v-if="isUserAdmin"
+          class="centered-card"
+          style="width: 10px; height: 10px"
+          @click="
+            (showDeleteDialog = true),
+              (showDeleteWord = false),
+              (showDeleteParaphrases = false),
+              (showDeleteSynonyms = true)
+          "
+        >
+          <i class="pi pi-trash" style="font-size: 1rem"></i>
+        </div>
       </div>
     </div>
     <div class="row" style="margin-top: 10px">
       <div>Перифраза:</div>
       <Listbox
-        v-model="j"
+        v-model="SelectedPar"
         :options="paraphrases"
         optionLabel="paraphrase"
         class="w-full md:w-14rem"
         style="margin-left: 10px"
         listStyle="max-height:100px"
       />
-      <div
-        class="centered-card"
-        style="width: 10px; height: 10px"
-        @click="changeParDialog"
-      >
-        <i class="pi pi-plus" style="font-size: 1rem"></i>
+      <div class="row">
+        <div
+          class="centered-card"
+          style="width: 10px; height: 10px"
+          @click="changeParDialog"
+        >
+          <i class="pi pi-plus" style="font-size: 1rem"></i>
+        </div>
+        <div
+          v-if="isUserAdmin"
+          class="centered-card"
+          style="width: 10px; height: 10px"
+          @click="
+            (showDeleteDialog = true),
+              (showDeleteWord = false),
+              (showDeleteParaphrases = true),
+              (showDeleteSynonyms = false)
+          "
+        >
+          <i class="pi pi-trash" style="font-size: 1rem"></i>
+        </div>
       </div>
     </div>
   </div>
@@ -142,6 +187,34 @@
       ></Button>
     </div>
   </Dialog>
+  <Dialog
+    v-model:visible="showDeleteDialog"
+    modal
+    header="Өшіру"
+    :style="{ width: '50vw' }"
+  >
+    <p v-if="showDeleteWord">
+      "{{ words }}" сөзінің {{ family["family"] }} сөз табын өшіруге сендімдісіз
+      бе?
+    </p>
+    <p v-if="showDeleteParaphrases">
+      "{{ words }}" сөзінің {{ SelectedPar["paraphrase"] }} перифразасын өшіруге
+      сендімдісіз бе?
+    </p>
+    <p v-if="showDeleteSynonyms">
+      "{{ words }}" сөзінің {{ selectedSyn["synonym"] }} синонимін өшіруге
+      сенімдісіз бе?
+    </p>
+    <template #footer>
+      <Button
+        label="Жоқ"
+        icon="pi pi-times"
+        @click="showDeleteDialog = false"
+        text
+      />
+      <Button label="Иә" icon="pi pi-check" @click="onTrashClick" autofocus />
+    </template>
+  </Dialog>
 </template>
 <script>
 // import { ref } from "vue";
@@ -170,17 +243,56 @@ export default {
       inputValues: [],
       showDialogSynonyms: false,
       showDialogParaphrases: false,
+      showDeleteDialog: false,
+      showDeleteSynonyms: false,
+      showDeleteParaphrases: false,
+      showDeleteWord: false,
       sonynomToAdd: [],
       paraphraseToAdd: [],
       selectedWord: null,
       access_token: null,
       example: "",
+      selectedSyn: "",
+      SelectedPar: "",
+      Word_id: "",
+      isUserAdmin: false,
     };
   },
   mounted() {
-    this.access_token = useStore().getters.getAccessToken;
+    const store = useStore();
+    this.access_token = store.getters.getAccessToken;
+    this.isUserAdmin = store.getters.isUserAdmin;
   },
   methods: {
+    async onTrashClick() {
+      console.log("this.SelectedPar['id']:", this.SelectedPar["id"]);
+      var statusCode = 400;
+      if (this.showDeleteSynonyms) {
+        statusCode = await AhmetService.delete_syn(
+          this.access_token,
+          this.selectedSyn["id"]
+        );
+      }
+      if (this.showDeleteParaphrases) {
+        statusCode = await AhmetService.delete_par(
+          this.access_token,
+          this.SelectedPar["id"]
+        );
+      }
+      if (this.showDeleteWord) {
+        statusCode = await AhmetService.delete_family(
+          this.access_token,
+          this.Word_id
+        );
+      }
+      this.showDeleteDialog = false;
+      if (statusCode == 200) {
+        this.$emit("childEvent", "success");
+      } else {
+        this.$emit("childEvent", "error");
+      }
+      this.onSearchTap();
+    },
     async onChange(event, words_family) {
       var response = {};
       console.log("onChagne:", event);
@@ -196,6 +308,7 @@ export default {
       console.log(event.target.value);
       console.log("response word in console: ", response);
       if (response != null) {
+        this.Word_id = response[0]["id"];
         this.showSynAdd = false;
         this.example =
           response[0]["example"] == ""
@@ -281,7 +394,7 @@ export default {
       this.$emit("custom-event", this.word);
     },
     async addSynonym() {
-      await axios.post(
+      const repsonse = await axios.post(
         `${AHMET_API}/add/synonym/`,
         {
           synonyms: this.sonynomToAdd,
@@ -297,9 +410,11 @@ export default {
           },
         }
       );
+      this.$emit("add-word", repsonse.status == 200);
+      this.changeSynDialog();
     },
     async addParaphrase() {
-      await axios.post(
+      const response = await axios.post(
         `${AHMET_API}/add/paraphrase/`,
         {
           paraphrases: this.paraphraseToAdd,
@@ -315,6 +430,8 @@ export default {
           },
         }
       );
+      this.$emit("add-word", response.status == 200);
+      this.changeParDialog();
     },
   },
 };
