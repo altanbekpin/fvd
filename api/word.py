@@ -41,6 +41,7 @@ class Finder:
         return self._synonym
     
     def set_synonym(self, new_synonym):
+        print("new_synonym:", new_synonym)
         self._synonym = new_synonym
     
     def get_family(self):
@@ -172,8 +173,6 @@ class Finder:
             return 'д'
         if char == 'д':
             return 'т'
-        if char == 'с':
-            return 'з'
         if char == 'з':
             return 'с'
         if char == 'щ':
@@ -472,7 +471,7 @@ class Word(Finder):
         return self._search_property('Gen')
     
     def has_depend(self):
-        return self._search_property('POSS.1SG')
+        return self._search_property('POSS')
     
     suffix_symbols = ['AdjectivesToNoun', 'NamesToNoun', 'MimicsToNoun', 'VerbsToNoun', 'NounsToAdjective', 'VerbsToAdjective', 'NamesToVerbs', 'VerbsToVerbs', 'Kosemshe', 'Esimshe', 'KosemsheEsimshePlusTaueldik', 'VerbsToEsimshe', "VWFI"]
     def get_researhed_part(self, researhed_part=None):
@@ -531,7 +530,7 @@ class Word(Finder):
                     self.set_synonym(self.get_synonym() + second_part)
                     return 
                 print(second_part)
-                if not((self.is_soft(synonym) and self.is_soft(second_part)) or (not(self.is_soft(synonym)) and not(self.is_soft(second_part)))):
+                if not self.has_depend() and not((self.is_soft(synonym) and self.is_soft(second_part)) or (not(self.is_soft(synonym)) and not(self.is_soft(second_part)))):
                     if self.is_soft(synonym):
                         temp = ''
                         for i in second_part:
@@ -553,18 +552,21 @@ class Word(Finder):
         if self.isResearchable() and self.has_second_part:
             print("HELE")
             for i in parts:
+                print(i)
                 if i not in researcheableParts:
+                    print("AAAAAAAAAAAAAA1")
                     continue
-                if (i in researcheableParts) and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)) and word[-1] == self.get_synonym()[-1]:
-                    word = word + self.get_addition(i, [])
-                    print(word)
-                    syn = self.get_synonym() + self.get_addition(i, [])
+                if (i in researcheableParts) and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)) and self.get_first_part()[-1] == self.get_synonym()[-1]:
+                    print("AAAAAAAAAAAAAA2")
+                    print(self.get_synonym()[:-1])
+                    addition = self.get_addition(i, [])
+                    if self.get_synonym()[-1] in ['с'] and addition[0] == self.get_synonym()[-1]:
+                        self.set_synonym(self.get_synonym()[:-1]) 
+                    word = word + addition
+                    print(self.get_first_part())
+                    syn = self.get_synonym() + addition
                     self.set_synonym(syn)
                     print(syn)
-                    continue
-                if (i in researcheableParts) and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)) and ((word[-1] in uyan and self.get_synonym()[-1] in uyan) or (word[-1] in catan and self.get_synonym()[-1] in catan) or (word[-1] in un and self.get_synonym()[-1] in un)):
-                    word = word + self.get_addition(i, [])
-                    self.set_synonym(self.get_synonym() + self.get_addition(i, []))
                     continue
                 app = ""
                 if i == "Imprv":
@@ -604,10 +606,8 @@ class Word(Finder):
                     word = word + addition
                     if app == "":
                         app = addition
-                    if self.get_synonym()[-1] in ['м', 'у'] and app[0] in ['с']:
+                    if self.get_synonym()[-1] in ['м', 'у', 'с'] and app[0] in ['с']:
                         app = app.replace(app[0], "")
-                    # if self.get_synonym()[-1] in un and app[0] in couples and i not in "PL":
-                    #     app = self.get_couple(app[0]) + app[1:]
                     print("self.get_synonym() + app:", self.get_synonym() + app)
                     if self.get_synonym()[-1] in ['к'] and app[0] in self.soft:
                         self.set_synonym(self.get_synonym()[:-1] + self.get_couple(self.get_synonym()[-1]))
@@ -621,6 +621,7 @@ class Word(Finder):
                             else:
                                 temp += self.make_solid(i)
                         app = temp
+                    print("self.get_synonym() + app:", self.get_synonym() + app)
                     self.set_synonym(self.get_synonym() + app)
                 else:
                     for _, val in enumerate(app):
@@ -675,7 +676,16 @@ class Word(Finder):
             return False
         for i in self._stcs[0][0][2]:
             app += i[0]
-        return self.get_first_part() + app == self.word
+        print("first_aprt=",self.get_first_part() )
+        print("self.word=",self.word )
+        # Егер сөз түбірі табылған болса және сөз түбірі негізгі сөзге тең емес, әрі нақты анықталған жалғау жоқ болса онда түрлендірудің жалғастырып керек емес
+        if app == "" and self.get_first_part() + app != self.word:
+            return False
+        print("&&&&&&&&&&&&&")
+        print(self.get_first_part() + app)
+        print(self.word)
+        # return self.get_first_part() + app == self.word
+        return True
 
             
 
@@ -703,9 +713,20 @@ class Word(Finder):
             first_part= self.get_first_part()
             synonym, synomized_count = DB.get_instance().findsyn(first_part, self.synomized_count, self._synonyms, Word.get_pos_names(family))
             synonym = synonym.strip()
+            print(synonym)
             if len(synonym.split(" "))>1:
                 syn_temp = synonym.split(" ")[len(synonym.split(" "))-1]
                 self.first_synonym = synonym.split(" ")[:len(synonym.split(" "))-1]
+                print("syn_temp:", syn_temp)
+                if family == "N":
+                    t = Lemms.get_instance().get_kaz_lemms(st(syn_temp))
+                    print(t)
+                    if (not (len(t) == 0)) and (len(t[0][0]) > 2) and not len(t[0][0][2]) == 0:
+                        print("Not len:", t[0][0][2][0][2])
+                        if 'POSS' in t[0][0][2][0][1]:
+                            print(len(t[0][0][2][0][2]))
+                            l = len(t[0][0][2][0])
+                            syn_temp = syn_temp[:len(syn_temp)-l+1]
                 temp = ""
                 for i in self.first_synonym:
                     temp = temp + " " + i
@@ -728,13 +749,17 @@ class Word(Finder):
     def _search_property(self, property):
         if self.isResearchable() and self.has_second_part:
             for i in self.get_parts():
-                if i == property:
+                if property in i:
                     return True
         return False
 
     def capitalize_synonym(self):
+        print("capitalize_synonym:",self.get_first_part())
+        if len(self.get_synonym().split(" "))>1:
+            self.set_synonym(self.get_first_part().capitalize() + self.get_synonym())
+            return
         self.set_synonym(self.get_synonym().capitalize())
-    
+
     @staticmethod
     def split_string(first_string, second_string):
         index = second_string.find(first_string)

@@ -85,7 +85,56 @@ def searchWord():
     print("words:", words)
     output_words = []
     data_id = 0
+    bringed_words = []
+    neededindexes = []
+    # sozTirkesi = []
+    # index = 0
+    # while (index<len(words)):
+    #     index +=1
+    #     if (words[index-1] in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] 
+    #     or len(sozTirkesi)>2):
+    #         wordForSearch = " ".join(sozTirkesi)
+    #         ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
+    #         sozTirkesi = []
+    #         continue
+    #     if words[index-1] != " ":
+    #         findIndex = index
+    #         sozTirkesi.append(words[index-1])
+        
+
+    # print("+++++++++++++++++++++++++++++++++++++++++++++")
+    # for index in range(0, len(words)):
+    #     i = index
+    #     max_index = i + 3
+    #     while(max_index > i):
+    #         joined = "".join(words[index:i])
+    #         print(joined)
+    #         if len(words[index:i]) > 1:
+    #             i += 1
+    #             continue
+    #         ret = DB.get_instance().findsyn(joined, 0, [])
+    #         i += 1
+    #         if len(joined) and len(ret) > 1 and ret[0] not in joined:
+    #             if len(words[index:i])>1 and words[index:i][-1] == ' ':
+    #                 continue
+    #             print("index:", index)
+    #             print("i:", i)
+    #             print(words[index:i])
+    #             words[index:i] = [ret[0]]
+    #             neededindexes.append(index)
+    #             bringed_words.append(ret[0])
+    #             print("LALIZE:", ret[0])
+    #             continue
+    # print("+++++++++++++++++++++++++++++++++++++++++++++")
+    print("words:", words)
     for index, word in enumerate(words):
+        if index in neededindexes:
+            print(bringed_words[0])
+            translated_word = getHtml(bringed_words[0], "",data_id, bringed_words[0], "")
+            synomized_count += 1
+            data_id += 1
+            output_words.append(translated_word)   
+            continue
         if word not in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] and word.strip() and not is_person_name(word, data, index == 0):
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
@@ -112,24 +161,20 @@ def searchsyn():
     second_part = request.json['second_part']
     family = request.json['family']
     secondary = request.json['secondary']
-    print("secondary:", secondary)
     synonyms = []
     synonyms = DB.get_instance().findsyn_with_family(data, getTense(family))
-    print("synonyms:", synonyms)
     if len(synonyms) == 0:
-        synonyms = DB.get_instance().findsyn_with_family(secondary, '')
-        print("synonyms2:", synonyms)
+        synonyms = DB.get_instance().findsyn_with_family(secondary, '')[1:]
     else:
         synonyms.insert(0, {"words":data, "synonym": data+second_part})
     for i in range(0, len(synonyms)):
          synonyms[i]['synonym'] = synonyms[i]['synonym']
-    print(synonyms)
     return synonyms
 
 @app.route('/add/tag', methods=['POST'])
 @jwt_required()
 def addTag():
-    if not DB.isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user):
         return "don't have enough permission", 500
     definition_id = request.json['definition_id']
     file_id = request.json['file_id']

@@ -156,8 +156,9 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { AhmetService } from "@/service/AhmetService";
+
 import store from "../store.js";
-import { AHMET_API } from "../config.js";
+import { AHMET_API, getHeader } from "../config.js";
 import axios from "axios";
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
@@ -197,11 +198,35 @@ const tagsToAdd = [
   { name: "ДЕМОГРАФ", id: "20" },
   { name: "ТАРИХШЫ", id: "21" },
 ];
-const addTag = () => {
-  axios.post(`${AHMET_API}/add/tag`, {
-    file_id: fileID.value,
-    definition_id: selectedTag.value.id,
-  });
+const addTag = async () => {
+  try {
+    await axios.post(
+      `${AHMET_API}/add/tag`,
+      {
+        file_id: fileID.value,
+        definition_id: selectedTag.value.id,
+      },
+      {
+        // headers: getHeader(useStore().getters.getAccessToken),
+        headers: getHeader(store.getters.getAccessToken),
+      }
+    );
+    toast.add({
+      severity: "success",
+      summary: "Қосылды",
+      detail: "Жаңа тег сәтті қосылды",
+      life: 3000,
+    });
+  } catch (e) {
+    toast.add({
+      severity: "error",
+      summary: "Ақау",
+      detail: "Тег қосылмады",
+      life: 3000,
+    });
+  } finally {
+    isDialogForTagsVisible.value = false;
+  }
 };
 
 const handleFileUpload = (event) => {

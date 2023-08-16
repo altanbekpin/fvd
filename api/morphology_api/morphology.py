@@ -321,7 +321,14 @@ class Lemms:
                 while len(token) > 0 and not(token_found):
                     token = token[:-1] + self.change_syngor( token[-1:])
                     cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s))", (token,))
-                    for result in cur.fetchall():
+                    data = cur.fetchall()
+                    if not len(data) >= 1:
+                        cur.execute('''SELECT ss.synonym AS words,s.pos FROM synonyms ss
+                                            INNER JOIN synonym_word sw ON ss.id = sw.synonym_id
+                                            INNER JOIN synamizer s ON s.id = sw.word_id
+                                            WHERE LOWER(TRIM(ss.synonym)) = LOWER(TRIM(%s))''', (token,))
+                        data = cur.fetchall()
+                    for result in data:
                         if (not(token in kaz_stop_words)):
                             tok.append(u"".join(result[0]))
                             app = Septik
