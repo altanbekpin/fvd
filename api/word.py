@@ -504,7 +504,7 @@ class Word(Finder):
         print("researhed_part:", researhed_part)
         return researhed_part
 
-    def has_duplicate_elements(reference_list, target_list):
+    def has_duplicate_elements(self, reference_list, target_list):
         count = 0
         for item in target_list:
             if reference_list.count(item) >= 2:
