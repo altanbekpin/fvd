@@ -655,7 +655,7 @@ def get_owl_from_text(request):
 def search(request):
     qtext = request.POST['qtext']
     qtext = qtext.replace('?','')
-    o = MyOwlReady()
+    app.s = MyOwlReady()
     print(qtext)
     result = re.search('(.*) кім(.*)|(.*) кімге(.*)|(.*) кімдер (.*)|(.*) не (.*)|(.*) неге (.*)|(.*) нелер(.*)|(.*) нені(.*)', qtext);
     if result:

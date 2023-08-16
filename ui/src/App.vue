@@ -135,6 +135,8 @@ export default {
           items: [
             { label: "Ұсыныстар", icon: "pi pi-user-plus", to: "/admin" },
             { label: "Панель", icon: "pi pi-th-large", to: "/adminpanel" },
+            { label: "Теггер", icon: "pi pi-at", to: "/tagger" },
+
           ],
           visible: this.isAdmin,
         },

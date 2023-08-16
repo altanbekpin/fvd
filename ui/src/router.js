@@ -13,6 +13,11 @@ const routes = [
         component: () => import("./pages/AhmetLegacy.vue"),
       },
       {
+        path: "tagger",
+        name: "tagger",
+        component: () => import("./pages/Tagger.vue"),
+      },
+      {
         path: "synomizer",
         name: "synomizer",
         component: () => import("./pages/Synomizer.vue"),

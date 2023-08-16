@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from . import views
 from . import ilsviews
 from editor.models import MyOwlReady
+
 s = MyOwlReady() ## class initialized, but object not created
 print("Object created", MyOwlReady.getInstance()) # Object gets created here
 urlpatterns = [
