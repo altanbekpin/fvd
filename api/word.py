@@ -504,8 +504,24 @@ class Word(Finder):
         print("researhed_part:", researhed_part)
         return researhed_part
 
-    
+    def has_duplicate_elements(self, reference_list, target_list):
+        print("reference_list:", reference_list)
+        print("target_list:", target_list)
+        count_dict = {}
+        
+        for item in reference_list:
+            if item in target_list:
+                if item in count_dict:
+                    count_dict[item] += 1
+                else:
+                    count_dict[item] = 1
+                if count_dict[item] >= 2:
+                    return True
+        
+        return False
+
     def add_parts_to_synonym(self):
+        print("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
         parts = self.get_parts()
         jiktik = ['P1SG1', 'P1PL1', 'P2SG1', 'P2SG.P1', 'P3SG', 'P2SG', 'POSS', ]
         catan = ['п', 'ф', 'к', 'қ', 'т', 'с', 'ш', 'щ', 'х', 'ц', 'ч', 'һ']
@@ -519,6 +535,11 @@ class Word(Finder):
         is_word_soft = self.is_soft(first_part)
         is_synonym_soft = self.is_soft(synonym)
         researcheableParts= ["Imprv",'Gen','PL','Dir', 'Acc','Loc','Abl','Inst'] + jiktik + self.suffix_symbols
+        print("parts:", parts)
+        if self.has_duplicate_elements(['Dir', 'Acc','Loc','Abl','Inst'], parts):
+            print("SCR")
+            self.set_synonym("")
+            return
         if self.find_extra_chars(first_part, self.word) in Koptik.koptik:
             self.set_synonym(self.get_synonym() + self.get_plural(self.get_synonym()))
             return
