@@ -453,6 +453,7 @@ class Word(Finder):
         self._stcs = Lemms.get_instance().get_kaz_lemms_test(sentences, self.get_length())
         if not(self._stcs[0][0][1] == -1) and len(self._stcs[0][0][2]) == 0:
             self._stcs = temp
+        print("self._stcs:", self._stcs)
         self._length = self.get_length()
         self.synomized_count = synomized_count
         self._synonyms = synonyms
