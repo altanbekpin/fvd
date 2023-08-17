@@ -135,12 +135,13 @@ class DB(DatabaseOperations):
         self._close_db()
     
     def findsyn(self, word, synomized_count, synomized_words, pos = None):
+
         if pos is None:
             query = '''SELECT s.synonym FROM synonyms s 
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
             INNER JOIN offers o ON o.offer_id = sw.synonym_id
-            WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(TRIM(%s))
+            WHERE LOWER(TRIM(z.words)) = LOWER(TRIM(%s))
             AND o.activated = true;'''
             param = (word,)
         else:
@@ -148,7 +149,7 @@ class DB(DatabaseOperations):
             query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(TRIM(%s)) AND z.pos = %s;"
         synonym = self._select_one_query(query, param)
         if synonym is None or synonym.get("synonym") == word:
-            print("SYNONYM IS NONE")
+            #print("SYNONYM IS NONE")
             if pos is None:
                 query = '''SELECT DISTINCT ON (s.words_family)
                             s.words AS synonym

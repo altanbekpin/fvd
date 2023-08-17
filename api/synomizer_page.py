@@ -15,7 +15,18 @@ def split_string(first_string, second_string):
         return first_part, second_part
     else:
         return "", ""
-    
+def remove_extra_spaces(text):
+    return ' '.join(text.split())
+def merge_some_elements_of_string_array(words, start_index, count):
+    # start_index - біріктіру басталатын элемент индексі
+    # count - # бірігетін элементтер саны
+
+    # сөздерді бір жолға біріктіру
+    merged_words = (' '.join(words[start_index:start_index + count]))
+
+    # Сәйкес үзікті жаңа элементпен (біріктірілген) ауыстыру
+    words[start_index:start_index + count] = [merged_words]
+    return words
 def getTense(family):
     if family == "N":
         return "Зат есім"
@@ -76,39 +87,53 @@ def is_person_name(word, sentence, is_first):
 
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
-    print("/search/word/")
+    #print("/search/word/")
     synomized_count = 0
     data = request.json['value']
     synomized_words = []
-    print("data:", data)
+    #print("data:", data)
+    data = remove_extra_spaces(data)
     words = re.findall(r"[\w']+|[.,!?;() ]", data)
-    print("words:", words)
+    #print("words:", words)
     output_words = []
     data_id = 0
     bringed_words = []
     neededindexes = []
-    sozTirkesi = []
     index = 0
-    while (index<len(words)):
-        index +=1
-        if (words[index-1] in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] 
-        or len(sozTirkesi)>2):
-            wordForSearch = " ".join(sozTirkesi)
-            ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
-            sozTirkesi = []
-            continue
-        if words[index-1] != " ":
-            findIndex = index
-            sozTirkesi.append(words[index-1])
-        
-
-    # print("+++++++++++++++++++++++++++++++++++++++++++++")
+    globalIndex = 0
+    while globalIndex<len(words):
+        index = len(words)
+        found = False
+        while (index>globalIndex):
+            # if words[index-1] in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] or index==len(words):
+            wordForSearch = remove_extra_spaces(' '.join(words[globalIndex:index]))
+            while len(wordForSearch)>1:
+                if wordForSearch[-1]==" ":
+                    break
+                ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
+                if ret != wordForSearch:
+                    words = merge_some_elements_of_string_array(words, globalIndex, index-globalIndex)
+                    found = True
+                    break
+                wordForSearch = wordForSearch[:-1]
+                wordForSearch = wordForSearch[:-1] + Lemms.change_syngor(Lemms, wordForSearch[-1])
+            if found:
+                break
+            # if words[index-1] != " ":
+            #     if len(sozTirkesi)==0:
+            #         foundIndex = index
+            index-=1
+        globalIndex+=1
+    
+    print(words)
+            
+    # #print("+++++++++++++++++++++++++++++++++++++++++++++")
     # for index in range(0, len(words)):
     #     i = index
     #     max_index = i + 3
     #     while(max_index > i):
     #         joined = "".join(words[index:i])
-    #         print(joined)
+    #         #print(joined)
     #         if len(words[index:i]) > 1:
     #             i += 1
     #             continue
@@ -117,19 +142,19 @@ def searchWord():
     #         if len(joined) and len(ret) > 1 and ret[0] not in joined:
     #             if len(words[index:i])>1 and words[index:i][-1] == ' ':
     #                 continue
-    #             print("index:", index)
-    #             print("i:", i)
-    #             print(words[index:i])
+    #             #print("index:", index)
+    #             #print("i:", i)
+    #             #print(words[index:i])
     #             words[index:i] = [ret[0]]
     #             neededindexes.append(index)
     #             bringed_words.append(ret[0])
-    #             print("LALIZE:", ret[0])
+    #             #print("LALIZE:", ret[0])
     #             continue
-    # print("+++++++++++++++++++++++++++++++++++++++++++++")
-    print("words:", words)
+    # #print("+++++++++++++++++++++++++++++++++++++++++++++")
+    #print("words:", words)
     for index, word in enumerate(words):
         if index in neededindexes:
-            print(bringed_words[0])
+            #print(bringed_words[0])
             translated_word = getHtml(bringed_words[0], "",data_id, bringed_words[0], "")
             synomized_count += 1
             data_id += 1
@@ -139,7 +164,7 @@ def searchWord():
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()
-            print("word_instance.is_correct():", word_instance.is_correct())
+            #print("word_instance.is_correct():", word_instance.is_correct())
             if isWordUpper and word_instance.has_synonym():
                 word_instance.capitalize_synonym()
             if word_instance.has_synonym() and word_instance.is_correct():
@@ -156,7 +181,7 @@ def searchWord():
 
 @app.route('/search/synonyms/only', methods=['POST'])
 def searchsyn():
-    print("request.json:", request.json)
+    #print("request.json:", request.json)
     data = request.json['value']
     second_part = request.json['second_part']
     family = request.json['family']
@@ -215,10 +240,10 @@ def synomizing():
         temp = found_data[0]['words']
         found_data[0]['words'] = found_data[0].get('temp_word')
         for key, val in enumerate(synonyms):
-            print("val['synonym']:", val['synonym'])
+            #print("val['synonym']:", val['synonym'])
             if val['synonym'] == found_data[0].get('temp_word'):
                 synonyms[key]['synonym'] = temp
-                print(synonyms[key])
+                #print(synonyms[key])
     return jsonify([found_data[0], synonyms, paraphrase, all_words, all_families])
 
 def switch_case(argument):
@@ -304,16 +329,16 @@ def research():
     data = request.json['value']
     word = request.json['word']
     instance = Word(data, 0, [])
-    print("instance.get_researhed_part(word):", instance.get_researhed_part(word))
+    #print("instance.get_researhed_part(word):", instance.get_researhed_part(word))
     return instance.get_researhed_part(word)
 
 @app.route("/delete/synonym", methods=['DELETE'])
 @jwt_required()
 def delete_syn():
     synonym_id = request.args.get('synonym_id')
-    print("synonym_id:", synonym_id)
+    #print("synonym_id:", synonym_id)
     synonym_id = literal_eval(synonym_id)
-    print("synonym_id:", synonym_id)
+    #print("synonym_id:", synonym_id)
     if not DB.get_instance().isUserAdmin(current_user):
         return "don't have enough permission", 500
     DB.get_instance().delete_syn(synonym_id)
@@ -323,9 +348,9 @@ def delete_syn():
 @jwt_required()
 def delete_par():
     paraphrase_id = request.args.get('paraphrase_id')
-    print("paraphrase_id:", paraphrase_id)
+    #print("paraphrase_id:", paraphrase_id)
     paraphrase_id = literal_eval(paraphrase_id)
-    print("paraphrase_id:", paraphrase_id)
+    #print("paraphrase_id:", paraphrase_id)
     if not DB.get_instance().isUserAdmin(current_user):
         return "don't have enough permission", 500
     DB.get_instance().delete_par(paraphrase_id)
@@ -335,9 +360,9 @@ def delete_par():
 @jwt_required()
 def delete_family():
     word_id = request.args.get('word_id')
-    print("word_id:", word_id)
+    #print("word_id:", word_id)
     word_id = literal_eval(word_id)
-    print("word_id:", word_id)
+    #print("word_id:", word_id)
     if not DB.get_instance().isUserAdmin(current_user):
         return "don't have enough permission", 500
     DB.get_instance().delete_family(word_id)
