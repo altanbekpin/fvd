@@ -3,7 +3,6 @@ from morphology_api.morphology import Lemms, is_soft
 from nltk.tokenize import sent_tokenize as st
 from db import DB
 from morphology_api.appendix import Suffix, Septik, Jiktik, Taueldik, Koptik
-import math
 class Finder:
     def __init__(self, _stcs,_length, word) -> None:
         self.word = word
@@ -33,15 +32,11 @@ class Finder:
         else:
             self.first_part = self.word
         return self.first_part.strip()
-    # def get_word(self):
-    #     #print("self.word:", self.word)
-    #     return self.word
     
     def get_synonym(self):
         return self._synonym
     
     def set_synonym(self, new_synonym):
-        #print("new_synonym:", new_synonym)
         self._synonym = new_synonym
     
     def get_family(self):
@@ -453,7 +448,6 @@ class Word(Finder):
         self._stcs = Lemms.get_instance().get_kaz_lemms_test(sentences, self.get_length())
         if not(self._stcs[0][0][1] == -1) and len(self._stcs[0][0][2]) == 0:
             self._stcs = temp
-        print("self._stcs:", self._stcs)
         self._length = self.get_length()
         self.synomized_count = synomized_count
         self._synonyms = synonyms
@@ -733,6 +727,13 @@ class Word(Finder):
         return self.first_synonym
 
     def look_for_synonym(self):
+        print(self.word)
+        if len(self.word.split(" "))>1:
+            synonym, synomized_count = DB.get_instance().findsyn(' '.join(self.word.split()), self.synomized_count, self._synonyms)
+            if synomized_count != self.synomized_count:
+                self.synomized_count = synomized_count
+                self.set_synonym(synonym.lower())
+            return
         if self.isResearchable():
             family = self.get_family()
             first_part= self.get_first_part()

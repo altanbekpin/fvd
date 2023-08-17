@@ -5,7 +5,6 @@ import json
 @app.route('/getontology/<lang>/', methods=['GET'])
 def getontology(lang):
     from models import MyOwlReady
-    print("/getontology/<lang>/")
     owls = app.s.GetJson(lang=lang)
     return jsonify(owls)
 

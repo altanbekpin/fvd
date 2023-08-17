@@ -8,7 +8,6 @@ from flask_jwt_extended import create_access_token
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json['data']
-    print("data:", data)
     email = data['email']
     password = data['password']
     full_name = data['full_name']

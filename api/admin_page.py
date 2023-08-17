@@ -130,7 +130,6 @@ def delete_user():
 def update_user():
     if not DB.get_instance().isUserAdmin(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
-    print('/updateuser')
     data = request.json['data']
     email = data['email']
     full_name = data['full_name']

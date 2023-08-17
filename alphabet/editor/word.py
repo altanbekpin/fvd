@@ -126,10 +126,6 @@ class Word:
                             appendix.AppName = ""
                             appendix.AppendixString = ""
                             appendix.AppName = appendix.CheckForDefinition(Septik, appendixPart)
-                        if (appendix.AppName != ""):
-                            self.Appendixes.append(Septik(appendix.AppendixString, appendix.AppName, appendix.ToString()))
-                            appendixPart = self.AppendixPart.replace(appendixPart, "")
-                            continue
             appendixPart = appendixPart[:-1]
         self.CorrectAnalyze()
     def CorrectAnalyze(self): 

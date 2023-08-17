@@ -48,3 +48,4 @@ flask_mail
 xlrd
 xlutils
 xlwt
+tokenizers

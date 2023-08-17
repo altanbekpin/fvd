@@ -164,7 +164,6 @@ class Suffix(Appendix):
                     self.AppName = "VWFI"
                     break
         if (pos == self.POS_NOUN or (pos == self.POS_VERB and lastappendix == 'у')):
-            print("HERE")
             for ve in self.NamesToNoun:
                 if ve == ending and self.AppName == "":
                     self.AppName = "NamesToNoun"
