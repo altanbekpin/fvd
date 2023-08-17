@@ -511,7 +511,7 @@ class Word(Finder):
                 if item1 == item2:
                     count += 1
                     if count >= 2:
-                        return True  # Early exit if we find at least two matches
+                        return True
         return False
 
     def add_parts_to_synonym(self):
@@ -617,6 +617,10 @@ class Word(Finder):
                     self.set_synonym(self.get_synonym()[:-1] + self.get_couple(self.get_synonym()[-1]))
                 if (self.get_synonym()[-1] in [ 'п', 'ф', 'к', 'қ', 'т', 'с', 'ш'] and app[0] not in self.solid+self.solid and app[0] not in [ 'п', 'ф', 'к', 'қ', 'т', 'с', 'ш']) and len(app)>1:
                     app = self.get_couple(app[0]) + app[1:]
+                # if (i in researcheableParts) and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)) and ((word[-1] in uyan and self.get_synonym()[-1] in uyan) or (word[-1] in catan and self.get_synonym()[-1] in catan) or (word[-1] in un and self.get_synonym()[-1] in un)):
+                #     word = word + self.get_addition(i, [])
+                #     self.set_synonym(self.get_synonym() + self.get_addition(i, []))
+                #     continue
                 if (len(app)>1 or app in self.solid + self.soft) and (self.is_soft(self.get_synonym()) and self.is_soft(app)) or ((not self.is_soft(self.get_synonym())) and (not self.is_soft(app))) or (app in ["мен", "бен", "пен", "пенен", "менен", "бенен"]):
                     addition = self.get_addition(i, [])
                     word = word + addition

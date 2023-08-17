@@ -97,6 +97,7 @@ class Word:
                         appendixPart = self.AppendixPart[len(appendixPart):]
                         self.AppendixPart = appendixPart
                         continue
+                    
                     appendix = Jiktik
                     appendix.AppName = ""
                     appendix.AppendixString = ""
@@ -106,16 +107,19 @@ class Word:
                         appendixPart = self.AppendixPart[len(appendixPart):]
                         self.AppendixPart = appendixPart
                         continue
+                    
                     if (len(self.Appendixes) > 0):
                         if (self.IsEsimshe() or (self.Appendixes[-1].AppendixString !="у")):
                             appendix = Septik
                             appendix.AppName = ""
                             appendix.AppendixString = ""
                             appendix.AppName = appendix.CheckForDefinition(Septik, appendixPart)
-                        if (appendix.AppName != ""):
-                            self.Appendixes.append(Septik(appendix.AppendixString, appendix.AppName, appendix.ToString()))
-                            appendixPart = self.AppendixPart.replace(appendixPart, "")
-                            continue
+                        # if (appendix.AppName != ""):
+                        #     self.Appendixes.append(Septik(appendix.AppendixString, appendix.AppName, appendix.ToString()))
+                        #     appendixPart = self.AppendixPart.replace(appendixPart, "")
+                        #     continue
+
+                
             appendixPart = appendixPart[:-1]
         # алдымен жұрнақтарды қарап аламыз
         appendixlast = ""

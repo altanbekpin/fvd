@@ -254,15 +254,12 @@ class Lemms:
             return main_list
         print(main_list)
         main_list[0][0][2] = []
-        print("sentences[0]:", sentences[0])
         morph_reult = GodsHelp.morphogay(sentences[0])
-        print("morph_reult:", morph_reult)
         list_of_parts = clear_word(morph_reult)
         pos = Lemms.get_pos_names_custom(main_list[0][0][1])
         main_list[0][length][3] = list_of_parts[0]
         main_list[0][length][4] = ""
         endings = list_of_parts[1:]
-        print("endings:", endings)
         for ending in endings:
             definition = ""
             name = ""
@@ -279,16 +276,12 @@ class Lemms:
                 definition = Koptik.CheckForDefinition(Koptik, ending)
                 name = 'Көптік жалғау'
             elif ending in Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe:
-                # print("HERE")
-                # definition = Suffix.CheckForDefinition(Suffix,ending=ending, pos=pos)
-                # print("definition1:", definition)
                 if definition == "":
                     definition = Suffix.CheckForDefinition2(Suffix,ending=ending)
                     print("definition2:", definition)
                 name = 'жұрнақ'
             main_list[0][length][2].append([ending, definition, name])
             main_list[0][length][4] = main_list[0][length][4] +  f"{definition}."
-        print("main_list:", main_list)
         return main_list
             
     def get_kaz_lemms(self, sentences):
@@ -319,6 +312,7 @@ class Lemms:
                 token_found = False
                 token = token.lower()
                 while len(token) > 0 and not(token_found):
+                    print(len(token) > 0 and not(token_found))
                     token = token[:-1] + self.change_syngor( token[-1:])
                     cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s))", (token,))
                     data = cur.fetchall()
@@ -343,7 +337,7 @@ class Lemms:
                                 endings.append([app.AppendixString, app.AppName, app.PosName])
                                 endsStr += app.AppName + "."
                             lemms.append(
-                                [sttoken, self.get_pos_names( int(result[1])), endings.copy(), result[0], endsStr])
+                                [sttoken, self.get_pos_names(int(result[1])), endings.copy(), result[0], endsStr])
                             endings.clear()
                             token_found = True
                             break
