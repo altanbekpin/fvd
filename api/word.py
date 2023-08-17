@@ -545,6 +545,10 @@ class Word(Finder):
                 if first_part[-1] == 'я':
                     self.set_synonym(self.get_synonym() + second_part)
                     return 
+                if second_part != "" and second_part[0] in ['г'] and self.get_synonym()[-1] in ['к']:
+                    print("self.get_synonym()[:-1]:", self.get_synonym()[:-1])
+                    self.set_synonym(self.get_synonym()[:-1] + second_part)
+                    return
                 print(second_part)
                 if not self.has_depend() and not((self.is_soft(synonym) and self.is_soft(second_part)) or (not(self.is_soft(synonym)) and not(self.is_soft(second_part)))):
                     if self.is_soft(synonym):

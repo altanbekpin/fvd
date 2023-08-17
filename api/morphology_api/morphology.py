@@ -374,7 +374,6 @@ class Lemms:
                     token = "меннің"
                 if (token in [u'.', u',']):
                     continue
-
                 sttoken = token
                 if self.is_number(sttoken):
                     tok.append(u"".join(sttoken))
@@ -396,7 +395,6 @@ class Lemms:
                             endings = []
                             endsStr = ""
                             for app in words[-1].Appendixes:
-
                                 endings.append([app.AppendixString, app.AppName, app.PosName])
                                 endsStr += app.AppName + "."
                             lemms.append(
@@ -404,7 +402,6 @@ class Lemms:
                             endings.clear()
                             token_found = True
                             break
-
                     token = token[:len(token)-1]
                 if not(token_found):
                     if (not(sttoken in kaz_stop_words) & (sttoken != u'.')):
