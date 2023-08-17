@@ -262,6 +262,16 @@
     <p>email: {{ manage_user.email }}</p>
     <template #footer>
       <Button
+        label="Қолданушыны өзгерту"
+        icon="pi pi-user-edit"
+        @click="
+          (showUpdateUser = true),
+            (new_user_email = manage_user.email),
+            (new_user_name = manage_user.full_name)
+        "
+        text
+      />
+      <Button
         label="Қолданушыны базадан өшіру"
         icon="pi pi-trash"
         @click="manage('delete')"
@@ -272,6 +282,23 @@
         icon="pi pi-check"
         @click="manage('up')"
         autofocus
+      />
+    </template>
+  </Dialog>
+  <Dialog
+    v-model:visible="showUpdateUser"
+    modal
+    header="Қолданушыны басқару"
+    :style="{ width: '50vw' }"
+  >
+    <InputText type="text" v-model="new_user_email" />
+    <InputText type="text" v-model="new_user_name" />
+    <template #footer>
+      <Button
+        label="Қолданушыны өзгерту"
+        icon="pi pi-user-edit"
+        @click="manage('update')"
+        text
       />
     </template>
   </Dialog>
@@ -302,7 +329,10 @@ export default {
       userstable: [],
       AllLastNews: [],
       is_dialog_opened: false,
+      showUpdateUser: false,
       is_percent: true,
+      new_user_email: "",
+      new_user_name: "",
       lineData: {
         labels: [],
         datasets: [
@@ -453,18 +483,36 @@ export default {
       this.usersinfo = await AhmetService.userInfo(accesstoken);
     },
     async manage(todo) {
+      console.log("TODO:", todo);
       const accesstoken = store.getters.getAccessToken;
-      const message =
+      var message =
         todo == "delete"
           ? "Сәтті базадан өшірілді"
           : "Қолданушының рұқсаты көтерілді";
-      const label = todo == "delete" ? "Өшірілді" : "Көтерілді";
-      const errormessage =
+      var label = todo == "delete" ? "Өшірілді" : "Көтерілді";
+      var errormessage =
         todo == "delete"
           ? "Қолданушы базадан өшірілмеді"
           : "Қолданушы рұқсаты көтерілмеді";
       try {
-        await AhmetService.manage_user(accesstoken, todo, this.manage_user.id);
+        if (todo == "update") {
+          todo = "Қолданушы сәтті өзгертілді";
+          errormessage = "Қолданушы параметрлері өзгертілмеді";
+          label = "Өзгертілді";
+          console.log("CHANGE USER");
+          await AhmetService.update_user(
+            accesstoken,
+            this.manage_user.email,
+            this.manage_user.full_name,
+            this.manage_user.id
+          );
+        } else {
+          await AhmetService.manage_user(
+            accesstoken,
+            todo,
+            this.manage_user.id
+          );
+        }
         this.$toast.add({
           severity: "success",
           summary: label,
@@ -481,6 +529,7 @@ export default {
       } finally {
         this.getTableInfo(accesstoken);
         this.is_dialog_opened = false;
+        this.showUpdateUser = false;
         this.manage_user = null;
       }
     },

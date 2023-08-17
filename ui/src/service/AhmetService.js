@@ -291,4 +291,15 @@ export const AhmetService = {
     });
     return response.status;
   },
+  async update_user(access_token, email, full_name, id) {
+    console.log("email:", email);
+    console.log("access_token:", access_token);
+    await api.post(
+      AHMET_API + "/updateuser",
+      {
+        data: { email, full_name, id },
+      },
+      getHeader(access_token)
+    );
+  },
 };

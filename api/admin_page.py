@@ -124,3 +124,17 @@ def delete_user():
         DB.get_instance().up_user_role(id)
         return 'success', 200
     return 'failed', 400
+
+@app.route('/updateuser', methods=['POST'])
+@jwt_required()
+def update_user():
+    if not DB.get_instance().isUserAdmin(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
+    print('/updateuser')
+    data = request.json['data']
+    email = data['email']
+    full_name = data['full_name']
+    id = data['id']
+    DB.get_instance().update_user(email, full_name, id)
+    return 'success', 200
+    
