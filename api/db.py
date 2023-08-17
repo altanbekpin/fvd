@@ -610,6 +610,18 @@ class DB(DatabaseOperations):
         ) AS combined_words;'''
         data = self._select_all_query(query)
         return data
+    
+    def update_user(self, email, full_name, id):
+        query = """UPDATE users
+            SET email = %s, full_name = %s
+            WHERE id = %s;
+            """
+        print("query:", query)
+        print("email:", email)
+        print("full_name:", full_name)
+        print("id:", id)
+        self._insert_query(query, (email, full_name, id))
+        self._close_db()
 
 class User(db.Model):
     __tablename__ = 'users'
