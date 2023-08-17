@@ -38,7 +38,6 @@ def upload_file():
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',  # Add 'Authorization' to the list
         }
         return ('', 204, headers)
-    print("upload_file")
     data = request.files
     path_to_save = request.form.get('path_to_save')
     parent_id = request.form.get('parent_id')
@@ -53,7 +52,6 @@ def upload_file():
             DB.get_instance().addLegacy(key, path_to_save, file_storage.filename, content_type, parent_id)
         except Exception as e:
             return 'File uploading failed', 400
-        print(f"File {file_storage.filename} with content type {content_type} uploaded with key '{key}'")
     return 'File uploaded successfully'
 
 

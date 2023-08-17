@@ -12,13 +12,12 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):
+    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            port=5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -115,11 +114,9 @@ class DB(DatabaseOperations):
         return row_id
     
     def add_Synonyms(self, synonym, word_id, user_id):
-        print("inside add_Synonyms:")
         insert_synonyms = "INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id"
         self._insert_query(insert_synonyms, (synonym, ))
         syn_id = self.fetchone()['id']
-        print("syn_id:", syn_id)
         insert_syn_word = "INSERT INTO synonym_word (word_id, synonym_id) VALUES(%s, %s)"
         self._insert_query(insert_syn_word, (word_id, syn_id))
         self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 3)''', (syn_id, user_id))
@@ -244,7 +241,6 @@ class DB(DatabaseOperations):
         query += " OFFSET %s LIMIT %s;"
 
         params.extend([first, second])
-        print("QUERY:", query)
         data = self._select_all_query(query, params)
         return data
 
@@ -317,7 +313,6 @@ class DB(DatabaseOperations):
                         ORDER BY s.words_family, s.id;'''
                 temp_families = self._select_all_query(query, (data,))
                 temp_families[0]['temp_word'] = data.strip()
-                print(temp_families[0])
             return temp_families
         query = '''SELECT DISTINCT s.id, status,words_family, meaning, words FROM synamizer s
         INNER JOIN offers o ON o.offer_id = s.id
@@ -551,7 +546,6 @@ class DB(DatabaseOperations):
         return results
     
     def delete_user(self, id):
-        print("DELETE:", id)
         query = '''DELETE FROM offers WHERE activate_type = 2 AND offer_id = %s'''
         self._insert_query(query, (id, ))
         query = '''DELETE FROM user_role WHERE user_id = %s'''
@@ -561,20 +555,20 @@ class DB(DatabaseOperations):
         self._close_db()
     
     def up_user_role(self, id):
-        print('user up:', id)
         max_id = db.session.query(func.max(UserRole.id)).scalar() or 0
         query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 2, %s)'''
         self._insert_query(query, (id,max_id+1))
         self._close_db()
     def get_last_sentence(self):
-        results = self._select_all_query('''SELECT id
-        FROM tagged_sentence 
-        ORDER BY id DESC
-        LIMIT 1''') 
-        if results:  # Проверяем, есть ли результат
-            return results[0][0]  # Возвращаем ID
-        else:
-            return -1
+        # results = self._select_all_query('''SELECT id
+        # FROM tagged_sentence 
+        # ORDER BY id DESC
+        # LIMIT 1''') 
+        # if results:  # Проверяем, есть ли результат
+        #     return results[0][0]  # Возвращаем ID
+        # else:
+        #     return -1
+        return -1
 
     def delete_syn(self, synonym_id):
         param = (synonym_id, )
@@ -616,10 +610,6 @@ class DB(DatabaseOperations):
             SET email = %s, full_name = %s
             WHERE id = %s;
             """
-        print("query:", query)
-        print("email:", email)
-        print("full_name:", full_name)
-        print("id:", id)
         self._insert_query(query, (email, full_name, id))
         self._close_db()
 

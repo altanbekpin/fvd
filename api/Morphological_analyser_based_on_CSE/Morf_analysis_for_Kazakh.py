@@ -169,7 +169,6 @@ def stemming_with_lexicon(text_fn, affixes_fn, stopwords_fn, stems_fn, stop_stem
     
 def segmentation(text, affixes_fn):
     text_fseg = re.findall(r'\w+\~\w+', text)
-    print("text_fseg:", text_fseg)
     seg_affixes = {}
     for word in text_fseg:
         stem = re.findall(r'\w+\~', word)
@@ -189,7 +188,6 @@ def segmentation(text, affixes_fn):
     #print(seg_affixes)
     
     seg_text = text.replace('~', '+ ')
-    print("seg_text:", seg_text)
     
     for i in seg_affixes.keys():
         affix0 = str(i)

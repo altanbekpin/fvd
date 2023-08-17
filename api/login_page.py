@@ -20,7 +20,6 @@ def initialRoute():
 
 @app.route('/login/', methods=['POST'])
 def login():
-    print("data:", request.json['data'])
     data = request.json['data']
     email = data["email"]
     password = data["password"]

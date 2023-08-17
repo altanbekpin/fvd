@@ -94,7 +94,6 @@ def searchWord():
     #print("data:", data)
     data = remove_extra_spaces(data)
     words = re.findall(r"[\w']+|[.,!?;() ]", data)
-    #print("words:", words)
     output_words = []
     data_id = 0
     bringed_words = []
@@ -124,8 +123,7 @@ def searchWord():
             #         foundIndex = index
             index-=1
         globalIndex+=1
-    
-    print(words)
+
             
     # #print("+++++++++++++++++++++++++++++++++++++++++++++")
     # for index in range(0, len(words)):
