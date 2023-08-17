@@ -103,6 +103,8 @@ def searchWord():
     print("BEFORE", words)
     while globalIndex<len(words):
         index = len(words)
+        
+        # index = min(globalIndex + 4, len(words))
         found = False
         while (index>globalIndex):
             # if words[index-1] in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] or index==len(words):
