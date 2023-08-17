@@ -9,7 +9,7 @@ def edit_post():
     if not DB.get_instance().isUserAdmin(current_user):
         return jsonify("you don't have enough permission"), 500
     data = request.json
-    print("data:", data)
+    # print("data:", data)
     method = data.get('method').get('_value')
     if method == 'delete':
         for id in data.get('id'):

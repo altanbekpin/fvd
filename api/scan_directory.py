@@ -34,7 +34,7 @@ c.execute('''CREATE TABLE legacy (
 
 # Рекурсивная функция для сканирования директории и записи информации в базу данных
 def scan_directory(path, parent_id=None):
-    print(path)
+    # print(path)
     for name in os.listdir(path):
         if name == '.DS_Store':
             continue

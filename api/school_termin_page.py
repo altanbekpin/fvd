@@ -7,7 +7,7 @@ from flask_jwt_extended import current_user, jwt_required
 @app.route("/getTermins", methods=['POST', "GET"])
 def getTermins():
     data = request.json['data']['data']
-    print("data:",json.dumps(data, indent=2))
+    # print("data:",json.dumps(data, indent=2))
     first = data['first']
     filters = data["filters"]
     word = data.get("word", "")
@@ -17,24 +17,24 @@ def getTermins():
 
 @app.route("/countTermins", methods=['GET'])
 def countTermins():
-    print("/countTermins")
+    # print("/countTermins")
     amoung = DB.get_instance().countSchoolTermins()
     return amoung
 
 @app.route("/countChildrenTermins", methods=['GET'])
 def countChildrenTermins():
-    print("/countChildrenTermins")
+    # print("/countChildrenTermins")
     amoung = DB.get_instance().countSchoolTermins(isChildren=True)
     return amoung
 
 @app.route("/add/termin", methods=['POST'])
 @jwt_required()
 def addTermin():
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     if not DB.get_instance().isUserAdmin(current_user):
         return "don't have enough permission", 500
     data = request.json['data']
-    print("data:", data)
+    # print("data:", data)
     termin = data['termin']
     definition = data['definition']
     subject_id = data['subject']['id']
@@ -47,7 +47,7 @@ def addTermin():
 
 @app.route("/get/class/subject", methods=['GET'])
 def get_subject_class():
-    print("/get/class/subject")
+    # print("/get/class/subject")
     try:
         subjects = DB.get_instance().get_subjects()
     except Exception as e:

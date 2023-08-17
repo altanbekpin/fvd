@@ -38,7 +38,7 @@ def build_tokenizer():
 
 @app.route("/tokenizer/getinfo", methods=['GET'])
 def get_info():
-    print(app.last_tagget_sentence_id)
+    # print(app.last_tagget_sentence_id)
     vocab = app.tokenizer.get_vocab()
     num_tokens = len(vocab)
     return jsonify(numtokens= num_tokens),200

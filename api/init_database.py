@@ -18,7 +18,7 @@ with open(csv_file_path, 'r') as file:
     next(csv_reader)
     i = 0
     for row in csv_reader:
-        print("csv_reader:", row)
+        # print("csv_reader:", row)
         termin = row[0]
         definition = row[1]
         class_val = row[2]

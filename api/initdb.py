@@ -49,7 +49,7 @@ with open(csv_file_path, 'r') as file:
     csv_reader = csv.reader(file, delimiter=';')
     next(csv_reader)
     for row in csv_reader:
-        print("ROW:", row)
+        # print("ROW:", row)
         words = row[0]
         words_family = row[1]
         status = row[2]

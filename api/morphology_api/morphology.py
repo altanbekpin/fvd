@@ -252,7 +252,7 @@ class Lemms:
         main_list = self.get_kaz_lemms(sentences)
         if main_list[0][0][1] == -1:
             return main_list
-        print(main_list)
+        # print(main_list)
         main_list[0][0][2] = []
         morph_reult = GodsHelp.morphogay(sentences[0])
         list_of_parts = clear_word(morph_reult)
@@ -278,7 +278,7 @@ class Lemms:
             elif ending in Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe:
                 if definition == "":
                     definition = Suffix.CheckForDefinition2(Suffix,ending=ending)
-                    print("definition2:", definition)
+                    # print("definition2:", definition)
                 name = 'жұрнақ'
             main_list[0][length][2].append([ending, definition, name])
             main_list[0][length][4] = main_list[0][length][4] +  f"{definition}."
@@ -312,7 +312,7 @@ class Lemms:
                 token_found = False
                 token = token.lower()
                 while len(token) > 0 and not(token_found):
-                    print(len(token) > 0 and not(token_found))
+                    # print(len(token) > 0 and not(token_found))
                     token = token[:-1] + self.change_syngor( token[-1:])
                     cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s))", (token,))
                     data = cur.fetchall()
@@ -329,8 +329,8 @@ class Lemms:
                             appendix = sttoken[len(token):]
                             words.append(Word(result[0], int(result[1]), appendix, False))
                             words[-1].GetAppendixes()
-                            print(token)
-                            print(appendix)
+                            # print(token)
+                            # print(appendix)
                             endings = []
                             endsStr = ""
                             for app in words[-1].Appendixes:

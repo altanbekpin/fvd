@@ -100,6 +100,7 @@ def searchWord():
     neededindexes = []
     index = 0
     globalIndex = 0
+    print("BEFORE", words)
     while globalIndex<len(words):
         index = len(words)
         found = False
@@ -109,7 +110,11 @@ def searchWord():
             while len(wordForSearch)>1:
                 if wordForSearch[-1]==" ":
                     break
-                ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
+                ret = wordForSearch
+                # екі немесе 4 сөзден тұратын сөзтіркестерін базадан іздейміз
+                count = len(wordForSearch.split(' '))
+                if count >1 and count< 5:
+                    ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
                 if ret != wordForSearch:
                     words = merge_some_elements_of_string_array(words, globalIndex, index-globalIndex)
                     found = True
@@ -123,7 +128,7 @@ def searchWord():
             #         foundIndex = index
             index-=1
         globalIndex+=1
-
+    print("AFTER", words)
             
     # #print("+++++++++++++++++++++++++++++++++++++++++++++")
     # for index in range(0, len(words)):
@@ -151,13 +156,7 @@ def searchWord():
     # #print("+++++++++++++++++++++++++++++++++++++++++++++")
     #print("words:", words)
     for index, word in enumerate(words):
-        if index in neededindexes:
-            #print(bringed_words[0])
-            translated_word = getHtml(bringed_words[0], "",data_id, bringed_words[0], "")
-            synomized_count += 1
-            data_id += 1
-            output_words.append(translated_word)   
-            continue
+
         if word not in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] and word.strip() and not is_person_name(word, data, index == 0):
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)

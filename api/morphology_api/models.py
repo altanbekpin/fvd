@@ -182,7 +182,7 @@ class Ontothing:
         elif (type == OT_Relation):
             self.type = type
             childs = child.split(">")
-            print(childs)
+            # print(childs)
             self.childs = []
             self.name = childs[0]
             self.domain = name
@@ -208,8 +208,8 @@ class Ontothing:
                 return child2
         return None
     def print(self):
-        print(self.name + " " + str(self.id))
-        print(len(self.childs))
+        # print(self.name + " " + str(self.id))
+        # print(len(self.childs))
         for child in self.childs:
             child.print()
     # OWL синтаксисіндегі мәтінін қайтару
