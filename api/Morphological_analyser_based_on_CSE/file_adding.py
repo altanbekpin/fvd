@@ -12,7 +12,7 @@ workbook_copy = copy(workbook)
 sheet_copy = workbook_copy.get_sheet(0)
 
 # Data for the new row (assuming a list of values)
-new_row_data = ["ілген", "<NB>*іл<pl>*ген<pl>"]
+new_row_data = ["ылса", "<NB>*ыл<pl>*са<pl>"]
 
 # Find the last row index in the sheet
 last_row_index = sheet.nrows
