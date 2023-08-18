@@ -87,24 +87,17 @@ def is_person_name(word, sentence, is_first):
 
 @app.route('/search/word/', methods=['POST'])
 def searchWord():
-    #print("/search/word/")
     synomized_count = 0
     data = request.json['value']
     synomized_words = []
-    #print("data:", data)
     data = remove_extra_spaces(data)
     words = re.findall(r"[\w']+|[.,!?;() ]", data)
     output_words = []
     data_id = 0
-    bringed_words = []
-    neededindexes = []
     index = 0
     globalIndex = 0
-    print("BEFORE", words)
     while globalIndex<len(words):
         index = len(words)
-        
-        # index = min(globalIndex + 4, len(words))
         found = False
         while (index>globalIndex):
             # if words[index-1] in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] or index==len(words):
@@ -125,38 +118,9 @@ def searchWord():
                 wordForSearch = wordForSearch[:-1] + Lemms.change_syngor(Lemms, wordForSearch[-1])
             if found:
                 break
-            # if words[index-1] != " ":
-            #     if len(sozTirkesi)==0:
-            #         foundIndex = index
             index-=1
         globalIndex+=1
-    print("AFTER", words)
             
-    # #print("+++++++++++++++++++++++++++++++++++++++++++++")
-    # for index in range(0, len(words)):
-    #     i = index
-    #     max_index = i + 3
-    #     while(max_index > i):
-    #         joined = "".join(words[index:i])
-    #         #print(joined)
-    #         if len(words[index:i]) > 1:
-    #             i += 1
-    #             continue
-    #         ret = DB.get_instance().findsyn(joined, 0, [])
-    #         i += 1
-    #         if len(joined) and len(ret) > 1 and ret[0] not in joined:
-    #             if len(words[index:i])>1 and words[index:i][-1] == ' ':
-    #                 continue
-    #             #print("index:", index)
-    #             #print("i:", i)
-    #             #print(words[index:i])
-    #             words[index:i] = [ret[0]]
-    #             neededindexes.append(index)
-    #             bringed_words.append(ret[0])
-    #             #print("LALIZE:", ret[0])
-    #             continue
-    # #print("+++++++++++++++++++++++++++++++++++++++++++++")
-    #print("words:", words)
     for index, word in enumerate(words):
 
         if word not in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] and word.strip() and not is_person_name(word, data, index == 0):

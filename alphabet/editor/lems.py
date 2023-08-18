@@ -35,7 +35,7 @@ class Lems:
 
 
     def IsInteger(number):
-        print(number.isdigit())
+        # print(number.isdigit())
         return number.isdigit()
 
 

@@ -252,7 +252,7 @@ class Lemms:
         main_list = self.get_kaz_lemms(sentences)
         if main_list[0][0][1] == -1:
             return main_list
-        # print(main_list)
+        print(main_list)
         main_list[0][0][2] = []
         morph_reult = GodsHelp.morphogay(sentences[0])
         list_of_parts = clear_word(morph_reult)
