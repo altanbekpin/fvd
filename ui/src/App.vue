@@ -136,7 +136,6 @@ export default {
             { label: "Ұсыныстар", icon: "pi pi-user-plus", to: "/admin" },
             { label: "Панель", icon: "pi pi-th-large", to: "/adminpanel" },
             { label: "Теггер", icon: "pi pi-at", to: "/tagger" },
-
           ],
           visible: this.isAdmin,
         },
@@ -152,7 +151,7 @@ export default {
               to: "/schoolterminology",
             },
             {
-              label: "Кіші сынып оқулықтары терминологиясы",
+              label: "Бастауыш сынып оқулықтары терминологиясы",
               icon: "pi pi-align-left",
               to: "/childrenterminology",
             },
