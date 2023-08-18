@@ -1,16 +1,14 @@
 from app import app
 from flask import jsonify, request
 import json
-
+from db import DB
 @app.route('/getontology/<lang>/', methods=['GET'])
 def getontology(lang):
-    from models import MyOwlReady
-    owls = app.s.GetJson(lang=lang)
+    owls = DB.get_instance().get_onto().GetJson(lang=lang)
     return jsonify(owls)
 
 @app.route('/getontology/ask/', methods=['POST'])
 def send_question():
-    from models import MyOwlReady
     nation_to_lang = {
         'qazaq': 'kz',
         'qyrgyz': 'kg',
@@ -57,7 +55,7 @@ def send_question():
     
     question = temp['question']
     lang = 'kz'
-    g = app.s.TurkOnto
+    g = DB.get_instance().get_onto().TurkOnto
     s= ''
     quest = '''
         PREFIX kazont: <http://www.semanticweb.org/kazontolgy#>

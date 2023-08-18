@@ -4,6 +4,8 @@ from app import app
 import os, hashlib
 from sqlalchemy import func
 from datetime import datetime
+
+from models import MyOwlReady
 # from middleware import Middleware
 
 db = SQLAlchemy(app)
@@ -107,6 +109,9 @@ class StaticOperatioins:
         return hashlib.sha256(str(code).encode()).hexdigest()
 
 class DB(DatabaseOperations):
+    def __init__(self, password):
+        self._onto = MyOwlReady()
+        super().__init__(password)
     def addWord(self, word, family, meaning, pos, example, user_id):
         self._insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, example, status)
         VALUES (%s, %s, %s, %s, %s,'бірмағыналы') RETURNING id""", (word, family, meaning, pos, example))
@@ -614,6 +619,9 @@ class DB(DatabaseOperations):
             """
         self._insert_query(query, (email, full_name, id))
         self._close_db()
+
+    def get_onto(self):
+        return self._onto
 
 class User(db.Model):
     __tablename__ = 'users'
