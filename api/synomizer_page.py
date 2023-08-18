@@ -127,8 +127,13 @@ def searchWord():
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()
-            if isWordUpper and word_instance.has_synonym():
-                word_instance.capitalize_synonym()
+            word_instance.first_synonym = ''.join(word_instance.first_synonym)
+            if isWordUpper: 
+                if len(word_instance.first_synonym)>0:
+                    word_instance.first_synonym = word_instance.first_synonym.capitalize()
+                    print(word_instance.first_synonym)
+                elif word_instance.has_synonym():
+                    word_instance.capitalize_synonym()
             if word_instance.has_synonym() and word_instance.is_correct():
                 word_instance.set_synonym(word_instance.get_synonym() + word_instance.get_trash_part())
                 translated_word = getHtml(word_instance.get_first_part(), word_instance.find_extra_chars(word_instance.get_first_part(), word), data_id, f"{word_instance.get_first_synonym()} {word_instance.get_synonym()}", word_instance.get_family())

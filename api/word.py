@@ -119,6 +119,7 @@ class Finder:
             if self.is_soft(word):
                 return 'і'
             return 'ы'
+        
         if not(word[-1] in self.soft + self.solid + ["я"] and depence[0] in self.soft + self.solid) and (is_soft and self.is_soft(depence) or ((not is_soft) and (not self.is_soft(depence)))):
             if self.get_synonym()[-1] in ['к'] and depence[0] in ['і']:
                 self.set_synonym(self.get_synonym()[:-1] + "г")
@@ -158,8 +159,8 @@ class Finder:
             self.set_synonym(self.get_synonym()[:-1]+"ғ")
             #print("self.get_synonym():", self.get_synonym())
         #print("AT THE END")
-        print(depence)
-        # return depence
+        # print(depence)
+        return depence
     def get_couple(self, char):
         if char == 'п':
             return 'б'
@@ -197,7 +198,6 @@ class Finder:
     def get_suffix(self, symbol, word, founded):
         is_soft = self.is_soft(word)
         result = self.get_addition(symbol, founded)
-        print(symbol, result)
         suffix = self.suffix_helper(symbol)
         index = suffix.index(result)
         noise = self.solid + self.soft
@@ -217,9 +217,10 @@ class Finder:
                         return "те"
                     else:
                         return "та"
-            
         if self.get_yryqsyz_etis(symbol,result):
             if result == "л":
+                if len(word)>2 and word[-2] in ["д"] and self.is_vowel(word[-1]):
+                    return "н"
                 if self.is_vowel(word[-1]):
                     return "л"
             if result == "н" and word[-1] in ['а','е']  and word [-2] in ['т', 'м']:
@@ -267,11 +268,29 @@ class Finder:
             return 'дық'
         if result == "у":
             return "у"
+        
         if (word[-1] in noise) and (result[0] in noise):
             #print("NOISE")
             for i in range(index, len(suffix)):
                 if suffix[i][0] not in noise:
                     return suffix[i]
+        # синонимнің соңғы әрібі мен қосымшаның басқы әрібі дауыссыздар болса
+        if not(self.is_vowel(result[0]) or self.is_vowel(word[-1])):
+            if not(result[0] in self.consonantsounds and word[-1] in self.consonantsounds):
+                if result[0] in 'л' and word[-1] in ['қ']:
+                    result = "т" + result[1:]
+                    if result[-1] == 'к':
+                        result = result[:-1] + "қ"
+                    return result
+            if result[0] in self.consonantsounds and word[-1] in ['т','п']:
+                return self.get_couple(result[0]) + result[1:]
+            if word[-1] in self.consonantsounds and result[0] in ['т','п']:
+                return self.get_couple(result[0]) + result[1:]
+        if result in ["ба", "бе"] and word[-1] in ['л', 'р']:
+            return'м' + result[1:]
+
+        if result in ["ма", "ме", "па", "пе"] and word[-1] in ['з']:
+                result = 'б' + result[1:]
         if (is_soft and self.is_soft(result) or ((not is_soft) and (not self.is_soft(result)))) and result != word[-1] and not(word[-1] in ["і", 'р'] and result[0] in ['т', 'н']):
             if (self.get_synonym()[-1] in ['т'] and result[0] in ['д']) or (self.get_synonym()[-1] in ['д'] and result[0] in ['т']):
                 if result[0] in ['д']:
@@ -280,6 +299,7 @@ class Finder:
                     result = "д" + result[1:]
             #print("RETURNING:", result)
             return result
+        
         if is_soft and index+1<len(suffix):
             result = suffix[index+1]
         elif not(is_soft):
@@ -291,6 +311,7 @@ class Finder:
                 result = suffix[index - i]
         #print("word:", word[-1])
         #print("result:", result[0])
+
         if word[-1] in ["і", 'р'] and result[0] in ['т', 'н', 'ы']:
             i = 0
             #print("fuck".upper())
@@ -426,9 +447,10 @@ class Finder:
         if word.strip() == "":
             return ""
         ending = word.strip()[-1]
+        print(ending)
         consonantsounds = ['л', 'м', 'н', 'ң', 'з']
         tarter = ['п', 'ф', 'к', 'қ', 'т', 'с', 'ш', 'щ', 'х', 'ц', 'ч' ,'һ', 'д']
-        larler = ['й', 'р', 'а', 'ә', 'о', 'ө', 'е', 'ы', 'і', 'ұ', 'ү' ,'и' ,'э', 'б']
+        larler = ['й', 'р', 'а', 'ә', 'о', 'ө', 'е', 'ы', 'і', 'ұ', 'ү' ,'и' ,'э', 'б', 'я', 'ю']
         if ending in larler:
              if self.is_soft(word):
                 return 'лер'
@@ -584,6 +606,7 @@ class Word(Finder):
     def add_parts_to_synonym(self):
         #print("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
         parts = self.get_parts()
+        print("parts=",parts)
         jiktik = ['P1SG1', 'P1PL1', 'P2SG1', 'P2SG.P1', 'P3SG', 'P2SG', 'POSS', ]
         catan = ['п', 'ф', 'к', 'қ', 'т', 'с', 'ш', 'щ', 'х', 'ц', 'ч', 'һ']
         uyan  = ['б', 'в', 'г', 'ғ', 'д', 'ж', 'з' ]
@@ -598,73 +621,77 @@ class Word(Finder):
         researcheableParts= ["Imprv",'Gen','PL','Dir', 'Acc','Loc','Abl','Inst'] + jiktik + self.suffix_symbols
         #print("parts:", parts)
         #print(self.count_matching_elements(['Dir', 'Acc','Loc','Abl','Inst'], parts))
+
         if self.count_matching_elements(['Dir', 'Acc','Loc','Abl','Inst'], parts):
             #print("SCR")
             self.set_synonym("")
             return
+        
         if self.find_extra_chars(first_part, self.word) in Koptik.koptik:
             self.set_synonym(self.get_synonym() + self.get_plural(self.get_synonym()))
             return
+        # if first_part[-1] == synonym[-1] and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)):
+        #     # if "POSS" not in parts or ("POSS" not in parts or synonym[-1] not in ['к' , 'п']):
+        #         #print("I'M HERE")
+        #         second_part = self.get_second_part()
+        #         if first_part[-1] == 'я':
+        #             self.set_synonym(self.get_synonym() + second_part)
+        #             return 
+        #         if second_part != "" and second_part[0] in ['г'] and self.get_synonym()[-1] in ['к']:
+        #             # print("self.get_synonym()[:-1]:", self.get_synonym()[:-1])
+        #             self.set_synonym(self.get_synonym()[:-1] + second_part)
+        #             return
+
+        #         if not self.has_depend() and not((self.is_soft(synonym) and self.is_soft(second_part)) or (not(self.is_soft(synonym)) and not(self.is_soft(second_part)))):
+        #             if self.is_soft(synonym):
+        #                 temp = ''
+        #                 for i in second_part:
+        #                     if i in self.solid:
+        #                         temp += self.make_soft(i)
+        #                     else:
+        #                         temp += i
+        #                 second_part = temp
+        #             else:
+
+        #                 temp = ''
+        #                 for i in second_part:
+        #                     if i in self.soft:
+        #                         temp += self.make_solid(i)
+        #                     else:
+        #                         temp += i
+        #                 second_part = temp
+                
+        #         if len(second_part)>0 and len(synonym)>0:
+        #             if (synonym[-1]=="қ" and second_part[0] == "ғ") or (synonym[-1]=="к" and second_part[0] == "г"):
+        #                 synonym=synonym[:-1]
+                
+        #         self.set_synonym(synonym + second_part) 
+        #         return
         
-        if first_part[-1] == synonym[-1] and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)):
-            # if "POSS" not in parts or ("POSS" not in parts or synonym[-1] not in ['к' , 'п']):
-                #print("I'M HERE")
-                second_part = self.get_second_part()
-                if first_part[-1] == 'я':
-                    self.set_synonym(self.get_synonym() + second_part)
-                    return 
-                if second_part != "" and second_part[0] in ['г'] and self.get_synonym()[-1] in ['к']:
-                    # print("self.get_synonym()[:-1]:", self.get_synonym()[:-1])
-                    self.set_synonym(self.get_synonym()[:-1] + second_part)
-                    return
-
-                if not self.has_depend() and not((self.is_soft(synonym) and self.is_soft(second_part)) or (not(self.is_soft(synonym)) and not(self.is_soft(second_part)))):
-                    if self.is_soft(synonym):
-                        temp = ''
-                        for i in second_part:
-                            if i in self.solid:
-                                temp += self.make_soft(i)
-                            else:
-                                temp += i
-                        second_part = temp
-                    else:
-                        print("sasasa")
-
-                        temp = ''
-                        for i in second_part:
-                            if i in self.soft:
-                                temp += self.make_solid(i)
-                            else:
-                                temp += i
-                        second_part = temp
-                if len(second_part)>0 and len(synonym)>0:
-                    if (synonym[-1]=="қ" and second_part[0] == "ғ") or (synonym[-1]=="к" and second_part[0] == "г"):
-                        synonym=synonym[:-1]
-
-                self.set_synonym(synonym + second_part) 
-                return
         if self.isResearchable() and self.has_second_part:
-            #print("HELE")
             for i in parts:
                 #print(i)
                 if i not in researcheableParts:
+                    
+                    
                     #print("AAAAAAAAAAAAAA1")
                     continue
 
-                if (i in researcheableParts) and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)) and self.get_first_part()[-1] == self.get_synonym()[-1]:
-                    #print("AAAAAAAAAAAAAA2")
-                    #print(self.get_synonym()[:-1])
-                    addition = self.get_addition(i, [])
-                    if self.get_synonym()[-1] in ['с'] and addition[0] == self.get_synonym()[-1]:
-                        self.set_synonym(self.get_synonym()[:-1]) 
-                    word = word + addition
-                    #print(self.get_first_part())
-                    syn = self.get_synonym() + addition
-                    self.set_synonym(syn)
-                    #print(syn)
-                    continue
-                app = ""
+                # if (i in researcheableParts) and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)) and self.get_first_part()[-1] == self.get_synonym()[-1]:
+                #     print(i)
+                #     #print("AAAAAAAAAAAAAA2")
+                #     #print(self.get_synonym()[:-1])
+                #     addition = self.get_addition(i, [])
+                #     if self.get_synonym()[-1] in ['с'] and addition[0] == self.get_synonym()[-1]:
+                #         self.set_synonym(self.get_synonym()[:-1]) 
+                #     word = word + addition
+                #     #print(self.get_first_part())
+                #     syn = self.get_synonym() + addition
+                #     self.set_synonym(syn)
+                #     #print(syn)
+                #     continue
 
+                app = ""
                 if i == "Imprv":
                     app += self.get_buyryk(self.get_synonym())
                 if i == 'Gen':
@@ -675,7 +702,8 @@ class Word(Finder):
                     app+= self.get_taueldy(self.get_depence(), self.get_synonym())
                 elif i == 'Dir':
                     app+= self.get_barys(self.get_synonym(), 'Dir', founded)
-                    if self.get_synonym()[-1] in ['т'] and app[0] in ['ғ']:
+                    if (self.get_synonym()[-1] in ['т'] and app[0] in ['ғ']) or (self.get_synonym()[-1] in ['р', 'л'] + self.consonantsounds  and app[0] in ['к']):
+
                         app = self.get_couple(app[0]) + app[1:]
                 elif i == 'Acc':
                     app+= self.get_tabys(self.get_synonym())
@@ -707,7 +735,7 @@ class Word(Finder):
                     word = word + addition
                     if app == "":
                         app = addition
-                    if self.get_synonym()[-1] in ['м', 'у', 'с'] and app[0] in ['с']:
+                    if len(app)>0 and self.get_synonym()[-1] in ['м', 'у', 'с'] and app[0] in ['с']:
                         app = app.replace(app[0], "")
                     #print("self.get_synonym() + app:", self.get_synonym() + app)
                     if self.get_synonym()[-1] in ['к'] and app[0] in self.soft:
@@ -837,6 +865,7 @@ class Word(Finder):
             if len(synonym.split(" "))>1:
                 syn_temp = synonym.split(" ")[len(synonym.split(" "))-1]
                 self.first_synonym = synonym.split(" ")[:len(synonym.split(" "))-1]
+                
                 #print("syn_temp:", syn_temp)
                 if family == "N":
                     t = Lemms.get_instance().get_kaz_lemms(st(syn_temp))
@@ -847,10 +876,8 @@ class Word(Finder):
                             #print(len(t[0][0][2][0][2]))
                             l = len(t[0][0][2][0])
                             syn_temp = syn_temp[:len(syn_temp)-l+1]
-                temp = ""
-                for i in self.first_synonym:
-                    temp = temp + " " + i
-                self.first_synonym = temp
+                
+                
                 synonym = syn_temp
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count
@@ -875,9 +902,7 @@ class Word(Finder):
 
     def capitalize_synonym(self):
         #print("capitalize_synonym:",self.get_first_part())
-        if len(self.get_synonym().split(" "))>1:
-            self.set_synonym(self.get_first_part().capitalize() + self.get_synonym())
-            return
+       
         self.set_synonym(self.get_synonym().capitalize())
 
     @staticmethod

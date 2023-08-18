@@ -117,10 +117,10 @@ class Suffix(Appendix):
             self.AppName = "MimicsToNoun"
         if ending in self.VerbsToNoun:
             self.AppName = "VerbsToNoun"
+        if ending in self.VerbsToVerbs:
+            return "VerbsToVerbs"
         if ending in self.NounsToAdjective:
             self.AppName = "NounsToAdjective"
-        if ending in self.VerbsToVerbs:
-            self.AppName = "VerbsToVerbs"
         if ending in self.VerbsToAdjective:
             self.AppName = "VerbsToAdjective"
         if ending in self.NamesToVerbs:
@@ -186,6 +186,10 @@ class Suffix(Appendix):
             for ve in self.AdjectivesToNoun:
                 if ve == ending and self.AppName == "":
                     self.AppName = "AdjectivesToNoun"
+                    break
+            for ve in self.NamesToNoun:
+                if ve == ending and self.AppName == "":
+                    self.AppName = "NamesToNoun"
                     break
         if (pos == self.POS_NUMERAL):
             for ve in self.NamesToNoun:

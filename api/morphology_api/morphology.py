@@ -275,7 +275,7 @@ class Lemms:
             elif ending in Koptik.koptik:
                 definition = Koptik.CheckForDefinition(Koptik, ending)
                 name = 'Көптік жалғау'
-            elif ending in Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToAdjective +Suffix.NamesToVerbs + Suffix.VerbsToVerbs +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe:
+            elif ending in Suffix.AdjectivesToNoun + Suffix.NamesToNoun + Suffix.MimicsToNoun + Suffix.VerbsToNoun + Suffix.VWFI + Suffix.NounsToAdjective + Suffix.VerbsToVerbs +Suffix.VerbsToAdjective +Suffix.NamesToVerbs  +Suffix.Kosemshe+Suffix.Esimshe +Suffix.KosemsheEsimshePlusTaueldik+Suffix.VerbsToEsimshe:
                 if definition == "":
                     definition = Suffix.CheckForDefinition2(Suffix,ending=ending)
                     # print("definition2:", definition)

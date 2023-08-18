@@ -12,14 +12,23 @@ workbook_copy = copy(workbook)
 sheet_copy = workbook_copy.get_sheet(0)
 
 # Data for the new row (assuming a list of values)
-new_row_data = ["ылса", "<NB>*ыл<pl>*са<pl>"]
+new_row_data0 = ["ылса", "<NB>*ыл<pl>*са<pl>"]
+new_row_data1 = ["ме", "<NB>*ме<pl>"]
+new_row_data2 = ["лғаннан", "<NB>*л<pl>*ған<pl>*нан<pl>"]
+
+
 
 # Find the last row index in the sheet
 last_row_index = sheet.nrows
 
 # Add the new row data to the copy of the sheet
-for col_index, value in enumerate(new_row_data):
+for col_index, value in enumerate(new_row_data0):
     sheet_copy.write(last_row_index, col_index, value)
+for col_index, value in enumerate(new_row_data1):
+    sheet_copy.write(last_row_index, col_index, value)
+for col_index, value in enumerate(new_row_data2):
+    sheet_copy.write(last_row_index, col_index, value)
+
 
 # Save the changes to a new file (or overwrite the existing one)
 workbook_copy.save("modified_file.xls")
