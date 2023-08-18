@@ -30,7 +30,6 @@ class MyOwlReady:
     def __init__(self):
         _onto = None
         if not MyOwlReady.__instance:
-            print(" __init__ method called..")
             ont = Ontotext.objects.get(name="taxexpert")
             ont.savetofile()
             _onto = get_ontology("file:taxexpert.owl").load()

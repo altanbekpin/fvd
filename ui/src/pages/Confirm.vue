@@ -104,7 +104,7 @@ export default {
         this.$toast.add({
           severity: "error",
           summary: "Ақау",
-          detail: response,
+          detail: response["message"],
           life: 3000,
         });
       }

@@ -14,14 +14,14 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
-    # def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
+    # def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
+    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            port = 5435,
+            # port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -45,8 +45,8 @@ class DatabaseOperations(DBConfig):
 
         def _close_db(self):
             self._commit_db()
-            self.connection.close()
-            self.cursor.close()
+            # self.connection.close()
+            # self.cursor.close()
             self._delete_instance()
         def fetchone(self):
             return self.cursor.fetchone()
@@ -359,6 +359,9 @@ class DB(DatabaseOperations):
     def find_user(self,current_user):
         results = UserRole.query.filter_by(user_id=current_user.id).with_entities(UserRole.role_id).all()
         return results
+    def find_user_byid(self,id):
+        results = UserRole.query.filter_by(user_id=id).with_entities(UserRole.role_id).all()
+        return results
     
     def get_role(self, role_id):
         temp = Role.query.filter_by(role_id=role_id).one_or_none()
@@ -386,6 +389,7 @@ class DB(DatabaseOperations):
     
     def isUserAdmin(self, current_user):
         results = DB.get_instance().find_user(current_user)
+        print("results:", results)
         role_ids = [result[0] for result in results]
         roles = []
         for i in role_ids:
@@ -403,7 +407,7 @@ class DB(DatabaseOperations):
         if not (existing_user is None):
             is_verified = existing_user.is_verified
             if is_verified:
-                if not self.is_offer_activated(id=user.existing_user.id):
+                if not self.is_offer_activated(id=existing_user.id):
                     return ValueError('Сұранысыңыз әлі қабылданбады')
                 raise ValueError('Қолданушы базада бұрыннан бар!')
             else:
@@ -562,8 +566,13 @@ class DB(DatabaseOperations):
         self._close_db()
     
     def up_user_role(self, id):
+        print("self.isUserExpert(current_user):", self.isUserExpert(id))
         max_id = db.session.query(func.max(UserRole.id)).scalar() or 0
-        query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 2, %s)'''
+        if not self.isUserExpert(id):
+            query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 3, %s)'''
+        else:
+            query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 2, %s)'''
+        print("query:", query)
         self._insert_query(query, (id,max_id+1))
         self._close_db()
     def get_last_sentence(self):
@@ -619,6 +628,15 @@ class DB(DatabaseOperations):
             """
         self._insert_query(query, (email, full_name, id))
         self._close_db()
+
+    def isUserExpert(self, id):
+        results = DB.get_instance().find_user_byid(id)
+        role_ids = [result[0] for result in results]
+        roles = []
+        for i in role_ids:
+            roles.append(DB.get_instance().get_role(i).name)
+        print("roles:", roles)
+        return 'expert' in roles
 
     def get_onto(self):
         return self._onto

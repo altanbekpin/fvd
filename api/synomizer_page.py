@@ -161,8 +161,8 @@ def searchsyn():
 @app.route('/add/tag', methods=['POST'])
 @jwt_required()
 def addTag():
-    if not DB.get_instance().isUserAdmin(current_user):
-        return "don't have enough permission", 500
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
     definition_id = request.json['definition_id']
     file_id = request.json['file_id']
     DB.get_instance().addTag(definition_id, file_id)
@@ -232,8 +232,8 @@ def switch_case(argument):
 @app.route('/add/word/', methods=['POST'])
 @jwt_required()
 def addWord():
-    if not DB.get_instance().isUserAdmin(current_user):
-        return "don't have enough permission", 500
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
     synonyms = request.json['synonyms']
     example = request.json['example']
     paraphrases = request.json['paraphrases']
@@ -263,8 +263,8 @@ def addWord():
 @app.route('/add/synonym/', methods=['POST'])
 @jwt_required()
 def addSynonym():
-    if not DB.get_instance().isUserAdmin(current_user):
-        return "don't have enough permission", 500
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
     synonyms = request.json['synonyms']
     word = request.json['word']
     family = request.json['family']['family']
@@ -276,8 +276,8 @@ def addSynonym():
 @app.route('/add/paraphrase/', methods=['POST'])
 @jwt_required()
 def addParaphrase():
-    if not DB.get_instance().isUserAdmin(current_user):
-        return "don't have enough permission", 500
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
     paraphrases = request.json['paraphrases']
     word = request.json['word']
     family = request.json['family']['family']
@@ -301,8 +301,8 @@ def delete_syn():
     #print("synonym_id:", synonym_id)
     synonym_id = literal_eval(synonym_id)
     #print("synonym_id:", synonym_id)
-    if not DB.get_instance().isUserAdmin(current_user):
-        return "don't have enough permission", 500
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
     DB.get_instance().delete_syn(synonym_id)
     return "success", 200
 
@@ -313,8 +313,8 @@ def delete_par():
     #print("paraphrase_id:", paraphrase_id)
     paraphrase_id = literal_eval(paraphrase_id)
     #print("paraphrase_id:", paraphrase_id)
-    if not DB.get_instance().isUserAdmin(current_user):
-        return "don't have enough permission", 500
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
     DB.get_instance().delete_par(paraphrase_id)
     return "success", 200
 
@@ -325,7 +325,7 @@ def delete_family():
     #print("word_id:", word_id)
     word_id = literal_eval(word_id)
     #print("word_id:", word_id)
-    if not DB.get_instance().isUserAdmin(current_user):
-        return "don't have enough permission", 500
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
     DB.get_instance().delete_family(word_id)
     return "success", 200

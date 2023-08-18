@@ -19,10 +19,14 @@ export const AhmetService = {
     );
   },
   async getTokenizerInfo() {
-    return await api.get(AHMET_API + "/tokenizer/getinfo", {headers: getHeader()});
+    return await api.get(AHMET_API + "/tokenizer/getinfo", {
+      headers: getHeader(),
+    });
   },
   async getNextSentenceForTagging() {
-    return await api.get(AHMET_API + "/tokenizer/getnexttaggingline", {headers: getHeader()});
+    return await api.get(AHMET_API + "/tokenizer/getnexttaggingline", {
+      headers: getHeader(),
+    });
   },
 
   async countSchoolTermins() {

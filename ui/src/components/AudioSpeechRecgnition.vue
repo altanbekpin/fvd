@@ -2,7 +2,7 @@
   <div class="grid">
     <Toast></Toast>
     <Card>
-      <template #title> Ахметтану интеллектуалды жүйесі </template>
+      <template #title> "Ахметтану" интеллектуалды жүйесі </template>
       <template #content>
         <img src="/images/Ahmet.jpeg" />
       </template>

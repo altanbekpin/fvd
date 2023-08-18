@@ -65,6 +65,12 @@ const store = createStore({
       }
       return false;
     },
+    isUserExpert: (state) => {
+      if (state.user.roles.includes("expert")) {
+        return true;
+      }
+      return false;
+    },
     getAccessToken: (state) => {
       return state.user.access_token;
     },
