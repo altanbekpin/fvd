@@ -100,7 +100,6 @@ def searchWord():
     neededindexes = []
     index = 0
     globalIndex = 0
-    print("BEFORE", words)
     while globalIndex<len(words):
         index = len(words)
         found = False
@@ -128,7 +127,6 @@ def searchWord():
             #         foundIndex = index
             index-=1
         globalIndex+=1
-    print("AFTER", words)
             
     # #print("+++++++++++++++++++++++++++++++++++++++++++++")
     # for index in range(0, len(words)):
