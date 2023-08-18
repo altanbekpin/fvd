@@ -25,7 +25,7 @@ def merge_some_elements_of_string_array(words, start_index, count):
     merged_words = (' '.join(words[start_index:start_index + count]))
 
     # Сәйкес үзікті жаңа элементпен (біріктірілген) ауыстыру
-    words[start_index:start_index + count] = [merged_words]
+    words[start_index:start_index + count] = [merged_words] + [" "]
     return words
 def getTense(family):
     if family == "N":
@@ -102,6 +102,8 @@ def searchWord():
     globalIndex = 0
     while globalIndex<len(words):
         index = len(words)
+        
+        # index = min(globalIndex + 4, len(words))
         found = False
         while (index>globalIndex):
             # if words[index-1] in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] or index==len(words):
@@ -159,7 +161,6 @@ def searchWord():
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()
-            #print("word_instance.is_correct():", word_instance.is_correct())
             if isWordUpper and word_instance.has_synonym():
                 word_instance.capitalize_synonym()
             if word_instance.has_synonym() and word_instance.is_correct():

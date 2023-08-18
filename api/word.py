@@ -690,6 +690,8 @@ class Word(Finder):
         
         return get_first_part != word
     def is_correct(self):
+        if len(self.word.strip().split(" ")) > 1:
+            return True
         app = ""
         if self._stcs[0][0][1] == -1:
             return False
@@ -732,7 +734,14 @@ class Word(Finder):
             synonym, synomized_count = DB.get_instance().findsyn(' '.join(self.word.split()), self.synomized_count, self._synonyms)
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count
-                self.set_synonym(synonym.lower())
+                self.set_synonym(synonym)
+            self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]
+            synonym, synomized_count = DB.get_instance().findsyn(' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part, self.synomized_count, self._synonyms)
+            if synomized_count != self.synomized_count:
+                self.synomized_count = synomized_count
+                print(self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
+                self.set_synonym(synonym + self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
+            
             return
         if self.isResearchable():
             family = self.get_family()
