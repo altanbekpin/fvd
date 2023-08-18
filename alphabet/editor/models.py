@@ -29,7 +29,7 @@ class MyOwlReady:
     def __init__(self):
         _onto = None
         if not MyOwlReady.__instance:
-            print(" __init__ method called..")
+            # print(" __init__ method called..")
             ont = Ontotext.objects.get(name="taxexpert")
             ont.savetofile()
             _onto = get_ontology("file:taxexpert.owl").load()
@@ -38,9 +38,9 @@ class MyOwlReady:
             _turkOnto.parse ('owl/Akhmettanu.owl')
             
 
-        else:
-            print("Instance already created:", self.getInstance())
-            print(self.Onto)
+        # else:
+        #     # print("Instance already created:", self.getInstance())
+        #     print(self.Onto)
 
     @classmethod
     def getInstance(cls):
@@ -181,7 +181,7 @@ class Ontothing:
         elif (type == OT_Relation):
             self.type = type
             childs = child.split(">")
-            print(childs)
+            # print(childs)
             self.childs = []
             self.name = childs[0]
             self.domain = name
@@ -207,7 +207,7 @@ class Ontothing:
                 return child2
         return None
     def print(self):
-        print(self.name + " " + str(self.id))
+        # print(self.name + " " + str(self.id))
         print(len(self.childs))
         for child in self.childs:
             child.print()
