@@ -483,6 +483,15 @@ export default {
       this.usersinfo = await AhmetService.userInfo(accesstoken);
     },
     async manage(todo) {
+      if (!store.getters.isUserAdmin) {
+        this.$toast.add({
+          severity: "info",
+          summary: "Сәтсіз",
+          detail: "Сізде құқық жеткіліксіз",
+          life: 3000,
+        });
+        return;
+      }
       console.log("TODO:", todo);
       const accesstoken = store.getters.getAccessToken;
       var message =

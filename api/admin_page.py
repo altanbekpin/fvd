@@ -7,7 +7,7 @@ from ast import literal_eval
 @app.route('/offers', methods=['GET'])
 @jwt_required()
 def getOffers():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     lazy_event_str = request.args.get('lazyEvent')
     lazy_event = literal_eval(lazy_event_str)
@@ -20,7 +20,7 @@ def getOffers():
 @app.route("/activate", methods=['POST'])
 @jwt_required()
 def activateOffer():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     offer_id = request.json['offer_id']
     activate_type = request.json['activate_type']
@@ -33,7 +33,7 @@ def activateOffer():
 @app.route("/offers/count", methods=['GET'])
 @jwt_required()
 def get_amount_offers():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     try:
         count, today_offers = DB.get_instance().get_amount_offers()
@@ -44,7 +44,7 @@ def get_amount_offers():
 @app.route("/offers/count/words", methods=['GET'])
 @jwt_required()
 def get_amount_words():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     try:
         words_count, words_count_activated = DB.get_instance().get_amount_words()
@@ -55,7 +55,7 @@ def get_amount_words():
 @app.route("/offers/count/users", methods=['GET'])
 @jwt_required()
 def get_amount_users():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     try:
         users, admins = DB.get_instance().get_amount_users()
@@ -66,7 +66,7 @@ def get_amount_users():
 @app.route("/offers/count/synphrase", methods=['GET'])
 @jwt_required()
 def get_amount_synphrases():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     try:
         amount = DB.get_instance().get_amount_synparaphrases()
@@ -77,7 +77,7 @@ def get_amount_synphrases():
 @app.route("/user/info", methods=['GET'])
 @jwt_required()
 def get_inf_for_table():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})   
     start = literal_eval(request.args.get('start'))
     result = DB.get_instance().get_inf_for_table(start)
@@ -86,7 +86,7 @@ def get_inf_for_table():
 @app.route("/word/overview", methods=['GET'])
 @jwt_required()
 def word_overview():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     dates = literal_eval(request.args.get('dates'))
     results = []
@@ -97,16 +97,17 @@ def word_overview():
 @app.route("/user/table", methods=['GET'])
 @jwt_required()
 def user_table():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     users_results = DB.get_instance().user_table()
+    print("users_results:", users_results)
     return users_results
 
 
 @app.route('/last/news')
 @jwt_required()
 def last_news():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     results = DB.get_instance().last_news()
     return results
@@ -121,6 +122,7 @@ def delete_user():
         DB.get_instance().delete_user(id)
         return 'success', 200
     if request.method == 'PUT':
+        print("HERERERERER")
         DB.get_instance().up_user_role(id)
         return 'success', 200
     return 'failed', 400

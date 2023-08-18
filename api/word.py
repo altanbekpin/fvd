@@ -10,11 +10,9 @@ class Finder:
         self._length = _length
         self._trash_part = ""
         self._synonym = ""
-        self.consonantsounds = ['л', 'м', 'н', 'ң', 'з']
     solid = ['а', 'о', 'ы',  'я', 'ұ']
     soft = ['ә', 'ө', 'і', 'е', 'и', 'э', 'ү']
-    def is_vowel(self, word):
-        return word[-1] in self.solid or word[-1] in self.soft
+    
     def get_addition(self, part, founded=[]):
         if self.isResearchable() and len(self._stcs[0][self._length])>3:
             parts = self._stcs[0][self._length][2]
@@ -99,22 +97,12 @@ class Finder:
 
     def get_taueldy(self, depence, word):
         #print("word:", word)
-        # print("depence:", depence)
+        #print("depence:", depence)
         additions = [ "м", "ым", "ім", "ымыз", "іміз", "ң", "ың", "ің", "ңыз", "ыңыз", "іңіз", "сы", "сі", "ы", "і"]
         is_soft = self.is_soft(word)
         #print("is_soft:", is_soft)
         #print("is_soft(depence):", self.is_soft(depence))
         index = additions.index(depence)
-        if depence in ["м"]: 
-            if self.is_vowel(word[-1]):
-                return "м"
-        if depence in ["сы", "сі"] and self:
-            if not(self.is_vowel(word)):
-                   if self.is_soft(word):
-                       return "і" 
-                   else:
-                       return "ы"
-            
         if depence in ['ы', 'і'] and word[-1] not in self.solid + self.soft:
             if self.is_soft(word):
                 return 'і'
@@ -178,8 +166,8 @@ class Finder:
             return 'ғ'
         if char == 'ғ':
             return 'қ'
-        # if char == 'т':
-        #     return 'д'
+        if char == 'т':
+            return 'д'
         if char == 'д':
             return 'т'
         if char == 'з':
@@ -189,12 +177,6 @@ class Finder:
         if char == 'ж':
             return 'ш'
         return char
-    def get_yryqsyz_etis(self, suffix_name, suffix):
-        # л - анықтал, жүктел, қамал, 
-        # ыд - жабыл, табыл, соғыл, 
-        # іл - төгіл, сөгіл, көсіл, шешіл
-        # н - белгілен, сабалан, таран
-        return suffix_name == "VerbsToVerbs" and suffix in Suffix.YryqsyzEtis
     def get_suffix(self, symbol, word, founded):
         is_soft = self.is_soft(word)
         result = self.get_addition(symbol, founded)
@@ -236,24 +218,6 @@ class Finder:
                 else:
                     return "лық" 
         if symbol == "VerbsToEsimshe":
-            if result in ["қан", "кен"]:
-                if word[-1] in self.consonantsounds:
-                    if self.is_soft(word):
-                        return "ген" 
-                    else:
-                        return "ған"
-            if result in ["атын", "етін"]:
-                if self.is_vowel(word[-1]):
-                    if self.is_soft(word):
-                        return "йтын" 
-                    else:
-                        return "йтін" 
-            if result in ["йтын", "йтін"]:
-                if not(self.is_vowel(word[-1])):
-                    if self.is_soft(word):
-                        return "етін" 
-                    else:
-                        return "атын" 
             if is_soft and self.is_soft(result) or (not is_soft and not self.is_soft(result)):
                 return result
             else:
@@ -466,23 +430,17 @@ class Finder:
         return ''
         
     def is_soft(self, word):
-        # soft_count = 0
-        # solid_count = 0
-        # for k,i in enumerate(word):
-        #     if i in self.soft:
-        #         soft_count += 1
-        #     elif i == 'у':
-        #         if word[k-1] not in self.solid + self.soft:
-        #             solid_count += 1
-        #     elif i in self.solid:
-        #         solid_count += 1
-        # return soft_count >= solid_count
-        for item in word[::-1]:
-            if item in self.soft:
-                return True
-            if item in self.solid:
-                return False
-        return False
+        soft_count = 0
+        solid_count = 0
+        for k,i in enumerate(word):
+            if i in self.soft:
+                soft_count += 1
+            elif i == 'у':
+                if word[k-1] not in self.solid + self.soft:
+                    solid_count += 1
+            elif i in self.solid:
+                solid_count += 1
+        return soft_count >= solid_count
     
     def get_trash_part(self):
         return self._trash_part
@@ -725,7 +683,6 @@ class Word(Finder):
                     self.set_synonym(self.get_synonym()[:-1] + self.get_couple(self.get_synonym()[-1]))
                 if (self.get_synonym()[-1] in [ 'п', 'ф', 'к', 'қ', 'т', 'с', 'ш'] and app[0] not in self.solid+self.solid and app[0] not in [ 'п', 'ф', 'к', 'қ', 'т', 'с', 'ш']) and len(app)>1:
                     app = self.get_couple(app[0]) + app[1:]
-
                 # if (i in researcheableParts) and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)) and ((word[-1] in uyan and self.get_synonym()[-1] in uyan) or (word[-1] in catan and self.get_synonym()[-1] in catan) or (word[-1] in un and self.get_synonym()[-1] in un)):
                 #     word = word + self.get_addition(i, [])
                 #     self.set_synonym(self.get_synonym() + self.get_addition(i, []))
@@ -845,10 +802,7 @@ class Word(Finder):
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count
                 self.set_synonym(synonym)
-            try:
-                self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]
-            except:
-                print("self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]")
+            self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]
             synonym, synomized_count = DB.get_instance().findsyn(' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part, self.synomized_count, self._synonyms)
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count

@@ -6,8 +6,8 @@ from db import DB
 @app.route('/editPost/', methods = ['POST'])
 @jwt_required()
 def edit_post():
-    if not DB.get_instance().isUserAdmin(current_user):
-        return jsonify("you don't have enough permission"), 500
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return jsonify({"message":"Сізде құқық жеткіліксіз"})
     data = request.json
     # print("data:", data)
     method = data.get('method').get('_value')

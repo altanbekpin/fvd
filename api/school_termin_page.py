@@ -31,7 +31,7 @@ def countChildrenTermins():
 @jwt_required()
 def addTermin():
     # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return "don't have enough permission", 500
     data = request.json['data']
     # print("data:", data)

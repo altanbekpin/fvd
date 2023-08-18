@@ -120,6 +120,10 @@ export default {
       const temp = useStore().getters.isUserAdmin;
       return temp;
     },
+    isUserExpert() {
+      const temp = useStore().getters.isUserExpert;
+      return temp;
+    },
     menu() {
       return [
         {
@@ -137,7 +141,7 @@ export default {
             { label: "Панель", icon: "pi pi-th-large", to: "/adminpanel" },
             { label: "Теггер", icon: "pi pi-at", to: "/tagger" },
           ],
-          visible: this.isAdmin,
+          visible: this.isAdmin || this.isUserExpert,
         },
         {
           label: "Анықтамалық",
@@ -168,7 +172,7 @@ export default {
           items: [
             { label: "Тұлғасы", icon: "pi pi-fw pi-align-justify", to: "/" },
             { label: "Мұрасы", icon: "pi pi-fw pi-briefcase", to: "/legacy" },
-            { label: "Тіл құрал", icon: "pi pi-fw pi-file", to: "/intelect" },
+            { label: "Тіл-құрал", icon: "pi pi-fw pi-file", to: "/intelect" },
             { label: "Интеллектуалды жүйе", icon: "pi pi-fw pi-star" },
             {
               label: "Терминдері мен анықтамалары",
