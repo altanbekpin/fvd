@@ -116,7 +116,7 @@ class Finder:
                        return "ы"
             
         if depence in ['ы', 'і'] and word[-1] not in self.solid + self.soft:
-            if is_soft:
+            if self.is_soft(word):
                 return 'і'
             return 'ы'
         if not(word[-1] in self.soft + self.solid + ["я"] and depence[0] in self.soft + self.solid) and (is_soft and self.is_soft(depence) or ((not is_soft) and (not self.is_soft(depence)))):
@@ -195,9 +195,9 @@ class Finder:
         # н - белгілен, сабалан, таран
         return suffix_name == "VerbsToVerbs" and suffix in Suffix.YryqsyzEtis
     def get_suffix(self, symbol, word, founded):
-        #print(word)
         is_soft = self.is_soft(word)
         result = self.get_addition(symbol, founded)
+        print(symbol, result)
         suffix = self.suffix_helper(symbol)
         index = suffix.index(result)
         noise = self.solid + self.soft
@@ -205,8 +205,23 @@ class Finder:
             if is_soft:
                 return "ле"
             return "ла"
-        
+        if symbol == "NamesToVerbs":
+            if result in ["да", "де", "та", "те"]:
+                if word[-1] in self.consonantsounds:
+                    if self.is_soft(word):
+                        return "де"
+                    else:
+                        return "да"
+                elif not(self.is_vowel(word[-1])):
+                    if self.is_soft(word):
+                        return "те"
+                    else:
+                        return "та"
+            
         if self.get_yryqsyz_etis(symbol,result):
+            if result == "л":
+                if self.is_vowel(word[-1]):
+                    return "л"
             if result == "н" and word[-1] in ['а','е']  and word [-2] in ['т', 'м']:
                 return "л"
             if result == "н" and word [-1] in ['т']:
