@@ -14,14 +14,14 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    # def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
-    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
+    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
+    #def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            # port = 5435,
+            port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -110,7 +110,7 @@ class StaticOperatioins:
 
 class DB(DatabaseOperations):
     def __init__(self, password):
-        self._onto = MyOwlReady()
+        # self._onto = MyOwlReady()
         super().__init__(password)
     def addWord(self, word, family, meaning, pos, example, user_id):
         self._insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, example, status)
@@ -639,7 +639,7 @@ class DB(DatabaseOperations):
         return 'expert' in roles
 
     def get_onto(self):
-        return self._onto
+        return app.s
 
 class User(db.Model):
     __tablename__ = 'users'

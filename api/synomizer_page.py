@@ -108,7 +108,7 @@ def searchWord():
                 ret = wordForSearch
                 # екі немесе 4 сөзден тұратын сөзтіркестерін базадан іздейміз
                 count = len(wordForSearch.split(' '))
-                if count >1 and count< 5:
+                if count > 1 and count < 4:
                     ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
                 if ret != wordForSearch:
                     words = merge_some_elements_of_string_array(words, globalIndex, index-globalIndex)

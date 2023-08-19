@@ -252,7 +252,7 @@ class Lemms:
         main_list = self.get_kaz_lemms(sentences)
         if main_list[0][0][1] == -1:
             return main_list
-        print(main_list)
+        # print(main_list)
         main_list[0][0][2] = []
         morph_reult = GodsHelp.morphogay(sentences[0])
         list_of_parts = clear_word(morph_reult)
@@ -311,7 +311,7 @@ class Lemms:
                     continue
                 token_found = False
                 token = token.lower()
-                while len(token) > 0 and not(token_found):
+                while len(token) > 1 and not(token_found):
                     # print(len(token) > 0 and not(token_found))
                     token = token[:-1] + self.change_syngor( token[-1:])
                     cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s))", (token,))

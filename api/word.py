@@ -606,7 +606,7 @@ class Word(Finder):
     def add_parts_to_synonym(self):
         #print("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
         parts = self.get_parts()
-        print("parts=",parts)
+        # print("parts=",parts)
         jiktik = ['P1SG1', 'P1PL1', 'P2SG1', 'P2SG.P1', 'P3SG', 'P2SG', 'POSS', ]
         catan = ['п', 'ф', 'к', 'қ', 'т', 'с', 'ш', 'щ', 'х', 'ц', 'ч', 'һ']
         uyan  = ['б', 'в', 'г', 'ғ', 'д', 'ж', 'з' ]
