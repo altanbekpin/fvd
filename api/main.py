@@ -8,9 +8,10 @@ import school_termin_page, login_page, legacy_page, tagger, synomizer_page, onto
 from db import db
 if __name__ == "__main__":
     from models import MyOwlReady
-    load_dotenv()
     app.s = MyOwlReady()
+    load_dotenv()
     app.tokenizer = Tokenizer.from_file("kazakh-bpe.tokenizer.json")
     app.run(port=5001, debug=True, host=os.environ.get("API_URL"))    
+
 
 
