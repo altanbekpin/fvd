@@ -6,7 +6,6 @@ from views import TextToSpeech
 from flask_restful import Api
 
 app = Flask(__name__)
-from models import MyOwlReady
 app.config['DB_PASSWORD'] = "magzhan2005"
 password = app.config['DB_PASSWORD']
 # app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@db/userdb'
