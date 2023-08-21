@@ -9,7 +9,6 @@ from db import db
 if __name__ == "__main__":
     from models import MyOwlReady
     app.s = MyOwlReady()
-    app.counter = 0
     load_dotenv()
     app.tokenizer = Tokenizer.from_file("kazakh-bpe.tokenizer.json")
     app.run(port=5001, debug=True, host=os.environ.get("API_URL"))    

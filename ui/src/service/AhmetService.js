@@ -312,4 +312,10 @@ export const AhmetService = {
       getHeader(access_token)
     );
   },
+  async textToSpeech(text) {
+    return api.post(AHMET_API + '/ttspeech', {text: text}, {
+            headers: getHeader(),    
+            responseType: 'blob',
+        })
+},
 };

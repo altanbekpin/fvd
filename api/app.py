@@ -2,6 +2,9 @@
 from flask import Flask
 from flask_cors import CORS, cross_origin
 from flask_mail import Mail
+from views import TextToSpeech
+from flask_restful import Api
+
 app = Flask(__name__)
 from models import MyOwlReady
 app.config['DB_PASSWORD'] = "magzhan2005"
@@ -18,3 +21,5 @@ app.config['MAIL_PASSWORD'] = 'zbtjzkncpdtbiczn'
 mail = Mail(app)
 CORS(app, origins=['http://localhost:8080', 'http://kazlangres.enu.kz'])
 CORS(app)
+api = Api(app)
+api.add_resource(TextToSpeech, '/ttspeech')

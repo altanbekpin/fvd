@@ -4,6 +4,11 @@
       Мектеп пәндерінің терминдер жинағы
     </div>
     <Toast />
+
+    <Dialog v-model:visible="talkingBoyVisible" :style="{ width: '75vw' }" modal>
+      <TalkingBoyAnimation/>
+    </Dialog>
+    
     <hr height="20px" />
     <DataTable
       v-model:filters="filters"
@@ -101,6 +106,11 @@
           </Dropdown>
         </template>
       </Column>
+      <Column>
+        <template #body="props">
+          <Button icon="pi pi-volume-up" severity="secondary" rounded outlined :loading="loading" @click="play(props)" />
+        </template>
+      </Column>
     </DataTable>
   </div>
   <Dialog
@@ -184,8 +194,10 @@
 <script>
 import { AhmetService } from "@/service/AhmetService";
 import { useStore } from "vuex";
+import TalkingBoyAnimation from "@/pages/components/TalkingBoyAnimation.vue";
 
 export default {
+  components: {TalkingBoyAnimation},
   data() {
     return {
       lazyParams: {},
@@ -199,6 +211,7 @@ export default {
       },
       classes: ["1", "2", "3", "4"],
       loading: true,
+      talkingBoyVisible: false,
       isUserAdmin: false,
       showAddTerminDialog: false,
       showAddSubjectDialog: false,
@@ -312,6 +325,31 @@ export default {
       this.showAddSubjectDialog = true;
       this.hideDialog();
     },
+    play(termin) {
+      this.loading = true;
+      AhmetService.textToSpeech(termin.data.termin + " дегеніміз - " + termin.data.definition + " .").then(response => 
+        {
+            var clipContainer = document.createElement('article');
+            var audio = document.createElement('audio');
+            var self = this;
+            clipContainer.classList.add('clip');
+            audio.setAttribute('controls', '');
+            audio.controls = true;
+            audio.src = window.URL.createObjectURL(new Blob([response.data], {type: "audio/mpeg"}));
+            audio.addEventListener('play', function() {
+              self.talkingBoyVisible = true;
+              });
+
+              audio.addEventListener('ended', function() {
+                self.talkingBoyVisible = false;
+                self.loading= false;
+                  // Или остановить анимацию
+              });
+
+            audio.play();
+        });
+    },
+    
     async saveSubject() {
       try {
         const access_token = this.store.getters.getAccessToken;
