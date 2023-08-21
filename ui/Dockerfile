@@ -17,5 +17,5 @@ RUN python -m nltk.downloader punkt
 # Copy the rest of your application files
 COPY . .
 
-# Custom command: Wait for the database, then start the uWSGI server
+# Custom command: Wait for the database, then start the uWSGI server 
 CMD bash -c 'while ! nc -z db 5432; do sleep 1; done; uwsgi app.ini'
