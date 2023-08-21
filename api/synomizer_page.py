@@ -96,6 +96,7 @@ def searchWord():
     data_id = 0
     index = 0
     globalIndex = 0
+    # сөз тіркестерін іздейміз
     while globalIndex<len(words):
         index = len(words)
         found = False
@@ -120,7 +121,6 @@ def searchWord():
                 break
             index-=1
         globalIndex+=1
-            
     for index, word in enumerate(words):
 
         if word not in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] and word.strip() and not is_person_name(word, data, index == 0):

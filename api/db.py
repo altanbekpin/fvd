@@ -14,14 +14,14 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    # def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
-    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
+    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
+    # def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            # port = 5435,
+            port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -139,7 +139,6 @@ class DB(DatabaseOperations):
         self._close_db()
     
     def findsyn(self, word, synomized_count, synomized_words, pos = None):
-
         if pos is None:
             query = '''SELECT s.synonym FROM synonyms s 
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
@@ -640,6 +639,9 @@ class DB(DatabaseOperations):
 
     def get_onto(self):
         return app.s
+    def counter(self):
+        app.counter+=1
+        return app.counter
 
 class User(db.Model):
     __tablename__ = 'users'

@@ -117,7 +117,7 @@ class MyOntology(models.Model):
 
         f.write(self.text)
         f.close()
-        #app.s = MyOwlReady()
+        app.s = MyOwlReady()
         app.s.ReloadTurkOnto()
     def GetJson(self,lang):
         res=''

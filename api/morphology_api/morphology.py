@@ -248,15 +248,15 @@ class Lemms:
         elif pos == "ADV":
             return 9
         
-    def get_kaz_lemms_test(self, sentences, length):
-        main_list = self.get_kaz_lemms(sentences)
+    def get_kaz_lemms_test(self, sentences, length, ml):
+        main_list = copy.deepcopy(ml)
         if main_list[0][0][1] == -1:
             return main_list
         # print(main_list)
         main_list[0][0][2] = []
         morph_reult = GodsHelp.morphogay(sentences[0])
         list_of_parts = clear_word(morph_reult)
-        pos = Lemms.get_pos_names_custom(main_list[0][0][1])
+        # pos = Lemms.get_pos_names_custom(main_list[0][0][1])
         main_list[0][length][3] = list_of_parts[0]
         main_list[0][length][4] = ""
         endings = list_of_parts[1:]
@@ -285,7 +285,8 @@ class Lemms:
         return main_list
             
     def get_kaz_lemms(self, sentences):
-        con = DB.get_instance().get_db_connection()
+        db = DB.get_instance()
+        con = db.get_db_connection()
         cur = con.cursor()
         token_list = []
         lemms_list = []

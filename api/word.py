@@ -447,7 +447,6 @@ class Finder:
         if word.strip() == "":
             return ""
         ending = word.strip()[-1]
-        print(ending)
         consonantsounds = ['л', 'м', 'н', 'ң', 'з']
         tarter = ['п', 'ф', 'к', 'қ', 'т', 'с', 'ш', 'щ', 'х', 'ц', 'ч' ,'һ', 'д']
         larler = ['й', 'р', 'а', 'ә', 'о', 'ө', 'е', 'ы', 'і', 'ұ', 'ү' ,'и' ,'э', 'б', 'я', 'ю']
@@ -539,7 +538,7 @@ class Word(Finder):
         sentences = st(word)
         temp = Lemms.get_instance().get_kaz_lemms(sentences)
         self._stcs = temp
-        self._stcs = Lemms.get_instance().get_kaz_lemms_test(sentences, self.get_length())
+        self._stcs = Lemms.get_instance().get_kaz_lemms_test(sentences, self.get_length(),temp)
         if not(self._stcs[0][0][1] == -1) and len(self._stcs[0][0][2]) == 0:
             self._stcs = temp
         self._length = self.get_length()
@@ -842,6 +841,8 @@ class Word(Finder):
         # print(self.word)
         if len(self.word.split(" "))>1:
             synonym, synomized_count = DB.get_instance().findsyn(' '.join(self.word.split()), self.synomized_count, self._synonyms)
+            print("findsyn1=",' '.join(self.word.split()))
+            print(self._synonyms)
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count
                 self.set_synonym(synonym)
@@ -849,11 +850,14 @@ class Word(Finder):
                 self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]
             except:
                 print("self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]")
-            synonym, synomized_count = DB.get_instance().findsyn(' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part, self.synomized_count, self._synonyms)
-            if synomized_count != self.synomized_count:
-                self.synomized_count = synomized_count
-                print(self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
-                self.set_synonym(synonym + self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
+            print("findsyn2=",' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part)
+            print(self._synonyms)
+
+            # synonym, synomized_count = DB.get_instance().findsyn(' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part, self.synomized_count, self._synonyms)
+            # if synomized_count != self.synomized_count:
+            #     self.synomized_count = synomized_count
+            #     print(self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
+            #     self.set_synonym(synonym + self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
             
             return
         if self.isResearchable():
@@ -865,7 +869,6 @@ class Word(Finder):
             if len(synonym.split(" "))>1:
                 syn_temp = synonym.split(" ")[len(synonym.split(" "))-1]
                 self.first_synonym = synonym.split(" ")[:len(synonym.split(" "))-1]
-                
                 #print("syn_temp:", syn_temp)
                 if family == "N":
                     t = Lemms.get_instance().get_kaz_lemms(st(syn_temp))
