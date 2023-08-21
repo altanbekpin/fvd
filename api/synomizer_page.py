@@ -7,6 +7,7 @@ from nltk.tokenize import sent_tokenize as st
 from db import DB
 from flask_jwt_extended import current_user, jwt_required
 from word import Word
+from Morphological_analyser_based_on_CSE.file_adding import addRowTofile
 def split_string(first_string, second_string):
     index = second_string.find(first_string)
     if index != -1:
@@ -334,3 +335,14 @@ def delete_family():
         return "don't have enough permission", 500
     DB.get_instance().delete_family(word_id)
     return "success", 200
+
+@app.route("/add/ending", methods=['POST'])
+def addEnding():
+    endings = request.json['endings']
+    row_data = ''
+    for (index,i) in enumerate(endings):
+        if index == 0:
+            row_data += f'<NB>*{i}<pc>'
+            continue
+        row_data += f'<pl>*{i}<pl>'
+    return addRowTofile([endings, row_data])

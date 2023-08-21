@@ -2,35 +2,28 @@ import xlrd
 from xlutils.copy import copy
 import os
 
-# Load the existing workbook
-affixes_fn = os.path.join(os.path.dirname(__file__), "Endings.xls")
-workbook = xlrd.open_workbook("Endings.xls")
-sheet = workbook.sheet_by_index(0)  # Assuming you want to work with the first sheet
+def addRowTofile(new_row_data):
+    # Load the existing workbook
+    affixes_fn = os.path.join(os.path.dirname(__file__), "Endings.xls")
+    workbook = xlrd.open_workbook(affixes_fn)
+    sheet = workbook.sheet_by_index(0)  # Assuming you want to work with the first sheet
 
-# Create a copy of the workbook for editing
-workbook_copy = copy(workbook)
-sheet_copy = workbook_copy.get_sheet(0)
+    # Create a copy of the workbook for editing
+    workbook_copy = copy(workbook)
+    sheet_copy = workbook_copy.get_sheet(0)
 
-# Data for the new row (assuming a list of values)
-new_row_data0 = ["ылса", "<NB>*ыл<pl>*са<pl>"]
-new_row_data1 = ["ме", "<NB>*ме<pl>"]
-new_row_data2 = ["лғаннан", "<NB>*л<pl>*ған<pl>*нан<pl>"]
+    # Find the last row index in the sheet
+    last_row_index = sheet.nrows
 
+    # Add the new row data to the copy of the sheet
+    for col_index, value in enumerate(new_row_data):
+        sheet_copy.write(last_row_index, col_index, value)
 
+    # Save the changes to the existing file (overwrite it)
+    workbook_copy.save(affixes_fn)
 
-# Find the last row index in the sheet
-last_row_index = sheet.nrows
+    print("Row added successfully and file overwritten!")
+    return 'Row added successfully and file overwritten!'
 
-# Add the new row data to the copy of the sheet
-for col_index, value in enumerate(new_row_data0):
-    sheet_copy.write(last_row_index, col_index, value)
-for col_index, value in enumerate(new_row_data1):
-    sheet_copy.write(last_row_index, col_index, value)
-for col_index, value in enumerate(new_row_data2):
-    sheet_copy.write(last_row_index, col_index, value)
-
-
-# Save the changes to a new file (or overwrite the existing one)
-workbook_copy.save("modified_file.xls")
-
-print("Row added successfully!")
+# Example data
+new_row_data = ["ылса", "<NB>*ыл<pl>*са<pl>"]

@@ -3,7 +3,6 @@ from flask import Flask
 from flask_cors import CORS, cross_origin
 from flask_mail import Mail
 app = Flask(__name__)
-from models import MyOwlReady
 app.config['DB_PASSWORD'] = "magzhan2005"
 password = app.config['DB_PASSWORD']
 # app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@db/userdb'
