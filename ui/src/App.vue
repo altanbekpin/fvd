@@ -146,16 +146,16 @@ export default {
         {
           label: "Анықтамалық",
           items: [
-            { label: "Тіл-құрал", icon: "pi pi-fw pi-file", to: "/intelect" },
+            { label: "Тіл-құрал", icon: "pi pi-fw pi-file", to: "/intelect/1" },
             {
               label: "Сұрақ-жауап жүйесі",
               icon: "pi pi-fw pi-star",
-              to: "/answer/question",
+              to: "/answer/question/2",
             },
             {
               label: "Терминдері мен анықтамалары",
               icon: "pi pi-fw pi-list",
-              to: "/terminology",
+              to: "/terminology/2",
             },
           ],
         },

@@ -10,10 +10,10 @@
       align-items: center;
     "
   >
-    <span style="font-size: large; font-weight: 500">Сұрақ-жауап жүйесі</span>
+    <span style="font-size: 170%; font-weight: 500">Сұрақ-жауап жүйесі</span>
     <span
       class="text-blue-600"
-      style="width: 70%; margin-top: 1%; font-weight: 700"
+      style="width: 70%; margin-top: 1%; font-weight: 700; font-size: 110%"
       >Қойылған сұраққа жауап Грамматика бойынша жаңа білім жүйесінен құралған
       онтологиялық модель негізінде орындалады</span
     >
@@ -56,7 +56,7 @@
               margin-bottom: 0;
             "
           >
-            <span style="font-weight: bold">Сұрақ</span>
+            <span style="font-weight: bold; font-size: 100%">Сұрақ</span>
           </div>
           <Textarea
             v-model="question"
@@ -91,7 +91,7 @@
             margin-bottom: 0;
           "
         >
-          <span style="font-weight: bold">Жауап</span>
+          <span style="font-weight: bold; font-size: 100%">Жауап</span>
         </div>
         <Textarea
           v-model="answer"
@@ -106,7 +106,7 @@
     <Button
       label="Сұрау"
       icon="pi pi-send"
-      style="height: 10%; width: 10%"
+      style="height: 10%; width: 10%; min-width: 7rem; font-size: 90%"
     ></Button>
   </div>
 </template>
