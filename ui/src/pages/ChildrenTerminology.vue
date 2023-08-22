@@ -72,7 +72,11 @@
           <AnimationComp />
         </div>
       </template>
-      <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+      <Column
+        v-if="isUserAdmin"
+        selectionMode="multiple"
+        headerStyle="width: 3rem"
+      ></Column>
       <Column field="termin" header="Термин" style="min-width: 12rem">
         <template #body="{ data }">
           {{ data.termin }}
@@ -441,43 +445,46 @@ export default {
     play(termin) {
       this.loading = true;
 
-      this.animationText = termin.data.termin + " дегеніміз - " + termin.data.definition + " .";
+      this.animationText =
+        termin.data.termin + " дегеніміз - " + termin.data.definition + " .";
       var self = this;
-      AhmetService.textToSpeech(this.animationText).then(response => 
-        {
-            var clipContainer = document.createElement('article');
-            this.audio = document.createElement('audio');
-            clipContainer.classList.add('clip');
-            this.audio.setAttribute('controls', '');
-            this.audio.controls = true;
-            this.audio.src = window.URL.createObjectURL(new Blob([response.data], {type: "audio/mpeg"}));
-            this.audio.addEventListener("loadedmetadata", function() {
-              // Теперь можно получить продолжительность аудио
-              const marquee = self.$refs.marquee;
-              const speedCoefficient = self.animationText.length / 70; 
-              const audioDuration = self.audio.duration
-              const animationDuration = audioDuration * speedCoefficient;
-              marquee.style.animationDuration = animationDuration + "s";
-              marquee.style.animationPlayState = "running";
-            });
-            this.audio.addEventListener('play', function() {
-              self.talkingBoyVisible = true;
-             
-              });
-            this.audio.addEventListener('ended', function() {
-                self.talkingBoyVisible = false;
-                self.loading= false;
-                const marquee = self.$refs.marquee;
-                marquee.style.animationPlayState = "paused";
-              });
-            
-            
-            this.audio.play();
-        }).catch((err) => {
-            console.error(err);
-        })
-        .finally(() => (self.talkingBoyVisible = false, self.loading = false));
+      AhmetService.textToSpeech(this.animationText)
+        .then((response) => {
+          var clipContainer = document.createElement("article");
+          this.audio = document.createElement("audio");
+          clipContainer.classList.add("clip");
+          this.audio.setAttribute("controls", "");
+          this.audio.controls = true;
+          this.audio.src = window.URL.createObjectURL(
+            new Blob([response.data], { type: "audio/mpeg" })
+          );
+          this.audio.addEventListener("loadedmetadata", function () {
+            // Теперь можно получить продолжительность аудио
+            const marquee = self.$refs.marquee;
+            const speedCoefficient = self.animationText.length / 70;
+            const audioDuration = self.audio.duration;
+            const animationDuration = audioDuration * speedCoefficient;
+            marquee.style.animationDuration = animationDuration + "s";
+            marquee.style.animationPlayState = "running";
+          });
+          this.audio.addEventListener("play", function () {
+            self.talkingBoyVisible = true;
+          });
+          this.audio.addEventListener("ended", function () {
+            self.talkingBoyVisible = false;
+            self.loading = false;
+            const marquee = self.$refs.marquee;
+            marquee.style.animationPlayState = "paused";
+          });
 
+          this.audio.play();
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(
+          () => ((self.talkingBoyVisible = false), (self.loading = false))
+        );
     },
 
     async saveSubject() {
