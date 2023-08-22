@@ -15,7 +15,7 @@
           үшін белгіленген сөздің үстінен басып, көрсетілген синонимдер ішінен
           мағынасына сай сөзді таңдап, түзете аласыз
         </span>
-        <div class="card main-card" style="height: 500px; margin-top: 20px">
+        <div class="card main-card" style="height: 100%; margin-top: 20px">
           <WordSynomizer></WordSynomizer>
         </div>
       </div>
