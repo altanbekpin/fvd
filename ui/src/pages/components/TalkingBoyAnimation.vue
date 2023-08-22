@@ -1,5 +1,5 @@
 <template>
-  <div class="lottie-container" ref="lottieContainer"></div>
+  <div  class="lottie-container1" ref="lottieContainer"></div>
 </template>
 
 <script>
@@ -28,7 +28,10 @@ export default {
 </script>
 
 <style>
-.lottie-container {
-  height: 600px;
+.lottie-container1 {
+  height: 500px;
+  background-color: transparent; 
+  
 }
+
 </style>
