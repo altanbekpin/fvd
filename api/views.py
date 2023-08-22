@@ -3,6 +3,7 @@ import os
 import io
 import struct
 
+import requests
 from flask import request, send_file
 from flask_restful import Resource
 
@@ -78,22 +79,10 @@ class TextToSpeech(Resource):
     def post(self):
         content = request.json
         text = content["text"]
-        languageCode = "ru-RU"
-        if "langCode" in content:
-            languageCode = content["langCode"]
-        print(languageCode)
-        synthesis_input = texttospeech.SynthesisInput(text=text)
-        voice = texttospeech.VoiceSelectionParams(
-            language_code=languageCode, ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
-        )
-        audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.MP3
-        )
-        response = self.textToSpeechClient.synthesize_speech(
-            input=synthesis_input, voice=voice, audio_config=audio_config
-        )
-        return send_file(
-            io.BytesIO(response.audio_content),
-            download_name='speech.mp3',
-            mimetype='audio/mpeg'
-        )
+        request4 = requests.post(self.api_url_tt_to_speech, data={'text':text})
+        if request4.status_code == 200:
+            return send_file(
+                io.BytesIO(request4.content),
+                download_name='speech.wav',
+                mimetype='audio/wav'
+            )
