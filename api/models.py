@@ -6,7 +6,7 @@ import rdflib
 from rdflib.serializer import Serializer
 from rdflib.namespace import RDF, RDFS, OWL
 from owlready import *
-from app import app
+# from app import app
 
 
 class LegacySchema(Schema):
@@ -120,8 +120,8 @@ class MyOntology():
 
         f.write(self.text)
         f.close()
-        app.s = MyOwlReady()
-        app.s.ReloadTurkOnto()
+        # app.s = MyOwlReady()
+        # app.s.ReloadTurkOnto()
     
 
 
