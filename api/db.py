@@ -126,6 +126,7 @@ class DB(DatabaseOperations):
         self._insert_query(insert_syn_word, (word_id, syn_id))
         self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 3)''', (syn_id, user_id))
         self._close_db()
+        return syn_id
 
     def add_Paraphrases(self, paraphrase, word_id, user_id):
         query = "INSERT INTO paraphrases (paraphrase) VALUES (%s) RETURNING id"
@@ -133,8 +134,9 @@ class DB(DatabaseOperations):
         par_id = self.fetchone()['id']
         query = "INSERT INTO paraphrase_word (word_id, paraphrase_id) VALUES(%s, %s)"
         self._insert_query(query, (word_id, par_id))
-        self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 3)''', (par_id, user_id))
+        self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 4)''', (par_id, user_id))
         self._close_db()
+        return par_id
     
     def findsyn(self, word, synomized_count, synomized_words, pos = None):
         if pos is None:

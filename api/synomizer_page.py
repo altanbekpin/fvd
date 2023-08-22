@@ -238,8 +238,6 @@ def switch_case(argument):
 @app.route('/add/word/', methods=['POST'])
 @jwt_required()
 def addWord():
-    if not DB.get_instance().isUserAdmin(current_user):
-        return "don't have enough permission", 500
     synonyms = request.json['synonyms']
     example = request.json['example']
     paraphrases = request.json['paraphrases']
@@ -247,23 +245,35 @@ def addWord():
     word = request.json['word']
     family = request.json['family']['name']
     pos = switch_case(family)
+    syn_offer_ids = []
+    par_offer_ids = []
     try:
         row_id = DB.get_instance().addWord(word, family, meaning, pos, example, current_user.id)
+        
     except Exception as e:
         return str(e), 400
     word_id = row_id
     if len(synonyms) > 0:
         for i in synonyms:
             try:
-                DB.get_instance().add_Synonyms( synonym=i, word_id=word_id,user_id=current_user.id)
+               syn_offer_ids.append(DB.get_instance().add_Synonyms( synonym=i, word_id=word_id,user_id=current_user.id)) 
             except Exception as e:
                 return str(e), 400
     if len(paraphrases) > 0:
         for i in paraphrases:
             try:
-                DB.get_instance().add_Paraphrases( paraphrase=i, word_id=word_id, user_id=current_user.id)
+                par_offer_ids.append(DB.get_instance().add_Paraphrases( paraphrase=i, word_id=word_id, user_id=current_user.id))
             except Exception as e:
                 return str(e), 400
+    if DB.get_instance().isUserAdmin(current_user) or DB.get_instance().isUserExpert(current_user.id):
+        DB.get_instance().activate_offer(row_id, 1)
+        try:
+            for i in syn_offer_ids:
+                DB.get_instance().activate_offer(i, 3)
+            for i in par_offer_ids:
+                DB.get_instance().activate_offer(i, 4)
+        except Exception as e:
+            return jsonify({"message":str(e)}), 400
     return 'success', 200
 
 @app.route('/add/synonym/', methods=['POST'])

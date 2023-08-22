@@ -83,11 +83,11 @@
         ></InputText>
         <span style="color: grey; font-size: 13px">Синонимдер</span>
         <div style="max-width: 600px">
-          <Chips v-model="synonymInput" separator="," />
+          <Chips v-model="synonymInput" separator=";" />
         </div>
         <span style="color: grey; font-size: 13px">Перифразалар</span>
         <div style="max-width: 600px">
-          <Chips v-model="paraphraseInput" separator="," />
+          <Chips v-model="paraphraseInput" separator=";" />
         </div>
         <div style="margin-top: auto; align-self: flex-end">
           <Button

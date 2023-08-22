@@ -8,7 +8,12 @@
       <i class="pi pi-bars"></i>
     </button>
     <router-link to="/" class="layout-topbar-logo" style="margin-left: 10px">
-      <img alt="Logo" :src="topbarImage()" class="logo-image" />
+      <img
+        alt="Logo"
+        :src="topbarImage()"
+        class="logo-image"
+        style="width: 65%; height: 65%"
+      />
     </router-link>
     <span class="mobile-text">{{ $t("common.title") }}</span>
 
