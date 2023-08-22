@@ -343,11 +343,11 @@ export default {
     play(termin) {
       this.loading = true;
       this.animationText = termin.data.termin + " дегеніміз - " + termin.data.definition + " .";
+      var self = this;
       AhmetService.textToSpeech(this.animationText).then(response => 
         {
             var clipContainer = document.createElement('article');
             this.audio = document.createElement('audio');
-            var self = this;
             clipContainer.classList.add('clip');
             this.audio.setAttribute('controls', '');
             this.audio.controls = true;
@@ -374,7 +374,10 @@ export default {
             
             
             this.audio.play();
-        });
+        }).catch((err) => {
+            console.error(err);
+        })
+        .finally(() => (self.talkingBoyVisible = false, self.loading = false));
     },
 
     async saveSubject() {

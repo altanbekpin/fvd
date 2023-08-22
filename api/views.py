@@ -13,8 +13,7 @@ class TextToSpeech(Resource):
         self.api_url_tt_to_speech =  'http://kazlangres.enu.kz:7557/synthes'
         content = request.json
         text = content["text"]
-        cleaned = re.sub(r'[^а-яА-ЯӘәІіҢңҒғҮүҰұҚқҺһa-zA-Z0-9.,!?;:]', '', text)
-
+        cleaned = re.sub(r'[^а-яА-ЯӘәІіҢңҒғҮүҰұҚқҺһa-zA-Z0-9.,!?;: \-]', '', text)
         request4 = requests.post(self.api_url_tt_to_speech, data={'text':cleaned})
         if request4.status_code == 200:
             return send_file(
