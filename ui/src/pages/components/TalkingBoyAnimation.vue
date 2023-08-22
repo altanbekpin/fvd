@@ -1,16 +1,14 @@
 <template>
-  <div  class="lottie-container1" ref="lottieContainer"></div>
+  <div class="lottie-container1" ref="lottieContainer"></div>
 </template>
 
 <script>
 import lottie from "lottie-web";
-import animationData from "../../assets/talking_boy.json"
+import animationData from "../../assets/talking_boy.json";
 
 export default {
   name: "TalkingBoyAnimation",
   async mounted() {
-
-
     try {
       lottie.loadAnimation({
         container: this.$refs.lottieContainer,
@@ -23,15 +21,12 @@ export default {
       console.error("Error loading Lottie animation:", error);
     }
   },
-  
 };
 </script>
 
 <style>
 .lottie-container1 {
   height: 500px;
-  background-color: transparent; 
-  
+  background-color: transparent;
 }
-
 </style>
