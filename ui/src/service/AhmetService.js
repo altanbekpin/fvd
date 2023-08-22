@@ -313,9 +313,27 @@ export const AhmetService = {
     );
   },
   async textToSpeech(text) {
-    return api.post(AHMET_API + '/ttspeech', {text: text}, {
-            headers: getHeader(),    
-            responseType: 'blob',
-        })
-},
+    return api.post(
+      AHMET_API + "/ttspeech",
+      { text: text },
+      {
+        headers: getHeader(),
+        responseType: "blob",
+      }
+    );
+  },
+  async changeTermin(request, access_token) {
+    await api.post(
+      `${AHMET_API}/change/termin`,
+      { data: request },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
+  },
 };

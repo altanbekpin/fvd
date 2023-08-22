@@ -1,12 +1,33 @@
 <template>
   <div>
     <Textarea rows="15" cols="55" v-model="inputWords" style="width: 100%" />
-    <div class="row texts" style="margin-top: 30px">
-      <div>Символдар саны = {{ inputWords.length }}</div>
-      <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
+    <div class="row texts" style="margin-top: 10px; align-items: center">
+      <div style="display: flex; flex-direction: column; margin-right: 10%">
+        <Knob
+          v-model="inputWords.length"
+          disabled
+          :size="60"
+          :max="2000"
+          :min="0"
+        />
+        <span>Символдар саны</span>
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <Knob
+          v-model="synomized_counter"
+          disabled
+          :size="60"
+          :max="400"
+          :min="0"
+        />
+        <span>Ауыстырылған сөздер саны</span>
+      </div>
+
+      <!-- <div>Символдар саны = {{ inputWords.length }}</div>
+      <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div> -->
       <Button
         label="Өңдеу"
-        style="margin-left: 80px"
+        style="margin-left: 10%"
         @click="send_to_synomize"
       />
     </div>

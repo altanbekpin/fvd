@@ -47,7 +47,11 @@ const routes = [
         name: "intelect",
         component: () => import("./pages/Intelect.vue"),
       },
-
+      {
+        path: "/answer/question",
+        name: "/answer/question",
+        component: () => import("./pages/AnswerQuestion.vue"),
+      },
       {
         path: "/terminology",
         name: "terminology",
