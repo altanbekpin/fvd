@@ -97,7 +97,14 @@
           v-model="answer"
           class="custom-textarea"
           filled
-          style="border: none; height: 80%; width: 100%; resize: none"
+          style="
+            border: none;
+            height: 80%;
+            width: 100%;
+            resize: none;
+            color: blue;
+            font-weight: 700;
+          "
           disabled
         />
       </div>
@@ -107,17 +114,27 @@
       label="Сұрау"
       icon="pi pi-send"
       style="height: 10%; width: 10%; min-width: 7rem; font-size: 90%"
+      @click="ask"
     ></Button>
   </div>
 </template>
 
 <script>
+import { AhmetService } from "../service/AhmetService";
+
 export default {
   data() {
     return {
       question: "",
       answer: "",
     };
+  },
+  methods: {
+    async ask() {
+      const response = await AhmetService.ask(this.question);
+      console.log(response);
+      this.answer = response.data;
+    },
   },
 };
 </script>

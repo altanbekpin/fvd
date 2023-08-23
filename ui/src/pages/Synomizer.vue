@@ -157,14 +157,10 @@ const visible = ref(false);
 const optionSynonyms = ref([{ synonym: "синоним жоқ", words: "" }]);
 console.log(optionSynonyms.value);
 document.addEventListener("click", function (event) {
-  console.log("tapped");
-  var listBox = document.querySelector(".listbox"); // Select the ListBox element
-  console.log("finished1");
+  var listBox = document.querySelector(".listbox");
 
-  // Check if the click event occurred outside the ListBox
   if (listBox && !listBox.contains(event.target)) {
-    console.log("finished2");
-    listBox.style.display = "none"; // Hide the ListBox
+    listBox.style.display = "none";
   }
   console.log("finished");
 });

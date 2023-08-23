@@ -40,7 +40,7 @@
       <template #header>
         <div class="flex justify-content-end">
           <Button
-            v-if="isUserAdmin"
+            v-if="isUserAdmin || isUserExpert"
             type="button"
             icon="pi pi-plus"
             label="Жаңа термин қосу"
@@ -49,7 +49,7 @@
             style="margin-right: 4%"
           />
           <Button
-            v-if="isUserAdmin"
+            v-if="isUserAdmin || isUserExpert"
             type="button"
             icon="pi pi-pencil"
             label="Термин өзгерту"
@@ -73,7 +73,7 @@
         </div>
       </template>
       <Column
-        v-if="isUserAdmin"
+        v-if="isUserAdmin || isUserExpert"
         selectionMode="multiple"
         headerStyle="width: 3rem"
       ></Column>
@@ -226,7 +226,7 @@
   <Dialog
     v-model:visible="showChangeSubjectDialog"
     :style="{ width: '450px' }"
-    header="Жаңа пән қосу"
+    header="Термин өзгерту"
     :modal="true"
     class="p-fluid"
   >
@@ -276,7 +276,7 @@
             @click="hideDialog"
           />
           <Button
-            label="Сақтау"
+            label="Өзгерту"
             icon="pi pi-check"
             text
             @click="changeTermin()"
@@ -312,6 +312,7 @@ export default {
       loading: true,
       talkingBoyVisible: false,
       isUserAdmin: false,
+      isUserExpert: false,
       showAddTerminDialog: false,
       showAddSubjectDialog: false,
       subjectToAdd: null,
@@ -336,6 +337,7 @@ export default {
   async mounted() {
     this.store = useStore();
     this.isUserAdmin = this.store.getters.isUserAdmin;
+    this.isUserExpert = this.store.getters.isUserExpert;
     this.lazyParams = {
       first: 0,
       rows: this.$refs.dt.rows,
@@ -344,7 +346,7 @@ export default {
       filters: this.filters,
     };
     this.subjects = (await AhmetService.getSubjects())["data"];
-    console.log("subjects:", this.subjects);
+    // console.log("subjects:", this.subjects);
     this.loadLazyData();
   },
 
@@ -357,6 +359,12 @@ export default {
   },
   methods: {
     showChangeDialog() {
+      this.requestToChange.id = this.selectedProduct[0].id;
+      this.requestToChange.definition = this.selectedProduct[0].definition;
+      this.requestToChange.school_class = this.selectedProduct[0].class;
+      this.requestToChange.subject = this.selectedProduct[0].subject;
+      this.requestToChange.termin = this.selectedProduct[0].termin;
+      console.log("this.requestToChange:", this.selectedProduct[0]);
       this.showChangeSubjectDialog = true;
     },
     async delay(ms) {
@@ -366,16 +374,16 @@ export default {
       this.loading = true;
       this.customers = null;
       const count = await AhmetService.countChildrenTermins();
-      console.log("count:", count);
+      // console.log("count:", count);
       this.totalRecords = count["data"]["count"];
-      console.log("this.totalRecords:", this.totalRecords);
+      // console.log("this.totalRecords:", this.totalRecords);
       this.lazyParams.isChildren = true;
       await this.delay(2000);
       const object = await AhmetService.getSchoolTermins({
         data: this.lazyParams,
       });
       this.customers = object.data;
-      console.log("this.customers:", this.customers);
+      // console.log("this.customers:", this.customers);
       this.loading = false;
     },
     onPage(event) {
@@ -386,26 +394,26 @@ export default {
       this.lazyParams = event;
       this.loadLazyData();
     },
-    onFilter(event) {
+    onFilter() {
       this.lazyParams.filters = this.filters;
-      console.log("EVENT:", event);
+      // console.log("EVENT:", event);
       this.loadLazyData();
     },
     async showDialog() {
       this.showAddTerminDialog = true;
       this.subjects = (await AhmetService.getSubjects())["data"];
-      console.log("this.subjects:", this.subjects);
+      // console.log("this.subjects:", this.subjects);
     },
     hideDialog() {
       this.showAddTerminDialog = false;
     },
     async saveTermin() {
-      console.log("store:", this.store);
-      console.log("store.state:", this.store.state);
+      // console.log("store:", this.store);
+      // console.log("store.state:", this.store.state);
       const access_token = this.store.getters.getAccessToken;
-      console.log("###############");
+      // console.log("###############");
       try {
-        console.log("saveTermin:", access_token);
+        // console.log("saveTermin:", access_token);
         await AhmetService.saveTermin(this.request, access_token);
         this.$toast.add({
           severity: "success",
@@ -498,7 +506,7 @@ export default {
           life: 3000,
         });
       } catch (error) {
-        console.log("ERROR:", error);
+        // console.log("ERROR:", error);
         this.$toast.add({
           severity: "error",
           summary: "Ақау",
