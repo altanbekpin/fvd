@@ -18,18 +18,18 @@ const store = createStore({
   },
   mutations: {
     updateUser(state, data) {
-      console.log("updateUser:");
-      console.log(data);
+      // console.log("updateUser:");
+      // console.log(data);
       state.user = data;
-      console.log("state after updating:");
-      console.log(state.user);
+      // console.log("state after updating:");
+      // console.log(state.user);
       localStorage.setItem("user", JSON.stringify(data));
     },
     changeTheme(state, Theme) {
       Cookies.set("Theme", Theme, { expires: 7 });
       state.ChosenTheme.theme = Theme.theme;
       state.ChosenTheme.dark = Theme.dark;
-      console.log(state.ChosenTheme);
+      // console.log(state.ChosenTheme);
     },
     unLogUser(state) {
       const data = {

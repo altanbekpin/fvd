@@ -406,7 +406,7 @@ export default {
   },
   methods: {
     onItemSelected(boolean) {
-      console.log("BOOLEAN:", boolean);
+      // console.log("BOOLEAN:", boolean);
       this.is_percent = boolean;
     },
     openDialog(user) {
@@ -436,13 +436,13 @@ export default {
         );
       }
       this.lineData.labels = labels;
-      console.log("this.lineData.labels:", this.lineData.labels);
+      // console.log("this.lineData.labels:", this.lineData.labels);
       const accesstoken = store.getters.getAccessToken;
       var response = await AhmetService.getOffersAmount(accesstoken);
       this.offercount = response["count"]["count"];
       this.todayoffercount = response["today_offers"]["count"];
       response = await AhmetService.getWordsAmount(accesstoken);
-      console.log("response", response);
+      // console.log("response", response);
       this.wordscount = response["words_count"]["count"];
       this.wordscountactivated = response["words_count_activated"]["count"];
       response = await AhmetService.getUsersAmount(accesstoken);
@@ -456,28 +456,28 @@ export default {
         await AhmetService.wordDates(accesstoken, this.dates)
       ).data;
       this.wordDates = this.wordDates.map((obj) => obj.count);
-      console.log("this.wordDates:", this.wordDates);
-      console.log(this.wordDates[0]);
+      // console.log("this.wordDates:", this.wordDates);
+      // console.log(this.wordDates[0]);
       this.lineData.datasets[0].data = this.wordDates;
       this.lineData.datasets[1].data = this.wordDates;
-      console.log("this.lineData.datasets", this.lineData.datasets[0].data);
+      // console.log("this.lineData.datasets", this.lineData.datasets[0].data);
       response = (await AhmetService.userResults(accesstoken)).data;
       this.userstable = response;
-      console.log("userResults:", response);
-      console.log("this.userstable[0]:", this.userstable[0]);
-      console.log(
-        "this.userstable[0]['full_name']:",
-        this.userstable[0]["full_name"]
-      );
+      // console.log("userResults:", response);
+      // console.log("this.userstable[0]:", this.userstable[0]);
+      // console.log(
+      //   "this.userstable[0]['full_name']:",
+      //   this.userstable[0]["full_name"]
+      // );
       response = await AhmetService.lastNews(accesstoken);
       this.AllLastNews = response;
     },
     async lookforuser(newVal) {
-      console.log("newVal:", newVal);
+      // console.log("newVal:", newVal);
       const accesstoken = store.getters.getAccessToken;
       const response = await AhmetService.userInfo(accesstoken, newVal);
       this.usersinfo = response;
-      console.log("lookforuser:", response);
+      // console.log("lookforuser:", response);
     },
     async getTableInfo(accesstoken) {
       this.usersinfo = await AhmetService.userInfo(accesstoken);
@@ -492,7 +492,7 @@ export default {
         });
         return;
       }
-      console.log("TODO:", todo);
+      // console.log("TODO:", todo);
       const accesstoken = store.getters.getAccessToken;
       var message =
         todo == "delete"
@@ -508,7 +508,7 @@ export default {
           todo = "Қолданушы сәтті өзгертілді";
           errormessage = "Қолданушы параметрлері өзгертілмеді";
           label = "Өзгертілді";
-          console.log("CHANGE USER");
+          // console.log("CHANGE USER");
           await AhmetService.update_user(
             accesstoken,
             this.manage_user.email,

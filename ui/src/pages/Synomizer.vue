@@ -15,7 +15,7 @@
           үшін белгіленген сөздің үстінен басып, көрсетілген синонимдер ішінен
           мағынасына сай сөзді таңдап, түзете аласыз
         </span>
-        <div class="card main-card" style="height: 500px; margin-top: 20px">
+        <div class="card main-card" style="height: 100%; margin-top: 20px">
           <WordSynomizer></WordSynomizer>
         </div>
       </div>
@@ -83,11 +83,11 @@
         ></InputText>
         <span style="color: grey; font-size: 13px">Синонимдер</span>
         <div style="max-width: 600px">
-          <Chips v-model="synonymInput" separator="," />
+          <Chips v-model="synonymInput" separator=";" />
         </div>
         <span style="color: grey; font-size: 13px">Перифразалар</span>
         <div style="max-width: 600px">
-          <Chips v-model="paraphraseInput" separator="," />
+          <Chips v-model="paraphraseInput" separator=";" />
         </div>
         <div style="margin-top: auto; align-self: flex-end">
           <Button
@@ -154,19 +154,15 @@ const showToast = (data) => {
 };
 const visible = ref(false);
 
-const optionSynonyms = ref([{ synonym: "синоним жоқ", words: "" }]);
-console.log(optionSynonyms.value);
+// const optionSynonyms = ref([{ synonym: "синоним жоқ", words: "" }]);
+// console.log(optionSynonyms.value);
 document.addEventListener("click", function (event) {
-  console.log("tapped");
-  var listBox = document.querySelector(".listbox"); // Select the ListBox element
-  console.log("finished1");
+  var listBox = document.querySelector(".listbox");
 
-  // Check if the click event occurred outside the ListBox
   if (listBox && !listBox.contains(event.target)) {
-    console.log("finished2");
-    listBox.style.display = "none"; // Hide the ListBox
+    listBox.style.display = "none";
   }
-  console.log("finished");
+  // console.log("finished");
 });
 const selectedFamily = ref();
 const word_family = ref([
@@ -191,10 +187,10 @@ const showDialog = (data) => {
 };
 
 const addWord = () => {
-  console.log("synonymInput.value: ", synonymInput.value);
-  console.log("inputValues.value: ", inputValues.value);
-  console.log("meaningInput.value: ", meaningInput.value);
-  console.log("selectedFamily.value: ", selectedFamily.value);
+  // console.log("synonymInput.value: ", synonymInput.value);
+  // console.log("inputValues.value: ", inputValues.value);
+  // console.log("meaningInput.value: ", meaningInput.value);
+  // console.log("selectedFamily.value: ", selectedFamily.value);
   if (!store.getters.isUserRegistered) {
     toast.add({
       severity: "error",

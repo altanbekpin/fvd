@@ -8,7 +8,12 @@
       <i class="pi pi-bars"></i>
     </button>
     <router-link to="/" class="layout-topbar-logo" style="margin-left: 10px">
-      <img alt="Logo" :src="topbarImage()" class="logo-image" />
+      <img
+        alt="Logo"
+        :src="topbarImage()"
+        class="logo-image"
+        style="width: 65%; height: 65%"
+      />
     </router-link>
     <span class="mobile-text">{{ $t("common.title") }}</span>
 
@@ -54,7 +59,7 @@
 </template>
 
 <script>
-import { useStore } from "vuex";
+// import { useStore } from "vuex";
 import store from "./store";
 export default {
   data() {
@@ -69,16 +74,11 @@ export default {
     };
   },
   setup() {
-    const store = useStore();
-
+    // const store = useStore();
     // Access store.getters here
-    const isUserRegistered = store.getters.isUserRegistered;
-    console.log("isUserRegistered:", isUserRegistered);
-
+    // const isUserRegistered = store.getters.isUserRegistered;
+    // console.log("isUserRegistered:", isUserRegistered);
     // Rest of your component's code
-  },
-  mounted() {
-    console.log();
   },
   methods: {
     showTemplate(event) {

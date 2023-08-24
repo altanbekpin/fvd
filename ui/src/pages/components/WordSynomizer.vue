@@ -1,12 +1,33 @@
 <template>
   <div>
     <Textarea rows="15" cols="55" v-model="inputWords" style="width: 100%" />
-    <div class="row texts" style="margin-top: 30px">
-      <div>Символдар саны = {{ inputWords.length }}</div>
-      <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div>
+    <div class="row texts" style="margin-top: 10px; align-items: center">
+      <div style="display: flex; flex-direction: column; margin-right: 10%">
+        <Knob
+          v-model="inputWords.length"
+          disabled
+          :size="60"
+          :max="2000"
+          :min="0"
+        />
+        <span>Символдар саны</span>
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <Knob
+          v-model="synomized_counter"
+          disabled
+          :size="60"
+          :max="400"
+          :min="0"
+        />
+        <span>Ауыстырылған сөздер саны</span>
+      </div>
+
+      <!-- <div>Символдар саны = {{ inputWords.length }}</div>
+      <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div> -->
       <Button
         label="Өңдеу"
-        style="margin-left: 80px"
+        style="margin-left: 10%"
         @click="send_to_synomize"
       />
     </div>
@@ -117,7 +138,7 @@ export default {
           { headers: getHeader() }
         )
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           this.synomized_words = response.data[0];
           this.synomized_counter = response.data[1];
         });
@@ -134,14 +155,14 @@ export default {
         this.overlayTarget = target;
       }
       if (clickedElClass === "temp_testing_div2") {
-        const dataValue = e.target.getAttribute("id");
-        console.log("dataValue: ", dataValue);
-        console.log("overlayTarget:", this.overlayTarget);
+        // const dataValue = e.target.getAttribute("id");
+        // console.log("dataValue: ", dataValue);
+        // console.log("overlayTarget:", this.overlayTarget);
         this.handleClick(e);
-        console.log("temp_testing_div2 clicked!", this.clickedElHref);
-        console.log("clickkedRef:", clickkedRef);
+        // console.log("temp_testing_div2 clicked!", this.clickedElHref);
+        // console.log("clickkedRef:", clickkedRef);
         this.second_part = clickkedRef;
-        console.log("family:", family);
+        // console.log("family:", family);
         this.optionSynonyms = [
           {
             synonym: this.clickedElHref,
@@ -163,17 +184,17 @@ export default {
             this.optionSynonyms = response.data;
           });
         // this.optionSynonyms = this.clearArray(this.optionSynonyms);
-        console.log("this.optionSynonyms:", this.optionSynonyms);
+        // console.log("this.optionSynonyms:", this.optionSynonyms);
       } else {
-        console.log("another element was clicked");
+        // console.log("another element was clicked");
       }
     },
     handleClick(event) {
-      console.log("Span clicked!");
+      // console.log("Span clicked!");
       this.toggle(event);
     },
     toggle(event) {
-      console.log("toggle: ", event.target);
+      // console.log("toggle: ", event.target);
       this.$refs.op.toggle(event);
     },
     async onSynonymTap() {
@@ -181,9 +202,9 @@ export default {
         this.optionSynonyms[0].synonym,
         this.selectedSyn.synonym
       );
-      console.log(this.optionSynonyms);
-      console.log("selectedSyn: ", this.selectedSyn);
-      console.log("selectedSyn: ", this.selectedSyn.synonym);
+      // console.log(this.optionSynonyms);
+      // console.log("selectedSyn: ", this.selectedSyn);
+      // console.log("selectedSyn: ", this.selectedSyn.synonym);
       if (this.optionSynonyms[0].synonym.includes(this.selectedSyn.synonym)) {
         this.overlayTarget.innerText = this.optionSynonyms[0].synonym;
       } else {

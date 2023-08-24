@@ -43,14 +43,33 @@ const routes = [
         component: () => import("./pages/ChildrenTerminology"),
       },
       {
-        path: "intelect",
+        path: "/intelect/1",
+        name: "intelect1",
+        component: () => import("./pages/Intelect.vue"),
+      },
+      {
+        path: "/intelect",
         name: "intelect",
         component: () => import("./pages/Intelect.vue"),
       },
-
+      {
+        path: "/answer/question",
+        name: "answerquestion",
+        component: () => import("./pages/AnswerQuestion.vue"),
+      },
+      {
+        path: "/answer/question/2",
+        name: "answerquestion2",
+        component: () => import("./pages/AnswerQuestion.vue"),
+      },
       {
         path: "/terminology",
         name: "terminology",
+        component: () => import("./pages/TerminDefinition.vue"),
+      },
+      {
+        path: "/terminology/2",
+        name: "terminology2",
         component: () => import("./pages/TerminDefinition.vue"),
       },
       {

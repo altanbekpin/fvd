@@ -10,7 +10,7 @@ import animationData3 from "@/assets/animation_lktfimbc.json"; // Make sure this
 
 export default {
   async mounted() {
-    console.log("ANIMATIOOOOOON");
+    // console.log("ANIMATIOOOOOON");
     const animationModules = [animationData1, animationData2, animationData3];
 
     const animationData = this.getRandomElementFromArray(animationModules);

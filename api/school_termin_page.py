@@ -27,6 +27,23 @@ def countChildrenTermins():
     amoung = DB.get_instance().countSchoolTermins(isChildren=True)
     return amoung
 
+@app.route('/change/termin', methods=['POST'])
+@jwt_required()
+def changeTermin():
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+        return "don't have enough permission", 500
+    data = request.json['data']
+    termin = data['termin']
+    definition = data['definition']
+    subject_id = data['subject']['id']
+    school_class = data['school_class']
+    id = data['id']
+    try:
+        DB.get_instance().changeTermin(termin=termin, definition=definition, subject_id=subject_id, school_class=school_class, id=id)
+    except Exception as e:
+        return 400, e
+    return "success", 200
+
 @app.route("/add/termin", methods=['POST'])
 @jwt_required()
 def addTermin():

@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     getJson() {
-      console.log("AHMET_API:", `${AHMET_API}/getontology/kz/`);
+      // console.log("AHMET_API:", `${AHMET_API}/getontology/kz/`);
       axios
         .get(`${AHMET_API}/getontology/kz/`)
         .then((response) => (this.OntNames = response.data));
@@ -89,7 +89,7 @@ export default {
       var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
         headers: getHeader(),
       });
-
+      console.log("temp:", temp);
       this.OntoInner = temp.data;
       this.loading = false;
     },
@@ -102,23 +102,23 @@ export default {
     this.loading = true;
     window.DoSubmit = async function (text) {
       self.loading = true;
-      console.log(text);
+      // console.log(text);
       self.textController = text;
       var reqbody = {
         question: text,
       };
 
-      console.log(reqbody);
+      // console.log(reqbody);
       var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
         headers: getHeader(),
       });
-      console.log(temp.data);
+      // console.log(temp.data);
       self.OntoInner = temp.data;
       self.textController = text;
       self.loading = false;
     };
     this.loading = false;
-    console.log(this.OntNames.length);
+    // console.log(this.OntNames.length);
   },
   watch: {
     // OntNames(newValue){
@@ -126,17 +126,17 @@ export default {
     // },
     async selectedOnto() {
       this.loading = true;
-      console.log(this.selectedOnto["name"]);
+      // console.log(this.selectedOnto["name"]);
       this.textController = this.selectedOnto["name"];
       var reqbody = {
         question: this.selectedOnto["name"],
       };
 
-      console.log(reqbody);
+      // console.log(reqbody);
       var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
         headers: getHeader(),
       });
-      console.log(temp.data);
+      // console.log(temp.data);
       this.OntoInner = temp.data;
       this.loading = false;
     },

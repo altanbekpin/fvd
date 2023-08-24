@@ -4,8 +4,6 @@ from app import app
 import os, hashlib
 from sqlalchemy import func
 from datetime import datetime
-
-from models import MyOwlReady
 # from middleware import Middleware
 
 db = SQLAlchemy(app)
@@ -14,14 +12,14 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
-    # def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
+    # def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
+    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            port = 5435,
+            # port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -128,6 +126,7 @@ class DB(DatabaseOperations):
         self._insert_query(insert_syn_word, (word_id, syn_id))
         self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 3)''', (syn_id, user_id))
         self._close_db()
+        return syn_id
 
     def add_Paraphrases(self, paraphrase, word_id, user_id):
         query = "INSERT INTO paraphrases (paraphrase) VALUES (%s) RETURNING id"
@@ -135,8 +134,9 @@ class DB(DatabaseOperations):
         par_id = self.fetchone()['id']
         query = "INSERT INTO paraphrase_word (word_id, paraphrase_id) VALUES(%s, %s)"
         self._insert_query(query, (word_id, par_id))
-        self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 3)''', (par_id, user_id))
+        self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 4)''', (par_id, user_id))
         self._close_db()
+        return par_id
     
     def findsyn(self, word, synomized_count, synomized_words, pos = None):
         if pos is None:
@@ -283,6 +283,16 @@ class DB(DatabaseOperations):
     def addTermin(self, termin, subject_id, definition, school_class):
         self._insert_query("INSERT INTO school_termins (termin, definition, subject_id, class) VALUES (%s, %s, %s, %s)", (termin, definition, subject_id, school_class))
         self._close_db()
+
+    def changeTermin(self, termin, subject_id, definition, school_class, id):
+        self._insert_query('''UPDATE school_termins
+            SET termin = %s,
+                definition = %s,
+                subject_id = %s,
+                class = %s
+            WHERE id = %s;
+            ''', (termin, definition, subject_id, school_class, id))
+        self._commit_db()
         
     def get_subject_id(self, subject): 
         subject_id = self._select_one_query("SELECT id FROM subjects WHERE subject = %s", (subject,))[0]

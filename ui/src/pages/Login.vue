@@ -137,7 +137,7 @@ export default {
         store.commit("updateUser", data);
         this.$router.push("/");
       } catch (e) {
-        console.log("ERROR:", e);
+        // console.log("ERROR:", e);
         this.$toast.add({
           severity: "error",
           summary: "Сәтсіз",

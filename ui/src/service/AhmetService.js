@@ -7,7 +7,7 @@ export const AhmetService = {
   },
   getFile(fileID) {
     window.location.href = AHMET_API + "/legacy/download/" + fileID;
-    console.log(fileID);
+    // console.log(fileID);
   },
   async getSchoolTermins(lazyParams) {
     return await api.post(
@@ -43,8 +43,8 @@ export const AhmetService = {
     });
   },
   async saveTermin(request, access_token) {
-    console.log("access_token:", access_token);
-    console.log("getHeader(access_token):", getHeader(access_token));
+    // console.log("access_token:", access_token);
+    // console.log("getHeader(access_token):", getHeader(access_token));
     await api.post(
       `${AHMET_API}/add/termin`,
       { data: request },
@@ -96,18 +96,18 @@ export const AhmetService = {
     );
     const temp = response.data["access_token"];
 
-    console.log("temp:", temp);
+    // console.log("temp:", temp);
     response = await api.get(`${AHMET_API}/who_am_i/`, {
       headers: { Authorization: `Bearer ${temp}` },
     });
-    console.log("response:", response);
+    // console.log("response:", response);
     roles = response.data["roles"];
-    console.log("who am i returns:");
+    // console.log("who am i returns:");
     return { access_token: temp, roles: roles };
   },
   async confirm(email, code) {
-    console.log("email:", email);
-    console.log("code:", code);
+    // console.log("email:", email);
+    // console.log("code:", code);
     const response = await api.post(
       `${AHMET_API}/confirm`,
       {
@@ -183,7 +183,7 @@ export const AhmetService = {
       },
       { headers: getHeader() }
     );
-    console.log("RESPONSE:", response);
+    // console.log("RESPONSE:", response);
     return response.data;
   },
   async onChange(event, words_family) {
@@ -194,19 +194,19 @@ export const AhmetService = {
           value: event.target.value,
           words_family: words_family,
         })
-        .then((_) => console.log((response = _.data)));
+        .then((_) => (response = _.data));
     } catch (error) {
       response = null;
     }
-    console.log(event.target.value);
-    console.log("response word in console: ", response);
+    // console.log(event.target.value);
+    // console.log("response word in console: ", response);
     return response;
   },
   async getOffersAmount(access_token) {
     const response = await api.get(`${AHMET_API}/offers/count`, {
       headers: getHeader(access_token),
     });
-    console.log("response:", response);
+    // console.log("response:", response);
     return response["data"];
   },
   async getWordsAmount(access_token) {
@@ -302,8 +302,8 @@ export const AhmetService = {
     return response.status;
   },
   async update_user(access_token, email, full_name, id) {
-    console.log("email:", email);
-    console.log("access_token:", access_token);
+    // console.log("email:", email);
+    // console.log("access_token:", access_token);
     await api.post(
       AHMET_API + "/updateuser",
       {
@@ -313,9 +313,41 @@ export const AhmetService = {
     );
   },
   async textToSpeech(text) {
-    return api.post(AHMET_API + '/ttspeech', {text: text}, {
-            headers: getHeader(),    
-            responseType: 'blob',
-        })
-},
+    return api.post(
+      AHMET_API + "/ttspeech",
+      { text: text },
+      {
+        headers: getHeader(),
+        responseType: "blob",
+      }
+    );
+  },
+  async changeTermin(request, access_token) {
+    await api.post(
+      `${AHMET_API}/change/termin`,
+      { data: request },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
+  },
+  async ask(question) {
+    return await api.post(
+      `${AHMET_API}/getontology/ask/test`,
+      { question: question },
+      {
+        headers: {
+          // Authorization: `Bearer ${access_token}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
+  },
 };

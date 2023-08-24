@@ -230,21 +230,21 @@ const addTag = async () => {
 };
 
 const handleFileUpload = (event) => {
-  console.log(event);
+  // console.log(event);
   const file = event.files[0];
   const formData = new FormData();
   formData.append(FileName.value, file);
   formData.append("path_to_save", path_to_save.value);
   formData.append("parent_id", parent_id.value);
-  console.log("acess token", store.state.user.access_token);
-  console.log("handleFileUpload");
+  // console.log("acess token", store.state.user.access_token);
+  // console.log("handleFileUpload");
   fetch(`${AHMET_API}/upload`, {
     method: "POST",
     headers: { Authorization: `Bearer ${store.state.user.access_token}` },
     body: formData,
   })
-    .then((response) => {
-      console.log("response: ", response);
+    .then(() => {
+      // console.log("response: ", response);
       toast.add({
         severity: "success",
         summary: "Қосылды",
@@ -253,7 +253,7 @@ const handleFileUpload = (event) => {
       });
     })
     .catch((error) => {
-      console.log('There"s a issue:', error);
+      // console.log('There"s a issue:', error);
       toast.add({
         severity: "error",
         summary: "Ақау",
@@ -267,11 +267,11 @@ const handleFileUpload = (event) => {
 onMounted(() => {
   loading.value = true;
   init();
-  console.log(nodes.value);
+  // console.log(nodes.value);
 });
 const init = () => {
   AhmetService.getTreeTableNodes().then((data) => {
-    console.log(data);
+    // console.log(data);
     loading.value = false;
     let legacies = data.data;
     for (var i = 0; legacies.length; i++) {
@@ -304,7 +304,7 @@ const path_to_download = ref("");
 const showFile = ref(false);
 const getFile = (fileID) => {
   path_to_download.value = `${AHMET_API}/legacy/download/` + fileID;
-  console.log(fileID);
+  // console.log(fileID);
   showFile.value = true;
   // axios
   //   .post(`${AHMET_API}/legacy/${fileID}`)
@@ -313,7 +313,7 @@ const getFile = (fileID) => {
 };
 const deleteFile = () => {
   const formData = new FormData();
-  console.log(fileID.value);
+  // console.log(fileID.value);
   formData.append("fileID", fileID.value);
   fetch(`${AHMET_API}/delete/file`, {
     method: "POST",
@@ -331,7 +331,7 @@ const deleteFile = () => {
 };
 const changeFileName = () => {
   const formData = new FormData();
-  console.log(fileID.value);
+  // console.log(fileID.value);
   formData.append("fileID", fileID.value);
   formData.append("FileName", FileName.value);
   fetch(`${AHMET_API}/change/file/name`, {
@@ -347,8 +347,8 @@ const getFolder = (slotProps) => {
   path_to_save.value = slotProps.data;
   parent_id.value = slotProps.key;
   form_Data.value.append("path_to_save", path_to_save.value);
-  console.log(path_to_save.value);
-  console.log(slotProps);
+  // console.log(path_to_save.value);
+  // console.log(slotProps);
 };
 const setTrue = (fileID_) => {
   fileID.value = fileID_;

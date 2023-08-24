@@ -1,8 +1,11 @@
 from app import app
+from datetime import timedelta
 from flask_jwt_extended import create_access_token, current_user, jwt_required
 from flask import request, jsonify 
 from db import User, UserRole, Role, DB
 from flask_jwt_extended import JWTManager
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=10)
+
 jwt = JWTManager(app)
 
 @jwt.user_identity_loader

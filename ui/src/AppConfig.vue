@@ -607,8 +607,8 @@ export default {
 
     EventBus.on("theme-change", this.themeChangeListener);
     // EventBus.emit('theme-change', { theme: 'bootstrap4-light-blue', dark: false });
-    console.log(store.state.ChosenTheme.theme);
-    EventBus.emit("theme-change", store.state.ChosenTheme);
+    // console.log(store.state.ChosenTheme.theme);
+    // EventBus.emit("theme-change", store.state.ChosenTheme);
   },
   methods: {
     toggleConfigurator(event) {
@@ -668,7 +668,7 @@ export default {
     changeTheme(event, theme, dark) {
       EventBus.emit("theme-change", { theme: theme, dark: dark });
       event.preventDefault();
-      console.log({ theme: theme, dark: dark });
+      // console.log({ theme: theme, dark: dark });
       store.commit("changeTheme", { theme: theme, dark: dark });
     },
   },
