@@ -265,7 +265,7 @@ export default {
   },
   methods: {
     async onTrashClick() {
-      console.log("this.SelectedPar['id']:", this.SelectedPar["id"]);
+      // console.log("this.SelectedPar['id']:", this.SelectedPar["id"]);
       var statusCode = 400;
       if (this.showDeleteSynonyms) {
         statusCode = await AhmetService.delete_syn(
@@ -295,18 +295,18 @@ export default {
     },
     async onChange(event, words_family) {
       var response = {};
-      console.log("onChagne:", event);
+      // console.log("onChagne:", event);
       try {
         response = await AhmetService.onChange(event, words_family);
-        console.log(
-          `response[0]["example"] inside onChange:`,
-          response[0]["example"]
-        );
+        // console.log(
+        //   `response[0]["example"] inside onChange:`,
+        //   response[0]["example"]
+        // );
       } catch (error) {
         response = null;
       }
-      console.log(event.target.value);
-      console.log("response word in console: ", response);
+      // console.log(event.target.value);
+      // console.log("response word in console: ", response);
       if (response != null) {
         this.Word_id = response[0]["id"];
         this.showSynAdd = false;
@@ -324,14 +324,14 @@ export default {
         this.synonyms = response[1];
         this.paraphrases = response[2];
         this.all_words = response[3];
-        console.log("this.family: ", this.family);
-        console.log("this.words:", this.word);
-        console.log("this.families:", this.families);
+        // console.log("this.family: ", this.family);
+        // console.log("this.words:", this.word);
+        // console.log("this.families:", this.families);
         this.families = response[4];
-        console.log("this.families:", this.families);
+        // console.log("this.families:", this.families);
         return true;
       } else {
-        console.log("NULL");
+        // console.log("NULL");
         this.meaning = "";
         return false;
       }
@@ -349,7 +349,7 @@ export default {
       return uniqueArray;
     },
     onSelectionChange() {
-      console.log("selectedWord.value.name: ", this.selectedWord);
+      // console.log("selectedWord.value.name: ", this.selectedWord);
       const word = this.selectedWord["words"];
       const event = {
         target: {
@@ -365,7 +365,7 @@ export default {
       this.showDialogParaphrases = !this.showDialogParaphrases;
     },
     async handleSelection(selectedItem) {
-      console.log("Selected item:", selectedItem.value["family"]);
+      // console.log("Selected item:", selectedItem.value["family"]);
       const event = {
         target: {
           value: this.word,
@@ -374,7 +374,7 @@ export default {
       return await this.onChange(event, selectedItem.value["family"]);
     },
     async onSearchTap() {
-      console.log("onSearchTap");
+      // console.log("onSearchTap");
       const event = {
         target: {
           value: this.word,
@@ -382,13 +382,13 @@ export default {
       };
       const synWasFound = await this.onChange(event, "");
       if (synWasFound) {
-        console.log("showSynAdd.value: ", this.showSynAdd);
+        // console.log("showSynAdd.value: ", this.showSynAdd);
         this.showSynAdd = false;
         return;
       }
       this.inputValues = this.word;
       this.showSynAdd = true;
-      console.log("this.showSynAdd: ", this.showSynAdd);
+      // console.log("this.showSynAdd: ", this.showSynAdd);
     },
     showDialog() {
       this.$emit("custom-event", this.word);

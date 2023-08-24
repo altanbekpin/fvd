@@ -79,8 +79,6 @@ export default {
     },
     onMenuItemClick(event) {
       if (event.item && !event.item.items) {
-        console.log("Menu Item clicked:");
-        console.log(event);
         this.overlayMenuActive = false;
         this.mobileMenuActive = false;
       }

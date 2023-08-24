@@ -92,13 +92,13 @@ export default {
   name: "AudioSpeechRecognition",
   mounted() {
     //AhmetService.getFile(4)
-    console.log("mounted");
+    // console.log("mounted");
     // Select the buttons and add event listeners
     const buttons = document.querySelectorAll(".button");
     buttons.forEach((button) => {
       button.addEventListener("click", async () => {
         this.selectedWord = button.innerText;
-        console.log(`${this.selectedWord} button clicked`);
+        // console.log(`${this.selectedWord} button clicked`);
         await axios
           .post(`${AHMET_API}/search/book/file/`, {
             global: this.selectedWord,
@@ -172,14 +172,14 @@ export default {
         fileReader.readAsArrayBuffer(this.audioFile);
         //let audioBtn = this.$refs.audioBtn.$el.querySelector('button');
         //audioBtn.focus()
-        console.log(document.getElementById("audioBtn"));
+        // console.log(document.getElementById("audioBtn"));
 
         document.getElementById("audioBtn").focus();
       }
     },
     async requestMic() {
       this.recording = true;
-      console.log(this.$salem);
+      // console.log(this.$salem);
       try {
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         this.audioContext = new AudioContext();
@@ -234,12 +234,12 @@ export default {
           if (app.$media.recorder.state !== "recording")
             app.$media.recorder.start();
           //app.stopEnable = false;
-          console.log("voice start");
+          // console.log("voice start");
         },
         onVoiceStop: function () {
           app.stopEnable = true;
-          console.log("voice stop");
-          console.log(app.$media.recorder);
+          // console.log("voice stop");
+          // console.log(app.$media.recorder);
           if (app.$media.recorder.state === "recording") {
             app.$media.recorder.stop();
             app.$media.recorder.start();

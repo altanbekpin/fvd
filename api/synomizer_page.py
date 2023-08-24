@@ -238,8 +238,8 @@ def switch_case(argument):
 @app.route('/add/word/', methods=['POST'])
 @jwt_required()
 def addWord():
-    if DB.get_instance().isUserExist(current_user.email):
-        return 'UNAUTHTORIZED', 401
+    # if DB.get_instance().isUserExist(current_user.email):
+    #     return 'UNAUTHTORIZED', 401
     synonyms = request.json['synonyms']
     example = request.json['example']
     paraphrases = request.json['paraphrases']

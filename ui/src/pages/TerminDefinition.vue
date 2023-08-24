@@ -152,8 +152,8 @@ import { AHMET_API, getHeader } from "../config";
 const toast = useToast();
 onMounted(() => {
   loading.value = true;
-  console.log("roles:");
-  console.log(store.getters.getRoles);
+  // console.log("roles:");
+  // console.log(store.getters.getRoles);
 
   lazyParams.value = {
     first: 0,
@@ -218,7 +218,7 @@ const editProduct = async (method) => {
   }
 };
 const confirmDeleteSelected = async (method) => {
-  console.log(method);
+  // console.log(method);
   try {
     const id = selectedProducts.value.map((obj) => obj["id"]);
     const request = {
@@ -251,7 +251,7 @@ const confirmDeleteSelected = async (method) => {
     selectedProducts.value = null;
   }
 
-  console.log(request);
+  // console.log(request);
 };
 const dt = ref();
 const loading = ref(false);

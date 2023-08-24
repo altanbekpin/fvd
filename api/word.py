@@ -859,7 +859,7 @@ class Word(Finder):
             #     print(self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
             #     self.set_synonym(synonym + self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
             
-            return
+            return self
         if self.isResearchable():
             family = self.get_family()
             first_part= self.get_first_part()

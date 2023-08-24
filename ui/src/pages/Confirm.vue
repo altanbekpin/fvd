@@ -87,11 +87,11 @@ export default {
   methods: {
     async confirm() {
       const email = store.state.user.email;
-      console.log("access_token:", email);
+      // console.log("access_token:", email);
       var response = { message: "Қате код" };
       try {
         response = await AhmetService.confirm(email, this.code);
-        console.log("Response:", response);
+        // console.log("Response:", response);
         this.$toast.add({
           severity: "success",
           summary: "Сәтті",
@@ -100,7 +100,7 @@ export default {
         });
         this.$router.push("/");
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         this.$toast.add({
           severity: "error",
           summary: "Ақау",
