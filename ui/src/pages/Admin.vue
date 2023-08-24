@@ -104,8 +104,8 @@ export default {
     this.init();
   },
   methods: {
-    logItem(item) {
-      console.log("Item:", item); // Log the item object
+    logItem() {
+      // console.log("Item:", item); // Log the item object
       return "";
     },
     onselectStatus(event) {
@@ -123,7 +123,7 @@ export default {
       )["count"]["count"];
       // console.log(this.products.data[0].activate_type);
 
-      console.log(this.products.data);
+      // console.log(this.products.data);
     },
     getSeverity(activated) {
       if (activated) {
@@ -153,7 +153,7 @@ export default {
     },
     onPage(event) {
       this.lazyParams = event;
-      console.log("this.lazyParams:", this.lazyParams);
+      // console.log("this.lazyParams:", this.lazyParams);
       this.loadLazyData();
     },
     loadLazyData() {

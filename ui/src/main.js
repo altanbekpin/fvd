@@ -131,8 +131,8 @@ library.add(faUserSecret, faMicrophone, faFileAudio, faStop);
 const app = createApp(AppWrapper);
 const data = localStorage.getItem("myData");
 
-console.log("local storage: ");
-console.log(data);
+// console.log("local storage: ");
+// console.log(data);
 if (data) {
   store.commit("updateData", JSON.parse(data));
 }
@@ -151,7 +151,7 @@ app.config.globalProperties.$media = reactive({
   blobs: [],
   timeSlice: 5,
   setAttributeValue(name, value) {
-    console.log(name);
+    // console.log(name);
     this[name] = value;
   },
   addBlob(data) {

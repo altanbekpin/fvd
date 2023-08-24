@@ -2,6 +2,7 @@ from app import app
 from flask import jsonify, request
 import json
 from db import DB
+from word import Word
 
 @app.route('/getontology/ask/test', methods=['POST'])
 def send_question_test():
@@ -51,30 +52,31 @@ def send_question_test():
     
     question = temp['question']
     tempq = question
-    if question.split(' ')[-1].lower() in ['дескриптор', 'гипоним', 'uniturk', 'гипероним', 'индивид']:
-        question = " ".join(question.split(' ')[:-1])
+    ending = question.split(' ')[-1].lower()
+    instatnce = Word(ending, 0, [])
+    # instatnce.look_for_synonym()
+    ending = instatnce.get_first_part()
+    print("ending:", ending)
+    if ending in ['дескриптор', 'гипоним', 'uniturk', 'гипероним', 'индивид']:
+        question = " ".join(question.split(' ')[:-1]).capitalize()
     lang = 'kz'
     g = DB.get_instance().get_onto().TurkOnto
     s= ''
     data = {}
+    
     quest = '''
         PREFIX kazont: <http://www.semanticweb.org/kazontolgy#>
         SELECT ?subject ?label WHERE {{ ?subject rdfs:label "''' + question + '"@' + lang + ''' . ?subject rdfs:label  ?label
         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))} union { ?subject rdfs:label "''' + question.capitalize() + '"@' + lang + ''' . ?subject rdfs:label  ?label
         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))}}'
     qres = g.query(quest)
-    print("tempq.split(' ')[-1]:", tempq.split(' ')[-1])
     for row in qres:
-        # if tempq.split(' ')[-1].lower() == 'дескриптор':
-        #     print("row[1]:", row[1])
-        #     return row[1]
         words = row[0].split('#')
         data['дескриптор'] = row[1]
         s = '<b>' + descriptor_to_lang[lang]+': </b>' + row[1]
         word = words[len(words)-1]
         s = s + "<br/><b>UniTurk: </b>" + word
         data['uniturk'] = word
-        print("data1:", data)
         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#> Select * WHERE { kazont:' + word+ ''' kazont:definition ?def
                 FILTER(LANG(?def) = "" || LANGMATCHES(LANG(?def), " ''' + lang + '")) }'
         defres = g.query(quest)
@@ -99,10 +101,7 @@ def send_question_test():
         s = s + '<br/> <b>' + descriptor_to_gyponim[lang]+': </b>'
         for def_row in defres:
             s = s + "<br/>&emsp; <a href=\"javascript:DoSubmit('" + def_row[0] +"','"+ lang +"');\">" + def_row[0] +  "</a>"
-            print("tempq.split(' ')[-1].lower() == 'гипоним':", tempq.split(' ')[-1].lower() == 'гипоним')
-            print("def_row[0]:", def_row[0])
-            # if tempq.split(' ')[-1].lower() == 'гипоним':
-            #     return def_row[0]
+            data['гипоним'] = def_row[0]
         quest = 'PREFIX kazont: <http://www.semanticweb.org/kazontolgy#> SELECT ?subject ?label WHERE { ?subject rdf:type kazont:'+word+' . ?subject rdfs:label ?label FILTER(LANG(?label) = "' + lang + '" )}'
         defres = g.query(quest)
         s = s + "<br/><b>Индивид: </b>"
@@ -129,7 +128,14 @@ def send_question_test():
             for row in def_qres:
                 s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
     try:
-        result = data[tempq.split(' ')[-1].lower()]
+        print("#####################")
+        print("result:", data)
+        print("#####################")
+        result = data[ending]
     except:
         result = tempq + ' ' + 'табылмады'
+        if len(data)>0:
+            result = ''
+            for key, val in data.items():
+                result += f'{key}: {val}\n' 
     return jsonify(result)

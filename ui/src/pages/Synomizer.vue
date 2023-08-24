@@ -154,15 +154,15 @@ const showToast = (data) => {
 };
 const visible = ref(false);
 
-const optionSynonyms = ref([{ synonym: "синоним жоқ", words: "" }]);
-console.log(optionSynonyms.value);
+// const optionSynonyms = ref([{ synonym: "синоним жоқ", words: "" }]);
+// console.log(optionSynonyms.value);
 document.addEventListener("click", function (event) {
   var listBox = document.querySelector(".listbox");
 
   if (listBox && !listBox.contains(event.target)) {
     listBox.style.display = "none";
   }
-  console.log("finished");
+  // console.log("finished");
 });
 const selectedFamily = ref();
 const word_family = ref([
@@ -187,10 +187,10 @@ const showDialog = (data) => {
 };
 
 const addWord = () => {
-  console.log("synonymInput.value: ", synonymInput.value);
-  console.log("inputValues.value: ", inputValues.value);
-  console.log("meaningInput.value: ", meaningInput.value);
-  console.log("selectedFamily.value: ", selectedFamily.value);
+  // console.log("synonymInput.value: ", synonymInput.value);
+  // console.log("inputValues.value: ", inputValues.value);
+  // console.log("meaningInput.value: ", meaningInput.value);
+  // console.log("selectedFamily.value: ", selectedFamily.value);
   if (!store.getters.isUserRegistered) {
     toast.add({
       severity: "error",
