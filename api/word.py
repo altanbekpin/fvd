@@ -205,18 +205,29 @@ class Finder:
             if is_soft:
                 return "ле"
             return "ла"
-        if symbol == "NamesToVerbs":
-            if result in ["да", "де", "та", "те"]:
-                if word[-1] in self.consonantsounds:
-                    if self.is_soft(word):
-                        return "де"
-                    else:
-                        return "да"
-                elif not(self.is_vowel(word[-1])):
-                    if self.is_soft(word):
-                        return "те"
-                    else:
-                        return "та"
+        print(result)
+        if (symbol == "NamesToVerbs" and result in ["да", "де", "та", "те"]):
+            if word[-1] in self.consonantsounds:
+                if self.is_soft(word):
+                    return "де"
+                else:
+                    return "да"
+            elif not(self.is_vowel(word[-1])):
+                if self.is_soft(word):
+                    return "те"
+                else:
+                    return "та"
+        if (symbol == "NounsToAdjective" and result in ["ды", "ді", "ты", "ті"]):
+            if word[-1] in self.consonantsounds:
+                if self.is_soft(word):
+                    return "ді"
+                else:
+                    return "ды"
+            else:
+                if self.is_soft(word):
+                    return "ті"
+                else:
+                    return "ты"
         if self.get_yryqsyz_etis(symbol,result):
             if result == "л":
                 if len(word)>2 and word[-2] in ["д"] and self.is_vowel(word[-1]):
