@@ -250,9 +250,10 @@ class Lemms:
         
     def get_kaz_lemms_test(self, sentences, length, ml):
         main_list = copy.deepcopy(ml)
+        print("mд=",main_list)
+
         if main_list[0][0][1] == -1:
             return main_list
-        # print(main_list)
         main_list[0][0][2] = []
         morph_reult = GodsHelp.morphogay(sentences[0])
         list_of_parts = clear_word(morph_reult)
