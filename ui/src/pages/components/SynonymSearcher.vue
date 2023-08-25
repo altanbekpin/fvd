@@ -28,7 +28,11 @@
       @click="onSearchTap"
     ></Button>
   </div>
-  <div v-if="word != '' && meaning != ''" style="padding-top: 20px">
+  <div v-if="word != '' && meaning != ''" style="padding-top: 5px">
+    <Tag
+      :value="isfromsyn ? 'Синоним сөз' : 'Негізгі сөз'"
+      style="margin-bottom: 2%"
+    ></Tag>
     <div style="margin-bottom: 5px">Сөз: {{ words }}</div>
     <div style="margin-bottom: 5px">Түсіндірмесі: {{ meaning }}</div>
     <div style="margin-bottom: 10px">Мысалы: {{ example }}</div>
@@ -52,7 +56,7 @@
           <i class="pi pi-plus" style="font-size: 1rem"></i>
         </div>
         <div
-          v-if="isUserAdmin"
+          v-if="isUserAdmin || isUserExpert"
           class="centered-card"
           style="width: 10px; height: 10px"
           @click="
@@ -66,7 +70,54 @@
         </div>
       </div>
     </div>
-    <div class="row" style="margin-top: 10px">
+
+    <div class="row" v-if="isUserAdmin || isUserExpert">
+      <OrderList
+        v-model="synonyms"
+        @update:selection="updateSynonyms"
+        @reorder="updateOrder"
+        listStyle="max-width: 95%; max-height: 5rem"
+        dataKey="id"
+        style="
+          font-size: 12px;
+          padding: 4px;
+          width: 100%;
+          margin-left: 2%;
+          max-height: 50%;
+        "
+      >
+        <template #header> Синонимдері </template>
+        <template #item="data">
+          <div class="flex items-center gap-1">
+            <span class="font-semibold">{{ data.item.synonym }}</span>
+          </div>
+        </template>
+      </OrderList>
+      <div class="row">
+        <div
+          class="centered-card"
+          style="width: 10px; height: 10px"
+          @click="changeSynDialog"
+        >
+          <i class="pi pi-plus" style="font-size: 1rem"></i>
+        </div>
+        <div
+          v-if="isUserAdmin || isUserExpert"
+          class="centered-card"
+          style="width: 10px; height: 10px"
+          @click="
+            (showDeleteDialog = true),
+              (showDeleteWord = false),
+              (showDeleteParaphrases = false),
+              (showDeleteSynonyms = true)
+          "
+        >
+          <i class="pi pi-trash" style="font-size: 1rem"></i>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="row" style="margin-top: 10px">
       <div>синонимдері:</div>
       <Listbox
         v-model="selectedSyn"
@@ -84,7 +135,7 @@
           <i class="pi pi-plus" style="font-size: 1rem"></i>
         </div>
         <div
-          v-if="isUserAdmin"
+          v-if="isUserAdmin || isUserExpert"
           class="centered-card"
           style="width: 10px; height: 10px"
           @click="
@@ -117,7 +168,7 @@
           <i class="pi pi-plus" style="font-size: 1rem"></i>
         </div>
         <div
-          v-if="isUserAdmin"
+          v-if="isUserAdmin || isUserExpert"
           class="centered-card"
           style="width: 10px; height: 10px"
           @click="
@@ -131,6 +182,17 @@
         </div>
       </div>
     </div>
+  </div>
+  <div v-else-if="loading">
+    <Skeleton class="mb-2" style="margin-top: 5%"></Skeleton>
+    <Skeleton width="10rem" class="mb-2"></Skeleton>
+    <Skeleton width="5rem" class="mb-2"></Skeleton>
+    <Skeleton height="2rem" class="mb-2"></Skeleton>
+    <Skeleton width="10rem" height="4rem"></Skeleton
+    ><Skeleton class="mb-2" style="margin-top: 5%"></Skeleton>
+    <Skeleton width="10rem" height="4rem"></Skeleton>
+    <Skeleton height="2rem" class="mb-2" style="margin-top: 5%"></Skeleton>
+    <Skeleton height="2rem" class="mb-2"></Skeleton>
   </div>
   <div v-if="showSynAdd">
     <Button
@@ -256,18 +318,35 @@ export default {
       SelectedPar: "",
       Word_id: "",
       isUserAdmin: false,
+      isUserExpert: false,
+      oldSynonyms: null,
+      isfromsyn: false,
+      loading: false,
     };
   },
   mounted() {
     const store = useStore();
     this.access_token = store.getters.getAccessToken;
     this.isUserAdmin = store.getters.isUserAdmin;
+    this.isUserExpert = store.getters.isUserExpert;
   },
   methods: {
+    updateSynonyms(newVal) {
+      this.selectedSyn = newVal[0];
+    },
+    async updateOrder(event) {
+      console.log("this.synonyms:", this.synonyms);
+      console.log("event:", event);
+      await AhmetService.changeOrder(event.value, this.oldSynonyms);
+      this.synonyms = event.value;
+      this.oldSynonyms = event.value;
+      this.onSearchTap();
+    },
     async onTrashClick() {
       // console.log("this.SelectedPar['id']:", this.SelectedPar["id"]);
       var statusCode = 400;
       if (this.showDeleteSynonyms) {
+        console.log("this.selectedSyn:", this.selectedSyn);
         statusCode = await AhmetService.delete_syn(
           this.access_token,
           this.selectedSyn["id"]
@@ -297,7 +376,9 @@ export default {
       var response = {};
       // console.log("onChagne:", event);
       try {
+        this.loading = true;
         response = await AhmetService.onChange(event, words_family);
+        this.loading = false;
         // console.log(
         //   `response[0]["example"] inside onChange:`,
         //   response[0]["example"]
@@ -322,13 +403,16 @@ export default {
         this.family = { family: response[0]["words_family"] };
         this.words = response[0]["words"];
         this.synonyms = response[1];
+        this.oldSynonyms = this.synonyms;
+        console.log("synonyms:", this.synonyms);
         this.paraphrases = response[2];
         this.all_words = response[3];
         // console.log("this.family: ", this.family);
         // console.log("this.words:", this.word);
         // console.log("this.families:", this.families);
         this.families = response[4];
-        // console.log("this.families:", this.families);
+        this.isfromsyn = response[5];
+        console.log("this.isfromsyn:", this.isfromsyn);
         return true;
       } else {
         // console.log("NULL");
@@ -412,6 +496,7 @@ export default {
       );
       this.$emit("add-word", repsonse.status == 200);
       this.changeSynDialog();
+      // this.onSearchTap();
     },
     async addParaphrase() {
       const response = await axios.post(
@@ -436,7 +521,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .centered-card {
   display: flex;
   justify-content: center;

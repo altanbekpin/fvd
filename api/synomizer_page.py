@@ -155,9 +155,9 @@ def searchsyn():
     family = request.json['family']
     secondary = request.json['secondary']
     synonyms = []
-    synonyms = DB.get_instance().findsyn_with_family(data, getTense(family))
+    synonyms, isfromsyn = DB.get_instance().findsyn_with_family(data, getTense(family))
     if len(synonyms) == 0:
-        synonyms = DB.get_instance().findsyn_with_family(secondary, '')[1:]
+        synonyms, isfromsyn = DB.get_instance().findsyn_with_family(secondary, '')[1:]
     else:
         synonyms.insert(0, {"words":data, "synonym": data+second_part})
     for i in range(0, len(synonyms)):
@@ -204,15 +204,15 @@ def synomizing():
         found_data[0]['words_family'] = family
         synonyms = DB.get_instance().findsyn_with_family(word, family)
     paraphrase = DB.get_instance().find_paraphrase_by_word(word)
+    isfromsyn = False
     if found_data[0].get('temp_word') is not None:
+        isfromsyn = True
         temp = found_data[0]['words']
         found_data[0]['words'] = found_data[0].get('temp_word')
         for key, val in enumerate(synonyms):
-            #print("val['synonym']:", val['synonym'])
             if val['synonym'] == found_data[0].get('temp_word'):
                 synonyms[key]['synonym'] = temp
-                #print(synonyms[key])
-    return jsonify([found_data[0], synonyms, paraphrase, all_words, all_families])
+    return jsonify([found_data[0], synonyms, paraphrase, all_words, all_families, isfromsyn])
 
 def switch_case(argument):
     if argument == 'зат есім':
@@ -281,8 +281,8 @@ def addWord():
 @app.route('/add/synonym/', methods=['POST'])
 @jwt_required()
 def addSynonym():
-    if DB.get_instance().isUserExist(current_user.email):
-        return 'UNAUTHTORIZED', 401
+    # if DB.get_instance().isUserExist(current_user.email):
+    #     return 'UNAUTHTORIZED', 401
     synonyms = request.json['synonyms']
     word = request.json['word']
     family = request.json['family']['family']
@@ -366,3 +366,29 @@ def addEnding():
             continue
         row_data += f'<pl>*{i}<pl>'
     return addRowTofile([endings, row_data])
+
+@app.route('/change/order', methods=['PUT'])
+def change_order():
+    newSyonyms = request.json['value']
+    oldSynonyms = request.json['oldSynonyms']
+    sorted_data = sortOrder(newSyonyms, oldSynonyms)
+    return sorted_data, 200
+
+def sortOrder(newSyonyms, oldSynonyms):
+    for j, val1 in enumerate(newSyonyms):
+        if val1['id'] != oldSynonyms[j]['id']:
+            print("#######################################")
+            print("val1['id']:", val1['id'])
+            print("oldSynonyms[j]['id']:", oldSynonyms[j]['id'])
+            DB.get_instance().swap_synonym(val1['id'], oldSynonyms[j]['id'])
+            oldSynonyms[j] = val1
+            return val1
+    return oldSynonyms
+    # for j, val1 in enumerate(data):
+    #     for i, val2 in enumerate(data):
+    #         if j < i and val1['id'] > val2['id']:
+    #             temp = data[j]
+    #             data[j] = data[i]
+    #             data[i] = temp
+    #             DB.get_instance().swap_synonym(val1['id'], val2['id'])
+    # return data
