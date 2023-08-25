@@ -12,41 +12,74 @@
       <template #content>
         <ul>
           <li>
-            <span class="button" id="1">АҒАРТУШЫ</span>,
-            <span class="button" id="2">ҰЛТ ҰСТАЗЫ</span>,
-            <span class="button" id="3">ҚОҒАМ ҚАЙРАТКЕРІ</span>
+            <span class="button" id="1">АҒАРТУШЫ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="2"
+              >ҰЛТ ҰСТАЗЫ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="3"
+              >ҚОҒАМ ҚАЙРАТКЕРІ <i class="pi pi-tag"></i
+            ></span>
           </li>
           <li>
-            <span class="button" id="4">ТІЛТАНУШЫ</span>,
-            <span class="button" id="5">ТҮРКІТАНУШЫ</span>,
-            <span class="button" id="6">ТЕРМИНТАНУШЫ</span>
+            <span class="button" id="4"
+              >ТІЛТАНУШЫ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="5"
+              >ТҮРКІТАНУШЫ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="6"
+              >ТЕРМИНТАНУШЫ <i class="pi pi-tag"></i
+            ></span>
           </li>
           <li>
             <span class="button" id="7"
-              >ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ</span
-            >
+              >ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ <i class="pi pi-tag"></i
+            ></span>
           </li>
           <li>
-            <span class="button" id="8">ӘДЕБИЕТТАНУШЫ</span>,
-            <span class="button" id="9">ФОЛЬКЛОРТАНУШЫ</span>,
-            <span class="button" id="10">ӨНЕРТАНУШЫ</span>
+            <span class="button" id="8"
+              >ӘДЕБИЕТТАНУШЫ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="9"
+              >ФОЛЬКЛОРТАНУШЫ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="10"
+              >ӨНЕРТАНУШЫ <i class="pi pi-tag"></i
+            ></span>
           </li>
           <li>
-            <span class="button" id="11">АҚЫН</span>,
-            <span class="button" id="12">ЖАЗУШЫ</span>,
-            <span class="button" id="13">ПУБЛИЦИСТ</span>,
-            <span class="button" id="14">АУДАРМАШЫ</span>
+            <span class="button" id="11">АҚЫН <i class="pi pi-tag"></i></span>,
+            <span class="button" id="12">ЖАЗУШЫ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="13"
+              >ПУБЛИЦИСТ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="14"
+              >АУДАРМАШЫ <i class="pi pi-tag"></i
+            ></span>
           </li>
           <li>
-            <span class="button" id="15">ӘДІСКЕР</span>,
-            <span class="button" id="16">ПЕДАГОГ</span>,
-            <span class="button" id="17">ПСИХОЛОГ</span>
+            <span class="button" id="15">ӘДІСКЕР <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="16">ПЕДАГОГ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="17"
+              >ПСИХОЛОГ <i class="pi pi-tag"></i
+            ></span>
           </li>
           <li>
-            <span class="button" id="18">ЗАҢГЕР</span>,
-            <span class="button" id="19">САЯСАТКЕР</span>,
-            <span class="button" id="20">ДЕМОГРАФ</span>,
-            <span class="button" id="21">ТАРИХШЫ</span>
+            <span class="button" id="18">ЗАҢГЕР <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="19"
+              >САЯСАТКЕР <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="20"
+              >ДЕМОГРАФ <i class="pi pi-tag"></i></span
+            >,
+            <span class="button" id="21"
+              >ТАРИХШЫ <i class="pi pi-tag"></i
+            ></span>
           </li>
         </ul>
       </template>
@@ -97,14 +130,15 @@ export default {
     const buttons = document.querySelectorAll(".button");
     buttons.forEach((button) => {
       button.addEventListener("click", async () => {
-        this.selectedWord = button.innerText;
-        // console.log(`${this.selectedWord} button clicked`);
+        this.selectedWord = button.innerText.trim();
+        console.log(`${this.selectedWord} button clicked`);
         await axios
           .post(`${AHMET_API}/search/book/file/`, {
             global: this.selectedWord,
           })
           .then((resp) => {
             this.repo = resp.data;
+            console.log(this.repo);
             // this.label = resp.data[0].label;
             // this.key = resp.data[0].key;
           });
@@ -349,7 +383,7 @@ export default {
   cursor: pointer;
   border: 1px solid #ccc;
   border-radius: 4px;
-  color: #333;
+  color: blue;
   background-color: #fff;
   text-decoration: none;
 }
