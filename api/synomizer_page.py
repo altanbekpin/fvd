@@ -1,6 +1,6 @@
 from ast import literal_eval
 from app import app
-from morphology_api.morphology import Lemms
+from morphology_api.morphology import Lemms, Morphology
 from flask import request, jsonify 
 import re
 from nltk.tokenize import sent_tokenize as st
@@ -92,7 +92,7 @@ def searchWord():
     data = request.json['value']
     synomized_words = []
     data = remove_extra_spaces(data)
-    words = re.findall(r"[\w']+|[.,!?;() ]", data)
+    words = re.findall(r"[\w'-]+|[.,!?;() ]", data)
     output_words = []
     data_id = 0
     index = 0
@@ -122,29 +122,48 @@ def searchWord():
                 break
             index-=1
         globalIndex+=1
+    clean_ouput_words = []
     for index, word in enumerate(words):
-
+        just_word= ""
         if word not in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] and word.strip() and not is_person_name(word, data, index == 0):
             isWordUpper = word[0].isupper()
             word_instance = Word(word.lower(), synomized_count, synomized_words)
             word_instance.look_for_synonym()
-            word_instance.first_synonym = ''.join(word_instance.first_synonym)
+            word_instance.first_synonym = ' '.join(word_instance.first_synonym)
             if isWordUpper: 
                 if len(word_instance.first_synonym)>0:
                     word_instance.first_synonym = word_instance.first_synonym.capitalize()
-                    print(word_instance.first_synonym)
+                    # print(word_instance.first_synonym)
                 elif word_instance.has_synonym():
                     word_instance.capitalize_synonym()
             if word_instance.has_synonym() and word_instance.is_correct():
                 word_instance.set_synonym(word_instance.get_synonym() + word_instance.get_trash_part())
+                just_word = f"{word_instance.get_first_synonym()} {word_instance.get_synonym()}"
                 translated_word = getHtml(word_instance.get_first_part(), word_instance.find_extra_chars(word_instance.get_first_part(), word), data_id, f"{word_instance.get_first_synonym()} {word_instance.get_synonym()}", word_instance.get_family())
                 data_id += 1
             else:
+                just_word = word
                 translated_word = word
             synomized_count = word_instance.synomized_count
+            if just_word.strip() != "":
+                if len(clean_ouput_words)>0:
+                    just_word_new = Morphology.change_conjunction(clean_ouput_words[-1], just_word)
+                    if just_word_new != just_word:
+                        translated_word = just_word_new
+                clean_ouput_words.append(just_word)
+                
             output_words.append(translated_word) 
+            
         else:
+            if word.strip() != "":
+                if len(clean_ouput_words)>0:
+                    word_new = Morphology.change_conjunction(clean_ouput_words[-1], word)
+                    if word_new != word:
+                        word = word_new
+                clean_ouput_words.append(word)
             output_words.append(word)
+
+    # print("sw=",clean_ouput_words)
     return jsonify([output_words, synomized_count, synomized_words]), 200
 
 @app.route('/search/synonyms/only', methods=['POST'])
