@@ -19,7 +19,7 @@ class DBConfig:
             dbname=dbname,
             user=user,
             password=self.password,
-            port = 5435,
+            # port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
