@@ -154,7 +154,7 @@ export const AhmetService = {
     exampleInput,
     store
   ) {
-    await api.post(
+    return await api.post(
       `${AHMET_API}/add/word/`,
       {
         synonyms: synonymInput.value,
@@ -347,6 +347,15 @@ export const AhmetService = {
           "Content-Type": "application/json",
           Accept: "*/*",
         },
+      }
+    );
+  },
+  async changeOrder(value, oldSynonyms) {
+    return await api.put(
+      `${AHMET_API}/change/order`,
+      { value: value, oldSynonyms: oldSynonyms },
+      {
+        headers: getHeader(),
       }
     );
   },

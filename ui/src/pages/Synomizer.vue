@@ -22,7 +22,12 @@
       <div style="height: 100%">
         <div
           class="card temp"
-          style="width: 500px; height: 560px; position: relative"
+          style="
+            width: 500px;
+            height: 100%;
+            min-height: 560px;
+            position: relative;
+          "
         >
           <SynonymSearcher
             @custom-event="showDialog"

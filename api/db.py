@@ -196,7 +196,7 @@ class DB(DatabaseOperations):
             AND o.activated = true;'''
             data = (word,family)
         else:
-            query = '''SELECT s.synonym, z.words 
+            query = '''SELECT s.synonym, z.words, s.id
             FROM synonyms s 
             INNER JOIN synonym_word sw ON s.id = sw.synonym_id 
             INNER JOIN synamizer z ON z.id = sw.word_id 
@@ -206,10 +206,13 @@ class DB(DatabaseOperations):
             AND o.activated = true;'''
             data = (word,)
         synonyms = self._select_all_query(query, data)
-        if synonyms is None:
-            return synonyms
         return synonyms
-    
+
+    def is_syn(self, word):
+        ref = self._select_all_query('SELECT * FROM synamizer WHERE words = %s', (word,))
+        print("ref:", ref)
+        return not(ref is not None and len(ref) > 0 )
+
     def getSchoolTermins(self, first, filters, word,isChildren=False):
         second = first + 10
         school_class = filters["class"]["value"]
@@ -328,6 +331,19 @@ class DB(DatabaseOperations):
                         WHERE LOWER(TRIM(ss.synonym)) = LOWER(TRIM(%s)) AND o.activated = true
                         ORDER BY s.words_family, s.id;'''
                 temp_families = self._select_all_query(query, (data,))
+                if temp_families is None or len(temp_families) == 0:
+                    query = '''SELECT DISTINCT ON (s.id) s.* FROM synonyms ss
+                        INNER JOIN synonym_word sw ON ss.id = sw.synonym_id
+                        INNER JOIN synamizer s ON s.id = sw.word_id
+                        INNER JOIN offers o ON sw.synonym_id = o.offer_id
+
+                        WHERE s.id = (SELECT DISTINCT ON (ss.synonym) s.id FROM synonyms ss
+                        INNER JOIN synonym_word sw ON ss.id = sw.synonym_id
+                        INNER JOIN synamizer s ON s.id = sw.word_id
+                        WHERE ss.synonym = LOWER(TRIM(%s))
+                        ) AND o.activated = true
+                        '''
+                    temp_families = self._select_all_query(query, (data,))
                 temp_families[0]['temp_word'] = data.strip()
             return temp_families
         query = '''SELECT DISTINCT s.id, status,words_family, meaning, words FROM synamizer s
@@ -452,6 +468,18 @@ class DB(DatabaseOperations):
         offer =  Offers.query.filter_by(offer_id=user.id, activate_type=2).one_or_none()
         return offer and offer.activated
     
+    def swap_synonym(self, id1, id2):
+        self._insert_query('''UPDATE synonyms
+            SET synonym = 
+                CASE 
+                    WHEN id = %s THEN (SELECT synonym FROM synonyms WHERE id = %s)
+                    WHEN id = %s THEN (SELECT synonym FROM synonyms WHERE id = %s)
+                    ELSE synonym
+                END
+            WHERE id IN (%s, %s);
+        ''', (id1, id2, id2, id1, id2, id1))
+        self._commit_db()
+
     def getOffers(self, first, rows, status):
         if status is '':
             self.execute('''
