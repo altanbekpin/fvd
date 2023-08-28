@@ -274,9 +274,18 @@ class Finder:
                 if len(word)>2 and word[-2] in ["д"] and self.is_vowel(word[-1]):
                     return "н"
                 if self.is_vowel(word[-1]):
-                    return "л"
+                    return "л" 
+                elif Phonetic.is_soft(word[-1]):
+                    return "ін"
+                else: 
+                    return "ын"
             if result == "н" and word[-1] in ['а','е']  and word [-2] in ['т', 'м']:
                 return "л"
+            elif not(Phonetic.is_vowel(word[-1])): 
+                if Phonetic.is_soft(word[-1]):
+                    return "іл"
+                else: 
+                    return "ыл"
             if result == "н" and word [-1] in ['т']:
                 if self.is_soft(word):
                     return "іл"
@@ -343,7 +352,14 @@ class Finder:
 
         if result in ["ма", "ме", "па", "пе"] and word[-1] in ['з']:
                 result = 'б' + result[1:]
-        if symbol == "Kosemshe": 
+        if symbol == "Kosemshe":
+            if result in ["а", "е", "й"]:
+                if Phonetic.is_vowel(word[-1]):
+                    return "й"
+                elif  Phonetic.is_soft(word):
+                    return "e"
+                else: 
+                    return "а"
             if result in ["ып", "іп", "п"]:
                 if Phonetic.is_vowel(word[-1]):
                     return "п"
@@ -372,7 +388,8 @@ class Finder:
             return result
         
         
-
+        if symbol == "VerbsToVerbs":
+            return result
         if is_soft and index+1<len(suffix):
             result = suffix[index+1]
         elif not(is_soft):
@@ -465,7 +482,14 @@ class Finder:
                 if self.is_soft(word):
                     return "де"
                 else:
-                    return "да"       
+                    return "да"    
+        if result in ["нда", "нде"]:
+            if not(Phonetic.is_vowel(word[-1])):
+                if Phonetic.is_soft(word):
+                    return "інде"
+                else:
+                    return "ында"
+                    
         if (is_soft and self.is_soft(result) or ((not is_soft) and (not self.is_soft(result)))):
             return result
         index = Jatys.index(result)
@@ -476,8 +500,8 @@ class Finder:
         return result
     
     def get_shygys(self, word):
-        nannen = ['м','н', 'ң']
-        danden = ['а', 'ә', 'о', 'ө', 'е', 'ы', 'і', 'ұ', 'ү', 'и', 'э', 'р', 'у', 'й', 'л', 'з', 'ж']
+        nannen = ['м','н', 'ң','ы', 'і']
+        danden = ['а', 'ә', 'о', 'ө', 'е',  'ұ', 'ү', 'и', 'э', 'р', 'у', 'й', 'л', 'з', 'ж']
         tanten = ['б','в','г','д', 'п', 'ф', 'к', 'қ', 'т', 'с', 'ш', 'щ', 'х', 'ц', 'ч', 'һ']
         is_soft = self.is_soft(word)
         ending = word[-1]
@@ -970,6 +994,11 @@ class Word(Finder):
             if not "POSS." in self._stcs[0][0][4]:
                 self._stcs[0][0][2].insert(insertIndex,self.possesive)
                 self.appendixes.insert(insertIndex,{"name": self.possesive[1], "appendix": self.possesive[0]})
+                if len(self._stcs[0][0][2])> insertIndex+1:
+                    if self._stcs[0][0][2][insertIndex+1][1] == "NounsToAdjective" and self._stcs[0][0][2][insertIndex+1][0] in ["ды", "ді", "ты","ті"]:
+                        self._stcs[0][0][2][insertIndex+1][1] = "Acc"
+                        self._stcs[0][0][2][insertIndex+1][2] = "жалғау"
+                        self.appendixes[insertIndex+1]["name"] = "Acc"
         
         
         
@@ -1000,8 +1029,6 @@ class Word(Finder):
         # print(self.word)
         if len(self.word.split(" "))>1:
             synonym, synomized_count = DB.get_instance().findsyn(' '.join(self.word.split()), self.synomized_count, self._synonyms)
-            print("findsyn1=",' '.join(self.word.split()))
-            print(self._synonyms)
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count
                 self.set_synonym(synonym)
@@ -1009,8 +1036,6 @@ class Word(Finder):
                 self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]
             except:
                 print("self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]")
-            print("findsyn2=",' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part)
-            print(self._synonyms)
 
             # synonym, synomized_count = DB.get_instance().findsyn(' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part, self.synomized_count, self._synonyms)
             # if synomized_count != self.synomized_count:

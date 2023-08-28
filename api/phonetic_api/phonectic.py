@@ -9,9 +9,11 @@ class Phonetic:
         """
         Сөздің жіңішкелігін анықтайды
         """
-        for s in word:
+        for s in word[::-1]:
             if s in Phonetic.thin_vowels:
                 return True
+            if s in Phonetic.thick_vowels:
+                return False
         return False
     def is_vowel(sound):
         """
