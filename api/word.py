@@ -343,6 +343,25 @@ class Finder:
 
         if result in ["ма", "ме", "па", "пе"] and word[-1] in ['з']:
                 result = 'б' + result[1:]
+        if symbol == "Kosemshe": 
+            if result in ["ып", "іп", "п"]:
+                if Phonetic.is_vowel(word[-1]):
+                    return "п"
+                elif Phonetic.is_soft(word):
+                    return "іп"
+                else: 
+                    return "ып"
+            if result in ["ғалы", "гелі", "қалы", "келі"]:
+                if Phonetic.is_strict_consonant(word[-1]):
+                    if Phonetic.is_soft(word):
+                        return "келі"
+                    else: 
+                        return "қалы"
+                else:
+                    if Phonetic.is_soft(word):
+                        return "гелі"
+                    else: 
+                        return "ғалы"
         if (is_soft and self.is_soft(result) or ((not is_soft) and (not self.is_soft(result)))) and result != word[-1] and not(word[-1] in ["і", 'р'] and result[0] in ['т', 'н']):
             if (self.get_synonym()[-1] in ['т'] and result[0] in ['д']) or (self.get_synonym()[-1] in ['д'] and result[0] in ['т']):
                 if result[0] in ['д']:
@@ -352,6 +371,8 @@ class Finder:
             #print("RETURNING:", result)
             return result
         
+        
+
         if is_soft and index+1<len(suffix):
             result = suffix[index+1]
         elif not(is_soft):
@@ -888,11 +909,6 @@ class Word(Finder):
     def correct_analyze(self):
         # барлық қосымшаларды сөздікке сақтап аламыз
         appIndex = 0
-        # егер сөзтіркесінен тұрса және соңғы сөз тәуелдік болса
-        if self.is_in_possesive:
-            if not "POSS." in self._stcs[0][0][4]:
-                self._stcs[0][0][2].append(self.possesive)
-
         for app in self._stcs[0][0][2]:
             appIndex+=1
             if app[0] == "ын": 
@@ -918,6 +934,10 @@ class Word(Finder):
                         self._stcs[0][0][2][appIndex-1][2] = "жалғау"
                         app = self._stcs[0][0][2][appIndex-1]
                         del self._stcs[0][0][2][appIndex]
+                        if len(self._stcs[0][0][2])> appIndex:
+                            if self._stcs[0][0][2][appIndex][1] == "VWFI":
+                                self._stcs[0][0][2][appIndex][1] = "Acc"
+                                self._stcs[0][0][2][appIndex][2] = "жалғау"
                         self.appendixes.append({"name": app[1], "appendix": app[0]})
                         continue
             if app[1] == "NamesToVerbs" and app[0] in ['да', 'де', 'та', 'те']:
@@ -941,7 +961,15 @@ class Word(Finder):
                     del self.appendixes[i+2:i+4]
                     break
                 i+=1
-        
+               # егер сөзтіркесінен тұрса және соңғы сөз тәуелдік болса
+        if self.is_in_possesive:
+            insertIndex = 0
+            index = next((i for i, item in enumerate(self._stcs[0][0][2]) if item[1] == 'PL'), None)
+            if index is not None:
+                insertIndex = index +1
+            if not "POSS." in self._stcs[0][0][4]:
+                self._stcs[0][0][2].insert(insertIndex,self.possesive)
+                self.appendixes.insert(insertIndex,{"name": self.possesive[1], "appendix": self.possesive[0]})
         
         
         

@@ -37,7 +37,7 @@ class MyOwlReady:
         if not MyOwlReady.__instance:
             print(" __init__ method called..")
             _turkOnto = rdflib.Graph()
-            _turkOnto.parse ('owl/Akhmettanu.owl')
+            _turkOnto.parse('owl/Tilqural25082023.owl')
         else:
             print("Instance already created:", self.getInstance())
             print(self.Onto)
@@ -72,8 +72,8 @@ class MyOwlReady:
         #lang = "kg"
         res= ""
         g = rdflib.Graph()
-        g.parse('owl/Akhmettanu.owl')
-        quest = 'SELECT ?label WHERE { ?subject rdfs:subClassOf ?object . ?subject rdfs:label ?label FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "' + lang + '")) } order by ?label '
+        g.parse('owl/Tilqural25082023.owl')
+        quest = 'SELECT distinct ?label WHERE { ?subject rdfs:subClassOf ?object . ?subject rdfs:label ?label FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "' + lang + '")) } order by ?label '
         qres = g.query(quest)
         owlclasses = []
         
@@ -89,7 +89,7 @@ class MyOwlReady:
         if cls._turkOnto == None:
             print("TurkOntology loading...")
             cls._turkOnto = rdflib.Graph()
-            cls._turkOnto.parse('owl/Akhmettanu.owl')
+            cls._turkOnto.parse('owl/Tilqural25082023.owl')
 
         return cls._turkOnto
     @property

@@ -277,7 +277,7 @@ class Septik(Ending):
 class Jiktik(Ending):
     FirstStepSingular = [ "мын", "мін", "пын", "пін", "дым", "дім"]
     FirstStepPlural = [ "мыз", "міз", "быз", "біз", "пыз", "піз", "дік", "дық"]
-    SecondStepSingular = [ "сың", "сің", "дың", "дің" ]
+    SecondStepSingular = [ "сың", "сің",] # "дың", "дің" ]
     SecondStepFormal = [ "сіз", "сыз" ]
     ThirdStep = [ "ды", "ді", "ты", "ті" ]
 
