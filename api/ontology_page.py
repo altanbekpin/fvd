@@ -5,6 +5,7 @@ from db import DB
 @app.route('/getontology/<lang>/', methods=['GET'])
 def getontology(lang):
     owls = DB.get_instance().get_onto().GetJson(lang=lang)
+    print("owls:", owls)
     return jsonify(owls)
 
 @app.route('/getontology/ask/', methods=['POST'])

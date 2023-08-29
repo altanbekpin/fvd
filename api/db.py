@@ -367,9 +367,8 @@ class DB(DatabaseOperations):
         self._insert_query('UPDATE legacy SET name = %s WHERE id = %s', (fileName, fileID))
 
     def addLegacy(self, key, path_to_save, filename, content_type, parent_id):
-        self.execute('ALTER SEQUENCE legacy_id_seq RESTART WITH 100;')
         self._insert_query("INSERT INTO legacy (name, path, parent_id, is_file) VALUES (%s, %s, %s, %s);", (key, path_to_save + "/" + filename + '.' + content_type, parent_id, 1))
-        self._close_db()
+        self._commit_db()
 
     def delete_legacy(self, fileID):
         self._insert_query('DELETE FROM legacy WHERE id = %s RETURNING *;', (fileID,))
