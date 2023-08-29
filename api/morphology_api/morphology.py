@@ -11,11 +11,12 @@ from nltk.tokenize import word_tokenize
 from pprint import pprint
 from Morphological_analyser_based_on_CSE.Morf_analysis_for_Kazakh import GodsHelp
 from numpy import true_divide
+
+from phonetic_api.phonectic import Phonetic
 # from appendix import *
 from .appendix import *
 from .ilsmodels import Task
 from .appendix import Septik
-from .phonetic import phonetic
 import re
 from .word import Word
 from db import *
@@ -27,14 +28,19 @@ def clear_word(input_string):
     return new_array
 
 
-def is_soft(word) : 
-    for s in word:
-        if s in phonetic.soft_voewls:
-            return True
-    return False
-def is_vowel(c):
-    return c in phonetic.soft_voewls or c in phonetic.hard_vowels 
-
+class Morphology:
+    def change_conjunction(preceding_word, conjuction):
+        """
+        жалғаулық алдыңғы сөздің аяқталуына орай шылауды ауыстырады
+        """
+        if conjuction in ["мен", "бен", "пен"]:
+            if Phonetic.is_vowel(preceding_word[-1]) or Phonetic.is_sonorat_consonant((preceding_word[-1])) :
+                return "мен"
+            elif preceding_word[-1] in ["ж", "з"]:
+                return "бен"
+            elif Phonetic.is_strict_consonant(preceding_word[-1]):
+                return "пен"
+        return conjuction
 class Lemms:
     instance = None
     @classmethod
@@ -45,18 +51,18 @@ class Lemms:
     def to_case(word, case_num):
         app = ""
         if case_num == 2 :
-            if is_soft(word) and is_vowel(word[-1]):
+            if Phonetic.is_soft(word) and Phonetic.is_vowel(word[-1]):
                 return "ге"
-            if not(is_soft(word)) and is_vowel(word[-1]):
+            if not(Phonetic.is_soft(word)) and Phonetic.is_vowel(word[-1]):
                 return "ға"
             vowel = 'а'
             cons = 'ғ'
-            if not(is_vowel(word[-1])):
+            if not(Phonetic.is_vowel(word[-1])):
                 if word[-1] in ['т', 'к', 'п','ш', 'c']:
                     cons = 'к' 
                 else:
                     cons = 'г'
-            if is_soft(word):
+            if Phonetic.is_soft(word):
                 vowel = 'е'
             app = cons + vowel
         return word + app
@@ -250,9 +256,10 @@ class Lemms:
         
     def get_kaz_lemms_test(self, sentences, length, ml):
         main_list = copy.deepcopy(ml)
+        # print("mд=",main_list)
+
         if main_list[0][0][1] == -1:
             return main_list
-        # print(main_list)
         main_list[0][0][2] = []
         morph_reult = GodsHelp.morphogay(sentences[0])
         list_of_parts = clear_word(morph_reult)

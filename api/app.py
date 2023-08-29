@@ -2,9 +2,9 @@
 from flask import Flask
 from flask_cors import CORS, cross_origin
 from flask_mail import Mail
+from models import MyOwlReady
 from views import TextToSpeech
 from flask_restful import Api
-from models import MyOwlReady
 app = Flask(__name__)
 app.s = MyOwlReady()
 app.config['DB_PASSWORD'] = "magzhan2005"

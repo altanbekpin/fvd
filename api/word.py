@@ -1,8 +1,9 @@
 
-from morphology_api.morphology import Lemms, is_soft
+from morphology_api.morphology import Lemms
 from nltk.tokenize import sent_tokenize as st
 from db import DB
 from morphology_api.appendix import Suffix, Septik, Jiktik, Taueldik, Koptik
+from phonetic_api.phonectic import Phonetic
 class Finder:
     def __init__(self, _stcs,_length, word) -> None:
         self.word = word
@@ -11,6 +12,7 @@ class Finder:
         self._trash_part = ""
         self._synonym = ""
         self.consonantsounds = ['л', 'м', 'н', 'ң', 'з']
+        self.appendixes = []
     solid = ['а', 'о', 'ы',  'я', 'ұ']
     soft = ['ә', 'ө', 'і', 'е', 'и', 'э', 'ү']
     def is_vowel(self, word):
@@ -83,7 +85,18 @@ class Finder:
         #print("GET BARYS")
         Barys = ["ға", "ге", "қа", "ке", "на", "не", "а", "е"]
         result = self.get_addition(symbol, founded)
-        is_soft = self.is_soft(word)
+        is_soft = Phonetic.is_soft(word)
+        if result in ["ға", "ге", "қа", "ке"]:
+            if Phonetic.is_strict_consonant(word[-1]):
+                if is_soft:
+                    return "ке"
+                else:
+                    return "қа"
+            else:
+                if is_soft:
+                    return "ге"
+                else:
+                    return "ға"
         if word[-1] in self.solid + self.soft and result[0] in self.solid +self.soft:
             return "й"
         if (is_soft and self.is_soft(result) or ((not is_soft) and (not self.is_soft(result)))):
@@ -205,6 +218,8 @@ class Finder:
             if is_soft:
                 return "ле"
             return "ла"
+        # print(result)
+       
         if symbol == "NamesToVerbs":
             if result in ["да", "де", "та", "те"]:
                 if word[-1] in self.consonantsounds:
@@ -212,19 +227,65 @@ class Finder:
                         return "де"
                     else:
                         return "да"
-                elif not(self.is_vowel(word[-1])):
+                elif Phonetic.is_vowel(word[-1]):
+                    if self.is_soft(word):
+                        return "ле"
+                    else:
+                        return "ла"
+                else:
                     if self.is_soft(word):
                         return "те"
                     else:
                         return "та"
+            if result in ["лан", "лен"]:
+                if self.is_vowel(word[-1]):
+                    if self.is_soft(word):
+                        return "лен"
+                    else:
+                        return "лан"
+                elif word[-1] in self.consonantsounds:
+                    if self.is_soft(word):
+                        return "ден"
+                    else:
+                        return "дан"
+                else:
+                    if self.is_soft(word):
+                        return "тен"
+                    else:
+                        return "тан"
+        if (symbol == "NounsToAdjective" and result in ["ды", "ді", "ты", "ті"]):
+            if Phonetic.is_vowel(word[-1]):
+                if self.is_soft(word):
+                    return "ні"
+                else:
+                    return "ны"
+            if word[-1] in Phonetic.strict_consonants:
+                if self.is_soft(word):
+                    return "ті"
+                else:
+                    return "ты"
+            else:
+                if self.is_soft(word):
+                    return "ді"
+                else:
+                    return "ды"
         if self.get_yryqsyz_etis(symbol,result):
             if result == "л":
                 if len(word)>2 and word[-2] in ["д"] and self.is_vowel(word[-1]):
                     return "н"
                 if self.is_vowel(word[-1]):
-                    return "л"
+                    return "л" 
+                elif Phonetic.is_soft(word[-1]):
+                    return "ін"
+                else: 
+                    return "ын"
             if result == "н" and word[-1] in ['а','е']  and word [-2] in ['т', 'м']:
                 return "л"
+            elif not(Phonetic.is_vowel(word[-1])): 
+                if Phonetic.is_soft(word[-1]):
+                    return "іл"
+                else: 
+                    return "ыл"
             if result == "н" and word [-1] in ['т']:
                 if self.is_soft(word):
                     return "іл"
@@ -291,6 +352,32 @@ class Finder:
 
         if result in ["ма", "ме", "па", "пе"] and word[-1] in ['з']:
                 result = 'б' + result[1:]
+        if symbol == "Kosemshe":
+            if result in ["а", "е", "й"]:
+                if Phonetic.is_vowel(word[-1]):
+                    return "й"
+                elif  Phonetic.is_soft(word):
+                    return "e"
+                else: 
+                    return "а"
+            if result in ["ып", "іп", "п"]:
+                if Phonetic.is_vowel(word[-1]):
+                    return "п"
+                elif Phonetic.is_soft(word):
+                    return "іп"
+                else: 
+                    return "ып"
+            if result in ["ғалы", "гелі", "қалы", "келі"]:
+                if Phonetic.is_strict_consonant(word[-1]):
+                    if Phonetic.is_soft(word):
+                        return "келі"
+                    else: 
+                        return "қалы"
+                else:
+                    if Phonetic.is_soft(word):
+                        return "гелі"
+                    else: 
+                        return "ғалы"
         if (is_soft and self.is_soft(result) or ((not is_soft) and (not self.is_soft(result)))) and result != word[-1] and not(word[-1] in ["і", 'р'] and result[0] in ['т', 'н']):
             if (self.get_synonym()[-1] in ['т'] and result[0] in ['д']) or (self.get_synonym()[-1] in ['д'] and result[0] in ['т']):
                 if result[0] in ['д']:
@@ -300,6 +387,9 @@ class Finder:
             #print("RETURNING:", result)
             return result
         
+        
+        if symbol == "VerbsToVerbs":
+            return result
         if is_soft and index+1<len(suffix):
             result = suffix[index+1]
         elif not(is_soft):
@@ -382,6 +472,24 @@ class Finder:
         Jatys = Septik.Jatys
         result = self.get_addition(symbol, founded)
         is_soft = self.is_soft(word)
+        if result in ["да", "де", "та", "те"]:
+            if Phonetic.is_strict_consonant(word[-1]):
+                if self.is_soft(word):
+                    return "те"
+                else:
+                    return "та"
+            else: 
+                if self.is_soft(word):
+                    return "де"
+                else:
+                    return "да"    
+        if result in ["нда", "нде"]:
+            if not(Phonetic.is_vowel(word[-1])):
+                if Phonetic.is_soft(word):
+                    return "інде"
+                else:
+                    return "ында"
+                    
         if (is_soft and self.is_soft(result) or ((not is_soft) and (not self.is_soft(result)))):
             return result
         index = Jatys.index(result)
@@ -392,8 +500,8 @@ class Finder:
         return result
     
     def get_shygys(self, word):
-        nannen = ['м','н', 'ң']
-        danden = ['а', 'ә', 'о', 'ө', 'е', 'ы', 'і', 'ұ', 'ү', 'и', 'э', 'р', 'у', 'й', 'л', 'з', 'ж']
+        nannen = ['м','н', 'ң','ы', 'і']
+        danden = ['а', 'ә', 'о', 'ө', 'е',  'ұ', 'ү', 'и', 'э', 'р', 'у', 'й', 'л', 'з', 'ж']
         tanten = ['б','в','г','д', 'п', 'ф', 'к', 'қ', 'т', 'с', 'ш', 'щ', 'х', 'ц', 'ч', 'һ']
         is_soft = self.is_soft(word)
         ending = word[-1]
@@ -548,6 +656,8 @@ class Word(Finder):
         self.first_part = ''
         self._plural = ''
         self.first_synonym = ''
+        self.is_in_possesive = False
+        self.possesive = []
         super().__init__(self._stcs, self._length, self.word)
 
     def get_ending_first_part(self):
@@ -604,6 +714,7 @@ class Word(Finder):
 
     def add_parts_to_synonym(self):
         #print("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
+        self.correct_analyze()
         parts = self.get_parts()
         # print("parts=",parts)
         jiktik = ['P1SG1', 'P1PL1', 'P2SG1', 'P2SG.P1', 'P3SG', 'P2SG', 'POSS', ]
@@ -626,9 +737,9 @@ class Word(Finder):
             self.set_synonym("")
             return
         
-        if self.find_extra_chars(first_part, self.word) in Koptik.koptik:
-            self.set_synonym(self.get_synonym() + self.get_plural(self.get_synonym()))
-            return
+        # if self.find_extra_chars(first_part, self.word) in Koptik.koptik:
+        #     self.set_synonym(self.get_synonym() + self.get_plural(self.get_synonym()))
+        #     return
         # if first_part[-1] == synonym[-1] and ((is_word_soft and is_synonym_soft) or (not is_word_soft and not is_synonym_soft)):
         #     # if "POSS" not in parts or ("POSS" not in parts or synonym[-1] not in ['к' , 'п']):
         #         #print("I'M HERE")
@@ -717,8 +828,8 @@ class Word(Finder):
                 elif i in self.suffix_symbols:
                     app+= self.get_suffix(i, self.get_synonym(), founded)
                 if parts.index(i) == 0 and len(app)>0:
-                    if synonym[-1] in ['к', 'қ','п'] and is_soft(app[0]):
-                        synonym = synonym[:-1] + Lemms.change_syngor_reverse(Lemms,synonym[-1])
+                    if synonym[-1] in ['к', 'қ','п'] and Phonetic.is_soft(app[0]):
+                        self._synonym = synonym[:-1] + Lemms.change_syngor_reverse(Lemms,synonym[-1])
                 #print("APP:", app)
                 if self.get_synonym()[-1] in [ 'п', 'ф', 'к', 'қ', 'т', 'с', 'ш'] and app[0] in self.solid:
                     self.set_synonym(self.get_synonym()[:-1] + self.get_couple(self.get_synonym()[-1]))
@@ -819,11 +930,88 @@ class Word(Finder):
 
             
 
-    
+    def correct_analyze(self):
+        # барлық қосымшаларды сөздікке сақтап аламыз
+        appIndex = 0
+        for app in self._stcs[0][0][2]:
+            appIndex+=1
+            if app[0] == "ын": 
+                if len(self._stcs[0][0][2])> appIndex:
+                    if self._stcs[0][0][2][appIndex][0] in ["ың", "ің"]:
+                        self._stcs[0][0][2][appIndex-1][1] = "POSS.3SG"
+                        self._stcs[0][0][2][appIndex-1][0] = "ы"
+                        self._stcs[0][0][2][appIndex][0] += self._stcs[0][0][2][appIndex][0]
+                        self._stcs[0][0][2][appIndex][1] = "Gen"
+                        self._stcs[0][0][2][appIndex][2] = "жалғау"
+                        app = self._stcs[0][0][2][appIndex-1]
+                        self.appendixes.append({"name": app[1], "appendix": app[0]})
+                        continue
+                elif len(self._stcs[0][0][2])== appIndex:
+                    self._stcs[0][0][2][appIndex-1][1] = "POSS.3SG"
+                    self._stcs[0][0][2][appIndex-1][0] = "ы"
+                    self._stcs[0][0][2].append(["н", "Acc", "жалғау"])
+            if app[1] == "NamesToVerbs" and app[0] in ['да', 'де', 'та', 'те', 'ла','ле']:
+                if len(self._stcs[0][0][2])> appIndex:
+                    if self._stcs[0][0][2][appIndex][0] == "р":
+                        self._stcs[0][0][2][appIndex-1][0] += self._stcs[0][0][2][appIndex][0]
+                        self._stcs[0][0][2][appIndex-1][1] = "PL"
+                        self._stcs[0][0][2][appIndex-1][2] = "жалғау"
+                        app = self._stcs[0][0][2][appIndex-1]
+                        del self._stcs[0][0][2][appIndex]
+                        if len(self._stcs[0][0][2])> appIndex:
+                            if self._stcs[0][0][2][appIndex][1] == "VWFI":
+                                self._stcs[0][0][2][appIndex][1] = "Acc"
+                                self._stcs[0][0][2][appIndex][2] = "жалғау"
+                        self.appendixes.append({"name": app[1], "appendix": app[0]})
+                        continue
+            if app[1] == "NamesToVerbs" and app[0] in ['да', 'де', 'та', 'те']:
+                if self.first_part[-1] == "й" or len(self._stcs[0][0][2]) == 1:
+                  app[1] = self._stcs[0][0][2][appIndex-1][1] = "Loc"
+            self.appendixes.append({"name": app[1], "appendix": app[0]})
+        # Жатыс септігімен есімдерді етістікке айналдырушы жұрнақтарды шатыстырмас үшін жқмыс жасаймыз
+        if len(self.appendixes)==2 and self.appendixes[0]["name"] == "NamesToVerbs" and self.appendixes[1]["name"] == "VerbsToVerbs" and self.appendixes[0]["appendix"] + self.appendixes[1]["appendix"] in Septik.Shygys:
+            self._stcs[0][0][2] = [self.appendixes[0]["appendix"] + self.appendixes[1]["appendix"], "Abl", "жалғау"]
+            self._stcs[0][self._length][4] = "Abl"
+        i = 0
+        if (len(self.appendixes)>3): 
+            while i < len(self.appendixes) - 3:
+                app = self.appendixes[i+1]["appendix"] + self.appendixes[i+2]["appendix"] +self.appendixes[i+3]["appendix"]
+                if self.appendixes[i]["name"] == "VerbsToEsimshe" and app in ["нан", "нен"]:
+
+                    self._stcs[0][0][2][i+1]=[app, "Abl", "жұрнақ"]
+                    self.appendixes[i+1]["name"]="Abl"
+                    self.appendixes[i+1]["appendix"] = app
+                    del self._stcs[0][0][2][i+2:i+4]
+                    del self.appendixes[i+2:i+4]
+                    break
+                i+=1
+               # егер сөзтіркесінен тұрса және соңғы сөз тәуелдік болса
+        if self.is_in_possesive:
+            insertIndex = 0
+            index = next((i for i, item in enumerate(self._stcs[0][0][2]) if item[1] == 'PL'), None)
+            if index is not None:
+                insertIndex = index +1
+            if not "POSS." in self._stcs[0][0][4]:
+                self._stcs[0][0][2].insert(insertIndex,self.possesive)
+                self.appendixes.insert(insertIndex,{"name": self.possesive[1], "appendix": self.possesive[0]})
+                if len(self._stcs[0][0][2])> insertIndex+1:
+                    if self._stcs[0][0][2][insertIndex+1][1] == "NounsToAdjective" and self._stcs[0][0][2][insertIndex+1][0] in ["ды", "ді", "ты","ті"]:
+                        self._stcs[0][0][2][insertIndex+1][1] = "Acc"
+                        self._stcs[0][0][2][insertIndex+1][2] = "жалғау"
+                        self.appendixes[insertIndex+1]["name"] = "Acc"
+        
+        
+        
     def get_parts(self):
         if self.isResearchable() and len(self._stcs[0][self._length])>3:
-            parts = self._stcs[0][self._length][4].split('.')
-            return parts[:len(parts)-1]
+            parts = []
+            for item in self.appendixes:
+                name = item['name']
+                if '.' in name:
+                    parts.extend(name.split('.'))
+                else:
+                    parts.append(name)
+            return parts
         return None
 
     def get_second_part(self):
@@ -841,8 +1029,6 @@ class Word(Finder):
         # print(self.word)
         if len(self.word.split(" "))>1:
             synonym, synomized_count = DB.get_instance().findsyn(' '.join(self.word.split()), self.synomized_count, self._synonyms)
-            print("findsyn1=",' '.join(self.word.split()))
-            print(self._synonyms)
             if synomized_count != self.synomized_count:
                 self.synomized_count = synomized_count
                 self.set_synonym(synonym)
@@ -850,8 +1036,6 @@ class Word(Finder):
                 self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]
             except:
                 print("self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]")
-            print("findsyn2=",' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part)
-            print(self._synonyms)
 
             # synonym, synomized_count = DB.get_instance().findsyn(' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part, self.synomized_count, self._synonyms)
             # if synomized_count != self.synomized_count:
@@ -869,7 +1053,6 @@ class Word(Finder):
             if len(synonym.split(" "))>1:
                 syn_temp = synonym.split(" ")[len(synonym.split(" "))-1]
                 self.first_synonym = synonym.split(" ")[:len(synonym.split(" "))-1]
-                #print("syn_temp:", syn_temp)
                 if family == "N":
                     t = Lemms.get_instance().get_kaz_lemms(st(syn_temp))
                     #print(t)
@@ -877,8 +1060,9 @@ class Word(Finder):
                         #print("Not len:", t[0][0][2][0][2])
                         if 'POSS' in t[0][0][2][0][1]:
                             #print(len(t[0][0][2][0][2]))
-                            l = len(t[0][0][2][0])
-                            syn_temp = syn_temp[:len(syn_temp)-l+1]
+                            self.is_in_possesive = True
+                            self.possesive = t[0][0][2][-1]
+                            syn_temp = t[0][0][3]#syn_temp[:len(syn_temp)-l+1]
                 
                 
                 synonym = syn_temp
