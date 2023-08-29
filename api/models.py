@@ -84,6 +84,7 @@ class MyOwlReady:
             owlclasses.append(owl)
             #print(row)
         return owlclasses
+
     @property
     def TurkOnto(cls):
         if cls._turkOnto == None:

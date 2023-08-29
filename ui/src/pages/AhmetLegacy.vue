@@ -22,6 +22,7 @@
             class="flex flex-wrap gap-2"
           >
             <Button
+              v-if="hasAllowedExtension(slotProps.node.data)"
               type="button"
               icon="pi pi-download"
               @click="getFile(slotProps.node.key)"
@@ -87,6 +88,14 @@
           ></FileUpload>
         </form>
       </div>
+      <template #footer>
+        <Button label="Жабу" icon="pi pi-times" @click="visible = false" text />
+        <Button
+          label="Сақтау"
+          icon="pi pi-check"
+          @click="(visible = false), handleFileUpload({ adam: true })"
+        />
+      </template>
     </Dialog>
 
     <Dialog
@@ -228,9 +237,45 @@ const addTag = async () => {
     isDialogForTagsVisible.value = false;
   }
 };
+const hasAllowedExtension = (filename) => {
+  const allowedExtensions = ["pdf", "json", "txt"]; // Add more extensions as needed
+  const extension = filename.split(".").pop().toLowerCase();
+  return allowedExtensions.includes(extension);
+};
 
 const handleFileUpload = (event) => {
-  // console.log(event);
+  if (event.adam) {
+    const formData = new FormData();
+    formData.append("filename", FileName.value);
+    formData.append("path_to_save", path_to_save.value);
+    formData.append("parent_id", parent_id.value);
+    fetch(`${AHMET_API}/upload`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${store.state.user.access_token}` },
+      body: formData,
+    })
+      .then(() => {
+        // console.log("response: ", response);
+        toast.add({
+          severity: "success",
+          summary: "Қосылды",
+          detail: "Жаңа файл сәтті қосылды",
+          life: 3000,
+        });
+      })
+      .catch((error) => {
+        // console.log('There"s a issue:', error);
+        toast.add({
+          severity: "error",
+          summary: "Ақау",
+          detail: error,
+          life: 3000,
+        });
+      })
+      .finally(() => init());
+    FileName.value = "";
+    return;
+  }
   const file = event.files[0];
   const formData = new FormData();
   formData.append(FileName.value, file);
@@ -279,6 +324,7 @@ const init = () => {
       if (legacies[i].is_file === 0) {
         legacies[i].leaf = false;
       }
+      console.log("legacies:", legacies);
       nodes.value = legacies;
     }
   });
@@ -286,6 +332,7 @@ const init = () => {
 const onNodeExpand = (node) => {
   loading.value = true;
   AhmetService.getTreeTableNodes(node.key).then((data) => {
+    console.log(data);
     loading.value = false;
     let legacies = data.data;
     for (var i = 0; legacies.length; i++) {

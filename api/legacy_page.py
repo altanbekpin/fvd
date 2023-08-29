@@ -33,25 +33,37 @@ def change_file_name():
 def upload_file():
     if request.method == 'OPTIONS' or len(request.form.keys()) == 0:
         headers = {
-            'Access-Control-Allow-Origin': 'http://localhost:8080',  # Adjust the origin accordingly
+            'Access-Control-Allow-Origin': 'http://localhost:8080',  
             'Access-Control-Allow-Methods': 'POST',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',  # Add 'Authorization' to the list
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         }
         return ('', 204, headers)
-    data = request.files
+    print("AKSMALMSLKAMSAMSLAS")
     path_to_save = request.form.get('path_to_save')
     parent_id = request.form.get('parent_id')
-    for key in data.keys():
-        file_storage = data.get(key)
-        content_type = file_storage.content_type
-        path_to_save = path_to_save
-        content_type = content_type.split("/")[1]
-        try:
-            file_storage.filename = key
-            file_storage.save(f'./{path_to_save}/' + key + '.' + content_type) 
-            DB.get_instance().addLegacy(key, path_to_save, file_storage.filename, content_type, parent_id)
-        except Exception as e:
-            return 'File uploading failed', 400
+    try:
+        filename = request.form.get('filename')
+        print(filename)
+        print("###########################")
+        # file_storage.save(f'./{path_to_save}/' + filename + '.' + content_type) 
+        with open(f'./{path_to_save}/' + filename, 'w') as file:
+            file.write("")
+        DB.get_instance().addLegacy(filename, path_to_save, filename, '', parent_id)
+        return 'File uploaded successfully'
+    except Exception as e: 
+        print("ERROR:", e)
+        data = request.files
+        for key in data.keys():
+            file_storage = data.get(key)
+            content_type = file_storage.content_type
+            path_to_save = path_to_save
+            content_type = content_type.split("/")[1]
+            try:
+                file_storage.filename = key
+                file_storage.save(f'./{path_to_save}/' + key + '.' + content_type) 
+                DB.get_instance().addLegacy(key, path_to_save, file_storage.filename, content_type, parent_id)
+            except Exception as e:
+                return 'File uploading failed', 400
     return 'File uploaded successfully'
 
 
