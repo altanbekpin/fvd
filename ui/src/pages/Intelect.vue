@@ -4,13 +4,14 @@
       <div class="card-header">
         <p1>Тезарус</p1>
       </div>
-      <Listbox
+      <!-- <Listbox
         v-if="OntNames.length != 0"
         v-model="selectedOnto"
         :options="OntNames"
         optionLabel="name"
         class="w-full listbox-scrollable"
-      />
+      /> -->
+      <Tree @nodeExpand="selectedOnto" v-if="nodes" :value="nodes" class="w-full" selectionMode="single" v-model:selectionKeys="selectedNode" ></Tree>
       <div v-else class="skeleton-container">
         <Skeleton class="mb-2"></Skeleton>
         <Skeleton width="10rem" class="mb-2"></Skeleton>
@@ -67,30 +68,62 @@ export default {
   data() {
     return {
       OntNames: [],
-      selectedOnto: "",
+      nodes: null,
+      selectedNode: null,
       OntoInner: "",
       textController: "",
       loading: false,
     };
   },
   methods: {
-    getJson() {
+    async getJson() {
       // console.log("AHMET_API:", `${AHMET_API}/getontology/kz/`);
-      axios
-        .get(`${AHMET_API}/getontology/kz/`)
-        .then((response) => (this.OntNames = response.data));
+      this.loading = true;
+      var reqbody = {
+        question: "Тіл құрал",
+        pkey: 0,
+      };
+      var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
+        headers: getHeader(),
+      });
+      this.OntoInner = temp.data.txt;
+      this.nodes = temp.data.childs;
+      this.loading = false;
     },
     async searchFunc() {
       this.loading = true;
       var reqbody = {
         question: this.textController,
+        pkey: 0,
       };
       console.log(reqbody);
       var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
         headers: getHeader(),
       });
-      console.log("temp:", temp);
-      this.OntoInner = temp.data;
+      this.OntoInner = temp.data.txt;
+      this.loading = false;
+    },
+    async selectedOnto(node) {
+      //this.selectedNode =node
+      let _node = {...node};
+      _node.children = [];
+      this.loading = true;
+      // console.log(this.selectedOnto["name"]);
+      this.textController = this.selectedOnto["name"];
+      var reqbody = {
+        question: node.label,
+        pkey: node.key,
+      };
+
+      // console.log(reqbody);
+      var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
+        headers: getHeader(),
+      });
+      this.OntoInner = temp.data.txt;
+      _node.children = temp.data.childs;
+      let _nodes = {...this.nodes}
+      _nodes[node.key] = _node;
+      this.nodes = _nodes;
       this.loading = false;
     },
     // async DoSubmit(text){
@@ -106,6 +139,7 @@ export default {
       self.textController = text;
       var reqbody = {
         question: text,
+        pkey: 0,
       };
 
       // console.log(reqbody);
@@ -113,7 +147,7 @@ export default {
         headers: getHeader(),
       });
       // console.log(temp.data);
-      self.OntoInner = temp.data;
+      self.OntoInner = temp.data.txt;
       self.textController = text;
       self.loading = false;
     };
@@ -124,22 +158,7 @@ export default {
     // OntNames(newValue){
     //     console.log(newValue[0])
     // },
-    async selectedOnto() {
-      this.loading = true;
-      // console.log(this.selectedOnto["name"]);
-      this.textController = this.selectedOnto["name"];
-      var reqbody = {
-        question: this.selectedOnto["name"],
-      };
-
-      // console.log(reqbody);
-      var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
-        headers: getHeader(),
-      });
-      // console.log(temp.data);
-      this.OntoInner = temp.data;
-      this.loading = false;
-    },
+  
     OntoInner(newValue) {
       console.log(newValue);
     },

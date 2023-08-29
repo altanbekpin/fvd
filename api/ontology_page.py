@@ -54,45 +54,52 @@ def send_question():
     temp = json.loads(request.data.decode('utf-8'))
     
     question = temp['question']
+    parent_key = temp['pkey']
     lang = 'kz'
     g = DB.get_instance().get_onto().TurkOnto
     s= ''
     quest = '''
-        PREFIX kazont: <http://www.semanticweb.org/Til-qural_A.Baitursynuly#>
+        PREFIX kazont: <http://www.semanticweb.org/til_qural_baitursyn#>
         SELECT ?subject ?label WHERE {{ ?subject rdfs:label "''' + question + '"@' + lang + ''' . ?subject rdfs:label  ?label
         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))} union { ?subject rdfs:label "''' + question.capitalize() + '"@' + lang + ''' . ?subject rdfs:label  ?label
         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))}}'
+    
     qres = g.query(quest)
     for row in qres:
         words = row[0].split('#')
         s = '<b>' + descriptor_to_lang[lang]+': </b>' + row[1]
         word = words[len(words)-1]
         s = s + "<br/><b>UniTurk: </b>" + word
-        quest = 'PREFIX kazont: <http://www.semanticweb.org/Til-qural_A.Baitursynuly#> Select * WHERE { kazont:' + word+ ''' kazont:definition ?def
+        quest = 'PREFIX kazont: <http://www.semanticweb.org/til_qural_baitursyn#> Select * WHERE { kazont:' + word+ ''' kazont:definition ?def
                 FILTER(LANG(?def) = "" || LANGMATCHES(LANG(?def), " ''' + lang + '")) }'
         defres = g.query(quest)
         for def_row in defres:
             s = s + '<br/> <b>' + descriptor_to_def[lang]+': </b>' + def_row[0]
-        quest = 'PREFIX kazont: <http://www.semanticweb.org/Til-qural_A.Baitursynuly#> Select * WHERE { kazont:' + word+ ''' kazont:question ?def
+        quest = 'PREFIX kazont: <http://www.semanticweb.org/til_qural_baitursyn#> Select * WHERE { kazont:' + word+ ''' kazont:question ?def
                 FILTER(LANG(?def) = "" || LANGMATCHES(LANG(?def), "''' + lang + '")) }'
         defres = g.query(quest)
         for def_row in defres:
             s = s + '<br/> <b>' + descriptor_to_question[lang]+': </b>' + def_row[0]
 
-        quest = 'PREFIX kazont: <http://www.semanticweb.org/Til-qural_A.Baitursynuly#> Select ?label WHERE {kazont:' + word+ ''' rdfs:subClassOf  ?s . ?s rdfs:label ?label
+        quest = 'PREFIX kazont: <http://www.semanticweb.org/til_qural_baitursyn#> Select ?label WHERE {kazont:' + word+ ''' rdfs:subClassOf  ?s . ?s rdfs:label ?label
                 FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '")) }'
         defres = g.query(quest)
         s = s + '<br/> <b>' + descriptor_to_gyperonim[lang]+': </b>'
         for def_row in defres:
             s = s + "<br/>&emsp; <a href=\"javascript:DoSubmit('" + def_row[0] +"','"+ lang +"');\">" + def_row[0] + "</a>"
 
-        quest = 'PREFIX kazont: <http://www.semanticweb.org/Til-qural_A.Baitursynuly#> Select ?label WHERE {?s rdfs:subClassOf kazont:' + word+ '''  . ?s rdfs:label ?label
+        quest = 'PREFIX kazont: <http://www.semanticweb.org/til_qural_baitursyn#> Select ?label WHERE {?s rdfs:subClassOf kazont:' + word+ '''  . ?s rdfs:label ?label
                 FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '")) }'
         defres = g.query(quest)
         s = s + '<br/> <b>' + descriptor_to_gyponim[lang]+': </b>'
+        childs = []
+        key = 0
         for def_row in defres:
+            childs.append({"key": str(parent_key) + "-" + str(key) , "label":  def_row[0].value, "leaf": False, "children": []})
+            print(childs)
+            key+=1
             s = s + "<br/>&emsp; <a href=\"javascript:DoSubmit('" + def_row[0] +"','"+ lang +"');\">" + def_row[0] +  "</a>"
-        quest = 'PREFIX kazont: <http://www.semanticweb.org/Til-qural_A.Baitursynuly#> SELECT ?subject ?label WHERE { ?subject rdf:type kazont:'+word+' . ?subject rdfs:label ?label FILTER(LANG(?label) = "' + lang + '" )}'
+        quest = 'PREFIX kazont: <http://www.semanticweb.org/til_qural_baitursyn#> SELECT ?subject ?label WHERE { ?subject rdf:type kazont:'+word+' . ?subject rdfs:label ?label FILTER(LANG(?label) = "' + lang + '" )}'
         defres = g.query(quest)
         s = s + "<br/><b>Индивид: </b>"
         instance_count = 0
@@ -100,7 +107,7 @@ def send_question():
             instance_count = instance_count + 1
             s = s + '<p style="color:red; margin-bottom:0">&emsp;' + def_row[1] +'</p>'
         if instance_count == 0 and lang == 'kz':
-            quest = 'PREFIX kazont: <http://www.semanticweb.org/Til-qural_A.Baitursynuly#> SELECT ?subject WHERE { ?subject rdf:type kazont:'+word+'}'
+            quest = 'PREFIX kazont: <http://www.semanticweb.org/til_qural_baitursyn#> SELECT ?subject WHERE { ?subject rdf:type kazont:'+word+'}'
             defres = g.query(quest)
             instance_count = 0
             s = s +'<p style="color:red; padding-left:15" class="m-0">'
@@ -112,8 +119,8 @@ def send_question():
         for key, value in nation_to_lang.items():
             if (value==lang):
                 continue
-            quest = 'PREFIX kazont: <http://www.semanticweb.org/Til-qural_A.Baitursynuly#>  SELECT ?label WHERE { kazont:' + word + ' rdfs:label ?label FILTER(LANG(?label) = "'+value+'")}'
+            quest = 'PREFIX kazont: <http://www.semanticweb.org/til_qural_baitursyn#>  SELECT ?label WHERE { kazont:' + word + ' rdfs:label ?label FILTER(LANG(?label) = "'+value+'")}'
             def_qres = g.query(quest)
             for row in def_qres:
                 s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
-    return jsonify(s)
+    return jsonify({"txt": s, "childs": childs})
