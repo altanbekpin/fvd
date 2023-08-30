@@ -174,9 +174,10 @@ def searchsyn():
     family = request.json['family']
     secondary = request.json['secondary']
     synonyms = []
-    synonyms, isfromsyn = DB.get_instance().findsyn_with_family(data, getTense(family))
+    synonyms = DB.get_instance().findsyn_with_family(data, getTense(family))
+    print(synonyms)
     if len(synonyms) == 0:
-        synonyms, isfromsyn = DB.get_instance().findsyn_with_family(secondary, '')[1:]
+        synonyms = DB.get_instance().findsyn_with_family(secondary, '')[1:]
     else:
         synonyms.insert(0, {"words":data, "synonym": data+second_part})
     for i in range(0, len(synonyms)):

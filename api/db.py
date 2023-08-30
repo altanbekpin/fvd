@@ -185,6 +185,8 @@ class DB(DatabaseOperations):
 
     
     def findsyn_with_family(self, word, family):
+        print("word:", word)
+        print("family:", family)
         if family != '':
             query = '''SELECT s.synonym, z.words, s.id
             FROM synonyms s 
@@ -206,6 +208,7 @@ class DB(DatabaseOperations):
             AND o.activated = true;'''
             data = (word,)
         synonyms = self._select_all_query(query, data)
+        print("synonyms:", synonyms)
         return synonyms
 
     def is_syn(self, word):
