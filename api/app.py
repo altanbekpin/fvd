@@ -2,15 +2,15 @@
 from flask import Flask
 from flask_cors import CORS, cross_origin
 from flask_mail import Mail
-from models import MyOwlReady
+# from models import MyOwlReady
 from views import TextToSpeech
 from flask_restful import Api
 app = Flask(__name__)
-app.s = MyOwlReady()
+# app.s = MyOwlReady()
 app.config['DB_PASSWORD'] = "magzhan2005"
 password = app.config['DB_PASSWORD']
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@db/userdb'
-# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@localhost:5435/userdb'
+# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@db/userdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@localhost:5435/userdb'
 # app.config['JSON_AS_ASCII'] = False
 app.config["JWT_SECRET_KEY"] = "@Remote2022" 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
