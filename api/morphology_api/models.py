@@ -35,7 +35,7 @@ class MyOwlReady:
             _onto = get_ontology("file:taxexpert.owl").load()
             _onto.sync_reasoner()
             _turkOnto = rdflib.Graph()
-            _turkOnto.parse ('owl/Akhmettanu.owl')
+            _turkOnto.parse ('owl/Tilqural25082023.owl')
             
 
         else:
@@ -53,7 +53,7 @@ class MyOwlReady:
             cls.__instance = MyOwlReady()
         print("TurkOntology loading...")
         cls._turkOnto = rdflib.Graph()
-        cls._turkOnto.parse('owl/Akhmettanu.owl')
+        cls._turkOnto.parse('owl/Tilqural25082023.owl')
     @classmethod
     def SyncReasoner(cls):
         if not cls.__instance:
@@ -76,7 +76,7 @@ class MyOwlReady:
         if cls._turkOnto == None:
             print("TurkOntology loading...")
             cls._turkOnto = rdflib.Graph()
-            cls._turkOnto.parse('owl/Akhmettanu.owl')
+            cls._turkOnto.parse('owl/Tilqural25082023.owl')
 
         return cls._turkOnto
     @classproperty
@@ -113,7 +113,7 @@ class MyOntology(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
     def savetofile(self):
-        f = open( 'owl/Akhmettanu.owl', 'w',encoding='utf-8')
+        f = open( 'owl/Tilqural25082023.owl', 'w',encoding='utf-8')
 
         f.write(self.text)
         f.close()
@@ -123,7 +123,7 @@ class MyOntology(models.Model):
         res=''
         self.savetofile()
         g = rdflib.Graph()
-        g.parse('owl/Akhmettanu.owl')
+        g.parse('owl/Tilqural25082023.owl')
         quest = 'SELECT ?label WHERE { ?subject rdfs:subClassOf ?object . ?subject rdfs:label ?label FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "' + lang + '")) } order by ?label '
         qres = g.query(quest)
         for row in qres:

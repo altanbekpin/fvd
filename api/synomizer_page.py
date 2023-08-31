@@ -335,9 +335,10 @@ def addParaphrase():
 @app.route("/research/",methods=['POST'])
 def research():
     data = request.json['value']
-    word = request.json['word']
+    word = request.json['word'] 
     instance = Word(data, 0, [])
     #print("instance.get_researhed_part(word):", instance.get_researhed_part(word))
+
     return instance.get_researhed_part(word)
 
 @app.route("/delete/synonym", methods=['DELETE'])

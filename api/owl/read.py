@@ -13,4 +13,4 @@ def read_owl_file(file_path):
         print(f"Subject: {subject}, Predicate: {predicate}, Object: {obj}")
 
 # Replace 'your_file.owl' with the actual path to your OWL file
-read_owl_file('./Akhmettanu.owl')
+read_owl_file('./Tilqural25082023.owl')
