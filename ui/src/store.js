@@ -9,6 +9,7 @@ const store = createStore({
       password: "",
       roles: [],
       access_token: "",
+      refresh_token: "",
       full_name: "",
     },
     ChosenTheme: {
@@ -24,6 +25,11 @@ const store = createStore({
       // console.log("state after updating:");
       // console.log(state.user);
       localStorage.setItem("user", JSON.stringify(data));
+    },
+    updateAccessToken(state, access_token) {
+      state.user.access_token = access_token;
+      const user = state.user;
+      localStorage.setItem("user", JSON.stringify(user));
     },
     changeTheme(state, Theme) {
       Cookies.set("Theme", Theme, { expires: 7 });
@@ -73,6 +79,9 @@ const store = createStore({
     },
     getAccessToken: (state) => {
       return state.user.access_token;
+    },
+    getRefreshToken: (state) => {
+      return state.user.refresh_token;
     },
   },
   plugins: [

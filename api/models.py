@@ -36,7 +36,7 @@ class MyOwlReady:
         if not MyOwlReady.__instance:
             print(" __init__ method called..")
             _turkOnto = rdflib.Graph()
-            _turkOnto.parse('owl/Tilqural25082023.owl')
+            _turkOnto.parse ('owl/Tilqural25082023.owl')
         else:
             print("Instance already created:", self.getInstance())
             print(self.Onto)
@@ -50,7 +50,7 @@ class MyOwlReady:
             cls.__instance = MyOwlReady()
         print("TurkOntology loading...")
         cls._turkOnto = rdflib.Graph()
-        cls._turkOnto.parse('owl/Akhmettanu.owl')
+        cls._turkOnto.parse('owl/Tilqural25082023.owl')
     def SyncReasoner(cls):
         if not cls.__instance:
             cls.__instance = MyOwlReady()
@@ -72,7 +72,7 @@ class MyOwlReady:
         res= ""
         g = rdflib.Graph()
         g.parse('owl/Tilqural25082023.owl')
-        quest = 'SELECT distinct ?label WHERE { ?subject rdfs:subClassOf ?object . ?subject rdfs:label ?label FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "' + lang + '")) } order by ?label '
+        quest = 'SELECT ?label WHERE { ?subject rdfs:subClassOf ?object . ?subject rdfs:label ?label FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "' + lang + '")) } order by ?label '
         qres = g.query(quest)
         owlclasses = []
         
@@ -115,7 +115,7 @@ class MyOntology():
     
         
     def savetofile(self):
-        f = open( 'owl/Akhmettanu.owl', 'w',encoding='utf-8')
+        f = open( 'owl/Tilqural25082023.owl', 'w',encoding='utf-8')
 
         f.write(self.text)
         f.close()

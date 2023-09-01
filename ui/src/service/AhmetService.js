@@ -1,4 +1,5 @@
 import { AHMET_API, getHeader } from "@/config";
+import store from "../store";
 import api from "./api";
 export const AhmetService = {
   getTreeTableNodes(parentID) {
@@ -10,6 +11,7 @@ export const AhmetService = {
     // console.log(fileID);
   },
   async getSchoolTermins(lazyParams) {
+    // console.log("store:", store.getters.getAccessToken);
     return await api.post(
       AHMET_API + "/getTermins",
       {
@@ -95,6 +97,7 @@ export const AhmetService = {
       { headers: getHeader() }
     );
     const temp = response.data["access_token"];
+    const refresh_token = response.data["refresh_token"];
 
     // console.log("temp:", temp);
     response = await api.get(`${AHMET_API}/who_am_i/`, {
@@ -103,7 +106,7 @@ export const AhmetService = {
     // console.log("response:", response);
     roles = response.data["roles"];
     // console.log("who am i returns:");
-    return { access_token: temp, roles: roles };
+    return { access_token: temp, roles: roles, refresh_token: refresh_token };
   },
   async confirm(email, code) {
     // console.log("email:", email);
@@ -358,5 +361,14 @@ export const AhmetService = {
         headers: getHeader(),
       }
     );
+  },
+  async refresh_token() {
+    const response = await api.post(
+      `${AHMET_API}/refresh`,
+      {},
+      { headers: getHeader(store.getters.getRefreshToken) }
+    );
+
+    store.commit("updateAccessToken", response["access_token"]);
   },
 };

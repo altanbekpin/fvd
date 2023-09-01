@@ -12,14 +12,14 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
-    # def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
+    # def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
+    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            port = 5435,
+            # port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -188,6 +188,8 @@ class DB(DatabaseOperations):
 
     
     def findsyn_with_family(self, word, family):
+        print("word:", word)
+        print("family:", family)
         if family != '':
             query = '''SELECT s.synonym, z.words, s.id
             FROM synonyms s 
@@ -209,6 +211,7 @@ class DB(DatabaseOperations):
             AND o.activated = true;'''
             data = (word,)
         synonyms = self._select_all_query(query, data)
+        print("synonyms:", synonyms)
         return synonyms
 
     def is_syn(self, word):

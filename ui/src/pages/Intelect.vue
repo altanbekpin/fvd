@@ -11,7 +11,15 @@
         optionLabel="name"
         class="w-full listbox-scrollable"
       /> -->
-      <Tree @nodeExpand="selectedOnto" v-if="nodes" :value="nodes" class="w-full" selectionMode="single" v-model:selectionKeys="selectedNode" ></Tree>
+      <Tree
+        @nodeExpand="selectedOnto"
+        v-if="nodes"
+        :value="nodes"
+        class="w-full"
+        selectionMode="single"
+        v-model:selectionKeys="selectedNode"
+        style="border: none"
+      ></Tree>
       <div v-else class="skeleton-container">
         <Skeleton class="mb-2"></Skeleton>
         <Skeleton width="10rem" class="mb-2"></Skeleton>
@@ -76,6 +84,43 @@ export default {
     };
   },
   methods: {
+    countDashes(str) {
+      return str.split("-").length - 1;
+    },
+    findAndReplaceObject(arr, targetKey, replacementObject) {
+      console.log("arr:", arr);
+      console.log("targetKey:", targetKey);
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].key === targetKey) {
+          arr[i] = replacementObject;
+          return true; // Object found and replaced
+        }
+
+        if (arr[i].children) {
+          if (
+            this.findAndReplaceObject(
+              arr[i].children,
+              targetKey,
+              replacementObject
+            )
+          ) {
+            return true; // Object found and replaced in children
+          }
+        }
+      }
+
+      return false; // Object not found
+    },
+    modifyKey(num, key) {
+      const components = key.split("-");
+      if (components.length <= num + 1) {
+        return key; // Return the original key if the requested number of components is equal or more than the original key's components
+      }
+      return components.slice(0, num + 1).join("-");
+    },
+    // sortArray(array, object){
+
+    // },
     async getJson() {
       // console.log("AHMET_API:", `${AHMET_API}/getontology/kz/`);
       this.loading = true;
@@ -105,7 +150,7 @@ export default {
     },
     async selectedOnto(node) {
       //this.selectedNode =node
-      let _node = {...node};
+      let _node = { ...node };
       _node.children = [];
       this.loading = true;
       // console.log(this.selectedOnto["name"]);
@@ -121,9 +166,13 @@ export default {
       });
       this.OntoInner = temp.data.txt;
       _node.children = temp.data.childs;
-      let _nodes = {...this.nodes}
-      _nodes[node.key] = _node;
-      this.nodes = _nodes;
+      // let _nodes = { ...this.nodes };
+      // _nodes[node.key] = _node;
+      console.log("_node:", _node);
+      console.log("nodes:", this.nodes);
+      this.findAndReplaceObject(this.nodes, _node.key, _node);
+      console.log("nodes after modification:", this.nodes);
+      // this.nodes = _nodes;
       this.loading = false;
     },
     // async DoSubmit(text){
@@ -158,7 +207,7 @@ export default {
     // OntNames(newValue){
     //     console.log(newValue[0])
     // },
-  
+
     OntoInner(newValue) {
       console.log(newValue);
     },

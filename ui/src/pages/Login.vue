@@ -132,6 +132,7 @@ export default {
           password: this.password,
           roles: repo["roles"],
           access_token: repo["access_token"],
+          refresh_token: repo["refresh_token"],
           full_name: "",
         };
         store.commit("updateUser", data);

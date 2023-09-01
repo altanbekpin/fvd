@@ -179,9 +179,10 @@ def searchsyn():
     family = request.json['family']
     secondary = request.json['secondary']
     synonyms = []
-    synonyms, isfromsyn = DB.get_instance().findsyn_with_family(data, getTense(family))
+    synonyms = DB.get_instance().findsyn_with_family(data, getTense(family))
+    print(synonyms)
     if len(synonyms) == 0:
-        synonyms, isfromsyn = DB.get_instance().findsyn_with_family(secondary, '')[1:]
+        synonyms = DB.get_instance().findsyn_with_family(secondary, '')[1:]
     else:
         synonyms.insert(0, {"words":data, "synonym": data+second_part})
     for i in range(0, len(synonyms)):
@@ -339,9 +340,10 @@ def addParaphrase():
 @app.route("/research/",methods=['POST'])
 def research():
     data = request.json['value']
-    word = request.json['word']
+    word = request.json['word'] 
     instance = Word(data, 0, [])
     #print("instance.get_researhed_part(word):", instance.get_researhed_part(word))
+
     return instance.get_researhed_part(word)
 
 @app.route("/delete/synonym", methods=['DELETE'])
