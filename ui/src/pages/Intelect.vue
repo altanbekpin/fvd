@@ -171,6 +171,7 @@ export default {
       console.log("_node:", _node);
       console.log("nodes:", this.nodes);
       this.findAndReplaceObject(this.nodes, _node.key, _node);
+      this.textController = _node.label
       console.log("nodes after modification:", this.nodes);
       // this.nodes = _nodes;
       this.loading = false;
