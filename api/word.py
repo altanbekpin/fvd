@@ -4,6 +4,7 @@ from nltk.tokenize import sent_tokenize as st
 from db import DB
 from morphology_api.appendix import Suffix, Septik, Jiktik, Taueldik, Koptik
 from phonetic_api.phonectic import Phonetic
+from app import app
 class Finder:
     def __init__(self, _stcs,_length, word) -> None:
         self.word = word
@@ -132,6 +133,14 @@ class Finder:
             if self.is_soft(word):
                 return 'і'
             return 'ы'
+        if depence in ["ың", "ің", "ң"]:
+            if Phonetic.is_vowel(word[-1]):
+                return "ң"
+            else:
+                if Phonetic.is_soft(word):
+                    return "ің"
+                else:
+                    return "ың"
         
         if not(word[-1] in self.soft + self.solid + ["я"] and depence[0] in self.soft + self.solid) and (is_soft and self.is_soft(depence) or ((not is_soft) and (not self.is_soft(depence)))):
             if self.get_synonym()[-1] in ['к'] and depence[0] in ['і']:
@@ -276,9 +285,11 @@ class Finder:
                 if self.is_vowel(word[-1]):
                     return "л" 
                 elif Phonetic.is_soft(word[-1]):
-                    return "ін"
-                else: 
-                    return "ын"
+                    return app.is_exists_in_vocab(word, ["ін", "іл"])
+                else:
+                    return app.is_exists_in_vocab(word, ["ын", "ыл"])
+                    
+                    
             if result == "н" and word[-1] in ['а','е']  and word [-2] in ['т', 'м']:
                 return "л"
             elif not(Phonetic.is_vowel(word[-1])): 
@@ -646,9 +657,9 @@ class Word(Finder):
         sentences = st(word)
         temp = Lemms.get_instance().get_kaz_lemms(sentences)
         self._stcs = temp
-        self._stcs = Lemms.get_instance().get_kaz_lemms_test(sentences, self.get_length(),temp)
-        if not(self._stcs[0][0][1] == -1) and len(self._stcs[0][0][2]) == 0:
-            self._stcs = temp
+        # self._stcs = Lemms.get_instance().get_kaz_lemms_test(sentences, self.get_length(),temp)
+        # if not(self._stcs[0][0][1] == -1) and len(self._stcs[0][0][2]) == 0:
+        #     self._stcs = temp
         self._length = self.get_length()
         self.synomized_count = synomized_count
         self._synonyms = synonyms
@@ -895,7 +906,7 @@ class Word(Finder):
         return val
 
     def isResearchable(self):
-        return (not (len(self._stcs) == 0)) and (len(self._stcs[0][0]) > 2) and not(" " in self.word.strip())
+        return (not (len(self._stcs) == 0)) and (len(self._stcs[0][0]) > 2) #and not(" " in self.word.strip())
     def get_first_part(self) -> str:
         if self.isResearchable():
             self.first_part = self._stcs[0][self._length][3]
@@ -965,8 +976,8 @@ class Word(Finder):
                         self.appendixes.append({"name": app[1], "appendix": app[0]})
                         continue
             if app[1] == "NamesToVerbs" and app[0] in ['да', 'де', 'та', 'те']:
-                if self.first_part[-1] == "й" or len(self._stcs[0][0][2]) == 1:
-                  app[1] = self._stcs[0][0][2][appIndex-1][1] = "Loc"
+                # if self.first_part[-1] in ["й"] or len(self._stcs[0][0][2]) == 1:
+                app[1] = self._stcs[0][0][2][appIndex-1][1] = "Loc"
             self.appendixes.append({"name": app[1], "appendix": app[0]})
         # Жатыс септігімен есімдерді етістікке айналдырушы жұрнақтарды шатыстырмас үшін жқмыс жасаймыз
         if len(self.appendixes)==2 and self.appendixes[0]["name"] == "NamesToVerbs" and self.appendixes[1]["name"] == "VerbsToVerbs" and self.appendixes[0]["appendix"] + self.appendixes[1]["appendix"] in Septik.Shygys:
@@ -1026,16 +1037,20 @@ class Word(Finder):
         return self.first_synonym
 
     def look_for_synonym(self):
-        # print(self.word)
         if len(self.word.split(" "))>1:
-            synonym, synomized_count = DB.get_instance().findsyn(' '.join(self.word.split()), self.synomized_count, self._synonyms)
+            synonym, synomized_count = DB.get_instance().findsyn(self._stcs[0][0][3], self.synomized_count, self._synonyms)
             if synomized_count != self.synomized_count:
+                first_part= self.get_first_part()
                 self.synomized_count = synomized_count
                 self.set_synonym(synonym)
-            try:
-                self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]
-            except:
-                print("self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]")
+                self.add_parts_to_synonym()
+            # try:
+            #     self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]
+            # except:
+            #     print("self.first_part = Lemms.get_instance().get_kaz_lemms(st(self.word))[0][len(' '.join(self.word.split()).split(' '))-1][3]")
+            # print("findsyn2=",' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part)
+            # print(self._synonyms)
+
 
             # synonym, synomized_count = DB.get_instance().findsyn(' '.join(' '.join(self.word.split()).split(' ')[:-1]) + " " + self.first_part, self.synomized_count, self._synonyms)
             # if synomized_count != self.synomized_count:
@@ -1043,6 +1058,11 @@ class Word(Finder):
             #     print(self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
             #     self.set_synonym(synonym + self.find_extra_chars( self.first_part,  ' '.join(self.word.split()).split(' ')[-1]))
             
+            # return self
+            # if synomized_count != self.synomized_count:
+            #     self.synomized_count = synomized_count
+            #     self.set_synonym(synonym.lower())
+                
             return self
         if self.isResearchable():
             family = self.get_family()

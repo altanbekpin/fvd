@@ -1,3 +1,4 @@
+from phonetic_api.phonectic import Phonetic
 from .appendix import Appendix, Suffix, Ending, Koptik, Jiktik, Taueldik, Septik, MOOD
 class Word:
     Root = ""
@@ -32,8 +33,12 @@ class Word:
     def IsTuyiqEtistik(self):
         if (self.CurrentPOS != Suffix.POS_VERB):
             return False
+        root = self.Root.strip().split(" ")[-1]
+        if len(root)>2 and root[-1] == 'у' and not(Phonetic.is_vowel(root[-2])):
+            return True
         if (len(self.Appendixes) == 0):
             return False
+        # if (self.Root.strip().split(" ")[-1])
         for app in self.Appendixes:
             if (app.AppName == "VerbsToVerbs") and app.AppendixString == 'у':
                 return True
@@ -45,6 +50,15 @@ class Word:
             appendixPart = self.AppendixPart
             # алдымен жұрнақтарды қарап аламыз
             while (len(appendixPart) > 0):
+                # Етістіктен сын есім тудыратын жүрнақтармен шатастырмас үшін түзету
+                if appendix.AppendixString in ["нды", "нді"] and appendixPart[0] == "р":
+                    self.Appendixes[-1].AppName = "VerbsToVerbs"
+                    self.Appendixes[-1].AppendixString = "н"
+                    self.Appendixes.append(Suffix(appendix.AppendixString[1:] + "р","VerbsToVerbs","жұрнақ" ))
+                    appendixPart=appendixPart[1:]
+                    self.AppendixPart = self.AppendixPart[1:]
+                    self.CurrentPOS = Suffix.POS_VERB
+                    continue
                 appendix = Suffix
                 appendix.AppName = ""
                 appendix.AppendixString = ""
@@ -71,7 +85,7 @@ class Word:
                 return
             appendixPart = self.AppendixPart
             while (len(appendixPart) > 0):
-                if (self.CurrentPOS in [Suffix.POS_NOUN, Suffix.POS_ADJECTIVE, Suffix.POS_PRONOUN, Suffix.POS_NUMERAL] or (self.CurrentPOS == Suffix.POS_VERB and self.IsEsimshe())):
+                if (self.CurrentPOS in [Suffix.POS_NOUN, Suffix.POS_ADJECTIVE, Suffix.POS_PRONOUN, Suffix.POS_NUMERAL] or (self.CurrentPOS == Suffix.POS_VERB and (self.IsEsimshe() or self.IsTuyiqEtistik()))):
                     appendix = Koptik
                     appendix.AppName = ""
                     appendix.AppendixString = ""

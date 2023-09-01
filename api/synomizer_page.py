@@ -21,9 +21,8 @@ def remove_extra_spaces(text):
 def merge_some_elements_of_string_array(words, start_index, count):
     # start_index - біріктіру басталатын элемент индексі
     # count - # бірігетін элементтер саны
-
     # сөздерді бір жолға біріктіру
-    merged_words = (' '.join(words[start_index:start_index + count]))
+    merged_words = (''.join(words[start_index:start_index + count]))
 
     # Сәйкес үзікті жаңа элементпен (біріктірілген) ауыстыру
     words[start_index:start_index + count] = [merged_words] + [" "]
@@ -98,6 +97,9 @@ def searchWord():
     index = 0
     globalIndex = 0
     # сөз тіркестерін іздейміз
+    tirkes = []
+    synonym = []
+    tirkes_root = []
     while globalIndex<len(words):
         index = len(words)
         found = False
@@ -114,6 +116,9 @@ def searchWord():
                     ret = DB.get_instance().findsyn(wordForSearch, 0, [])[0]
                 if ret != wordForSearch:
                     words = merge_some_elements_of_string_array(words, globalIndex, index-globalIndex)
+                    tirkes.append(words[globalIndex])
+                    tirkes_root.append(wordForSearch)
+                    synonym.append(ret)
                     found = True
                     break
                 wordForSearch = wordForSearch[:-1]
@@ -124,6 +129,7 @@ def searchWord():
         globalIndex+=1
     clean_ouput_words = []
     for index, word in enumerate(words):
+        word = word.replace("i","і")
         just_word= ""
         if word not in [",", ".", "!", "?", ";", "-", "\"", "`", "$", "^", "*", "+", "(", ")"] and word.strip() and not is_person_name(word, data, index == 0):
             isWordUpper = word[0].isupper()
@@ -162,7 +168,6 @@ def searchWord():
                         word = word_new
                 clean_ouput_words.append(word)
             output_words.append(word)
-
     # print("sw=",clean_ouput_words)
     return jsonify([output_words, synomized_count, synomized_words]), 200
 

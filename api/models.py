@@ -6,7 +6,6 @@ import rdflib
 from rdflib.serializer import Serializer
 from rdflib.namespace import RDF, RDFS, OWL
 from owlready import *
-# from app import app
 
 
 class LegacySchema(Schema):
@@ -84,7 +83,6 @@ class MyOwlReady:
             owlclasses.append(owl)
             #print(row)
         return owlclasses
-
     @property
     def TurkOnto(cls):
         if cls._turkOnto == None:

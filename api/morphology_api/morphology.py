@@ -301,7 +301,7 @@ class Lemms:
             lemms = []
             tok = []
             words = []
-            tokens = word_tokenize(sentence)
+            tokens = [sentence]
             for token in tokens:
                 token = token.lower()
                 if token == "оның":
@@ -322,7 +322,13 @@ class Lemms:
                 while len(token) > 1 and not(token_found):
                     # print(len(token) > 0 and not(token_found))
                     token = token[:-1] + self.change_syngor( token[-1:])
-                    cur.execute("SELECT words, pos FROM synamizer WHERE LOWER(TRIM(words)) = LOWER(TRIM(%s))", (token,))
+                    cur.execute('''SELECT distinct words, pos FROM synamizer sm
+INNER JOIN synonym_word sw on sm.id = sw.word_id
+INNER JOIN synonyms s on s.id = sw.synonym_id
+WHERE LOWER(TRIM(sm.words)) = LOWER(TRIM(%s)) or LOWER(TRIM(s.synonym)) = LOWER(TRIM(%s))'''
+
+
+, (token,token,))
                     data = cur.fetchall()
                     if not len(data) >= 1:
                         cur.execute('''SELECT ss.synonym AS words,s.pos FROM synonyms ss
@@ -332,10 +338,10 @@ class Lemms:
                         data = cur.fetchall()
                     for result in data:
                         if (not(token in kaz_stop_words)):
-                            tok.append(u"".join(result[0]))
+                            tok.append(u"".join(token))
                             app = Septik
                             appendix = sttoken[len(token):]
-                            words.append(Word(result[0], int(result[1]), appendix, False))
+                            words.append(Word(token, int(result[1]), appendix, False))
                             words[-1].GetAppendixes()
                             # print(token)
                             # print(appendix)
@@ -345,7 +351,7 @@ class Lemms:
                                 endings.append([app.AppendixString, app.AppName, app.PosName])
                                 endsStr += app.AppName + "."
                             lemms.append(
-                                [sttoken, self.get_pos_names(int(result[1])), endings.copy(), result[0], endsStr])
+                                [sttoken, self.get_pos_names(int(result[1])), endings.copy(), token, endsStr])
                             endings.clear()
                             token_found = True
                             break

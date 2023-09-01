@@ -2,10 +2,28 @@
 from flask import Flask
 from flask_cors import CORS, cross_origin
 from flask_mail import Mail
-# from models import MyOwlReady
+from tokenizers import Tokenizer
+from models import MyOwlReady
 from views import TextToSpeech
 from flask_restful import Api
-app = Flask(__name__)
+
+class MyExtendedFlaskApp(Flask):
+    def __init__(self, *args, **kwargs):
+        super(MyExtendedFlaskApp, self).__init__(*args, **kwargs)
+        self.s = MyOwlReady()
+        self.tokenizer = Tokenizer.from_file("kazakh-bpe.tokenizer.json")
+        self.vocabulary = self.tokenizer.get_vocab()
+        
+    def is_exists_in_vocab(self, word, endings):
+        # Проход по всем токенам в словаре
+        for token in self.vocabulary .keys():
+            # Проверка наличия слова или подслова в токене
+            for i in range(len(endings)):
+                if word + endings[i] in token or token in word:
+                    return endings[i]
+        return endings[0]
+
+app = MyExtendedFlaskApp(__name__)
 # app.s = MyOwlReady()
 app.config['DB_PASSWORD'] = "magzhan2005"
 password = app.config['DB_PASSWORD']
