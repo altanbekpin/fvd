@@ -149,7 +149,7 @@ class DB(DatabaseOperations):
             param = (word,)
         else:
             param = (word,pos)
-            query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(REPLACE(z.words, ' ', '')) = LOWER(TRIM(%s)) AND z.pos = %s;"
+            query = "SELECT s.synonym FROM synonyms s INNER JOIN synonym_word sw ON s.id = sw.synonym_id INNER JOIN synamizer z ON z.id = sw.word_id WHERE LOWER(TRIM(z.words)) = LOWER(TRIM(%s)) AND z.pos = %s;"
         synonym = self._select_one_query(query, param)
         if synonym is None or synonym.get("synonym") == word:
             #print("SYNONYM IS NONE")

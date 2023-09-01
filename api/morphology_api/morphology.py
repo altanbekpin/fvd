@@ -301,7 +301,7 @@ class Lemms:
             lemms = []
             tok = []
             words = []
-            tokens = word_tokenize(sentence)
+            tokens = [sentence]
             for token in tokens:
                 token = token.lower()
                 if token == "оның":

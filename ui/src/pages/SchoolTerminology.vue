@@ -25,6 +25,7 @@
       <template #header>
         <div class="flex justify-content-end">
           <Button
+            class="headerbutton"
             v-if="isUserAdmin"
             type="button"
             icon="pi pi-plus"
@@ -33,8 +34,8 @@
             @click="showDialog()"
           />
           <Button
+            class="headerbutton"
             v-if="isUserAdmin || isUserExpert"
-            style="margin-left: 5%"
             type="button"
             icon="pi pi-pencil"
             label="Термин өзгерту"
@@ -465,5 +466,17 @@ export default {
 <style scoped>
 .input-span {
   margin-left: auto;
+}
+.headerbutton {
+  margin-right: 5%;
+}
+@media (max-width: 768px) {
+  .headerbutton {
+    /* height: 20px;
+  width: 100px; */
+    /* font: 10px; */
+    font-size: 9px;
+    height: 40px;
+  }
 }
 </style>

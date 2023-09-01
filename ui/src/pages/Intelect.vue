@@ -18,6 +18,7 @@
         class="w-full"
         selectionMode="single"
         v-model:selectionKeys="selectedNode"
+        style="border: none"
       ></Tree>
       <div v-else class="skeleton-container">
         <Skeleton class="mb-2"></Skeleton>

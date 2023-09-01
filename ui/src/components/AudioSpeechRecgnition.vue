@@ -4,84 +4,126 @@
     <Card>
       <template #title> "Ахметтану" интеллектуалды жүйесі </template>
       <template #content>
-        <img src="/images/Ahmet.jpeg" />
-      </template>
-    </Card>
-    <Card>
-      <template #title> Тұлғасы </template>
-      <template #content>
-        <ul>
-          <li>
-            <span class="button" id="1">АҒАРТУШЫ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="2"
-              >ҰЛТ ҰСТАЗЫ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="3"
-              >ҚОҒАМ ҚАЙРАТКЕРІ <i class="pi pi-tag"></i
-            ></span>
-          </li>
-          <li>
-            <span class="button" id="4"
-              >ТІЛТАНУШЫ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="5"
-              >ТҮРКІТАНУШЫ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="6"
-              >ТЕРМИНТАНУШЫ <i class="pi pi-tag"></i
-            ></span>
-          </li>
-          <li>
-            <span class="button" id="7"
-              >ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ <i class="pi pi-tag"></i
-            ></span>
-          </li>
-          <li>
-            <span class="button" id="8"
-              >ӘДЕБИЕТТАНУШЫ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="9"
-              >ФОЛЬКЛОРТАНУШЫ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="10"
-              >ӨНЕРТАНУШЫ <i class="pi pi-tag"></i
-            ></span>
-          </li>
-          <li>
-            <span class="button" id="11">АҚЫН <i class="pi pi-tag"></i></span>,
-            <span class="button" id="12">ЖАЗУШЫ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="13"
-              >ПУБЛИЦИСТ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="14"
-              >АУДАРМАШЫ <i class="pi pi-tag"></i
-            ></span>
-          </li>
-          <li>
-            <span class="button" id="15">ӘДІСКЕР <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="16">ПЕДАГОГ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="17"
-              >ПСИХОЛОГ <i class="pi pi-tag"></i
-            ></span>
-          </li>
-          <li>
-            <span class="button" id="18">ЗАҢГЕР <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="19"
-              >САЯСАТКЕР <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="20"
-              >ДЕМОГРАФ <i class="pi pi-tag"></i></span
-            >,
-            <span class="button" id="21"
-              >ТАРИХШЫ <i class="pi pi-tag"></i
-            ></span>
-          </li>
-        </ul>
+        <img src="/images/Ahmet.jpeg" class="img" />
+        <span
+          >Қазақ тілінің цифрлық форматтағы жұмсалымы мен қолданыс аясын кеңейту
+          – еліміздің қазіргі стратегиялық даму бағытындағы маңызды әрі өзекті
+          мәселелердің бірі. Бұл бағытта ұлт руханиятының көсемі, ағартушы,
+          ғалым Ахмет Байтұрсынұлының тіл жүйесіне қатысты еңбектері тұрғысынан
+          тілдің барлық құрылымдық қабаттары бойынша білімнің онтологиялық
+          моделінен тұратын цифрландырылған білім базасын құрудың да маңызы зор.
+          Ахмет Байтұрсынұлының ғылыми мұрасы бойынша цифрланған материалдарды
+          қамтитын «Ахметтану» интеллектуалды жүйесі тілдің құрылымдық қабаттары
+          бойынша білімнің онтологиялық моделінен, жаңа цифрланған материалдарды
+          қосу және түзету функциясы бар қазақ тіліндегі қолданушылық
+          интерфейстен тұрады. Ғалымның «Тіл-құрал» еңбегі бойынша цифрланған
+          материалдар тілдің дыбыс, сөз және сөйлем жүйесіне қатысты жаңа білім
+          жүйесін қамтиды. Бұл жүйенің басты мақсаты – Ахмет Байтұрсынұлының
+          ғылыми мұрасын насихаттау арқылы қазақ тілінің дамуына әсер ететін
+          цифрландырылған білімді ақпараттық құралдар арқылы әрі қарай дамытуға
+          ықпал ету. Ғалымның ғылыми мұраларының цифрлық тұрғыда жүйеленуін де
+          интеллектуалдық жүйенің артықшылығы ретінде атап көрсетуге болады.
+          Ахмет Байтұрсынұлының тұлғасы әр түрлі ғылым салалары бойынша жазған
+          еңбектерінің төмендегідей жүйесі арқылы айқындалады:
+        </span>
+        <div>
+          <ul class="list">
+            <li>
+              <span class="button" id="1"
+                >АҒАРТУШЫ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="2"
+                >ҰЛТ ҰСТАЗЫ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="3"
+                >ҚОҒАМ ҚАЙРАТКЕРІ <i class="pi pi-tag"></i
+              ></span>
+            </li>
+            <li>
+              <span class="button" id="4"
+                >ТІЛТАНУШЫ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="5"
+                >ТҮРКІТАНУШЫ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="6"
+                >ТЕРМИНТАНУШЫ <i class="pi pi-tag"></i
+              ></span>
+            </li>
+            <li>
+              <span class="button" id="7"
+                >ҚАЗАҚ ЖАЗУЫ МЕН ЕМЛЕСІНІҢ РЕФОРМАТОРЫ <i class="pi pi-tag"></i
+              ></span>
+            </li>
+            <li>
+              <span class="button" id="8"
+                >ӘДЕБИЕТТАНУШЫ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="9"
+                >ФОЛЬКЛОРТАНУШЫ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="10"
+                >ӨНЕРТАНУШЫ <i class="pi pi-tag"></i
+              ></span>
+            </li>
+            <li>
+              <span class="button" id="11">АҚЫН <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="12"
+                >ЖАЗУШЫ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="13"
+                >ПУБЛИЦИСТ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="14"
+                >АУДАРМАШЫ <i class="pi pi-tag"></i
+              ></span>
+            </li>
+            <li>
+              <span class="button" id="15"
+                >ӘДІСКЕР <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="16"
+                >ПЕДАГОГ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="17"
+                >ПСИХОЛОГ <i class="pi pi-tag"></i
+              ></span>
+            </li>
+            <li>
+              <span class="button" id="18"
+                >ЗАҢГЕР <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="19"
+                >САЯСАТКЕР <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="20"
+                >ДЕМОГРАФ <i class="pi pi-tag"></i></span
+              >,
+              <span class="button" id="21"
+                >ТАРИХШЫ <i class="pi pi-tag"></i
+              ></span>
+            </li>
+          </ul>
+        </div>
+        <span
+          >«Ахметтану» интеллектуалды жүйесін пайдаланушы А.Байтұрсынұлының
+          ғылыми еңбектерімен танысып, ғалымның қазақ тілінің деңгейлері бойынша
+          ұсынған негізгі ұғымдары және түсініктері, ғылыми пайымдаулары туралы
+          қажет ақпарат алады. «Ахметтану» интеллектуалды жүйесінің сипаттамасы:
+          «Тұлғасы» бөлімінде жүйе сипаттамасы және Ахмет Байтұрсынұлының әр
+          түрлі ғылым салалары бойынша жазған еңбектері негізінде тұлғасы
+          анықталып, сол тұлғасын анықтайтын еңбектері көрсетілген «Ғалымның
+          мұрасы» бөлімінде А.Байтұрсынұлының ғылыми еңбектері бағыттар бойынша
+          жүйеленіп көрсетілген. «Тіл-құрал» бөлімінде ғалымның қазақ тілінің
+          деңгейлері бойынша ұсынған негізгі ұғымдары мен түсініктері және
+          ғылыми пайымдаулары онтологиялық модель арқылы жүйеленіп
+          орналастырылған; «Интеллектуалды жүйе» бөлімінде пайдаланушының
+          ғалымның еңбектері бойынша тілдің құрылымдық деңгейлері туралы сұраққа
+          жауап алу мүмкіндігі бар; «Терминдер мен анықтамалар» бөлімінде
+          ғалымның қазақ тілінің деңгейлері бойынша ұсынған негізгі ұғымдары мен
+          олардың анықтамалары бар.</span
+        >
       </template>
     </Card>
   </div>
@@ -394,5 +436,15 @@ export default {
 .scrollable-content {
   max-height: calc(80vh - 100px);
   overflow-y: auto;
+}
+
+.img {
+  float: left;
+  margin: 0 10px 0 0;
+  width: 150px;
+}
+
+ul li {
+  list-style: none;
 }
 </style>

@@ -23,7 +23,7 @@ def merge_some_elements_of_string_array(words, start_index, count):
     # count - # бірігетін элементтер саны
 
     # сөздерді бір жолға біріктіру
-    merged_words = (' '.join(words[start_index:start_index + count]))
+    merged_words = (''.join(words[start_index:start_index + count]))
 
     # Сәйкес үзікті жаңа элементпен (біріктірілген) ауыстыру
     words[start_index:start_index + count] = [merged_words] + [" "]
