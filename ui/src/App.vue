@@ -155,6 +155,11 @@ export default {
               icon: "pi pi-fw pi-list",
               to: "/terminology/2",
             },
+            {
+              label: "Сөз синтезі",
+              icon: "pi pi-fw pi-list",
+              to: "/syntez",
+            },
           ],
         },
         {
@@ -181,18 +186,22 @@ export default {
         {
           label: "Ахметтану",
           items: [
-            { label: "Тұлғасы", icon: "pi pi-fw pi-align-justify", to: "/" },
+            {
+              label: "Ғалым тұлғасы",
+              icon: "pi pi-fw pi-align-justify",
+              to: "/",
+            },
             { label: "Мұрасы", icon: "pi pi-fw pi-briefcase", to: "/legacy" },
-            { label: "Тіл-құрал", icon: "pi pi-fw pi-file", to: "/intelect" },
+            { label: "Тіл-құрал", icon: "pi pi-fw pi-file", to: "/intelect/2" },
             {
               label: "Интеллектуалды жүйе",
               icon: "pi pi-fw pi-star",
-              to: "/answer/question",
+              to: "/answer/question/1",
             },
             {
               label: "Терминдері мен анықтамалары",
               icon: "pi pi-fw pi-list",
-              to: "/terminology",
+              to: "/terminology/1",
             },
           ],
         },

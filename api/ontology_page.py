@@ -55,6 +55,7 @@ def send_question():
     
     question = temp['question']
     parent_key = temp['pkey']
+    is_new = int(temp['id']) == 2
     lang = 'kz'
     g = DB.get_instance().get_onto().TurkOnto
     s= ''
@@ -65,6 +66,7 @@ def send_question():
         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))}}'
     
     qres = g.query(quest)
+    childs = []
     for row in qres:
         words = row[0].split('#')
         s = '<b>' + descriptor_to_lang[lang]+': </b>' + row[1]

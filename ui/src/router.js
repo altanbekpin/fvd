@@ -42,34 +42,34 @@ const routes = [
         name: "childrenterminology",
         component: () => import("./pages/ChildrenTerminology"),
       },
+      // {
+      //   path: "/intelect/1",
+      //   name: "intelect1",
+      //   component: () => import("./pages/Intelect.vue"),
+      // },
       {
-        path: "/intelect/1",
-        name: "intelect1",
-        component: () => import("./pages/Intelect.vue"),
+        path: "/syntez",
+        name: "syntez",
+        component: () => import("./pages/Syntez.vue"),
       },
       {
-        path: "/intelect",
+        path: "/intelect/:id",
         name: "intelect",
         component: () => import("./pages/Intelect.vue"),
       },
+      // {
+      //   path: "/answer/question",
+      //   name: "answerquestion",
+      //   component: () => import("./pages/AnswerQuestion.vue"),
+      // },
       {
-        path: "/answer/question",
-        name: "answerquestion",
-        component: () => import("./pages/AnswerQuestion.vue"),
-      },
-      {
-        path: "/answer/question/2",
+        path: "/answer/question/:id",
         name: "answerquestion2",
         component: () => import("./pages/AnswerQuestion.vue"),
       },
       {
-        path: "/terminology",
+        path: "/terminology/:id",
         name: "terminology",
-        component: () => import("./pages/TerminDefinition.vue"),
-      },
-      {
-        path: "/terminology/2",
-        name: "terminology2",
         component: () => import("./pages/TerminDefinition.vue"),
       },
       {

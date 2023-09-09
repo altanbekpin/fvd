@@ -13,8 +13,10 @@
       /> -->
       <Tree
         @nodeExpand="selectedOnto"
+        @nodeSelect="expandNode"
         v-if="nodes"
         :value="nodes"
+        :expandedKeys="expandedKeys"
         class="w-full"
         selectionMode="single"
         v-model:selectionKeys="selectedNode"
@@ -81,6 +83,7 @@ export default {
       OntoInner: "",
       textController: "",
       loading: false,
+      expandedKeys: {},
     };
   },
   methods: {
@@ -127,6 +130,7 @@ export default {
       var reqbody = {
         question: "Тіл құрал",
         pkey: 0,
+        id: this.$route.params.id,
       };
       var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
         headers: getHeader(),
@@ -140,6 +144,7 @@ export default {
       var reqbody = {
         question: this.textController,
         pkey: 0,
+        id: this.$route.params.id,
       };
       console.log(reqbody);
       var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
@@ -148,6 +153,27 @@ export default {
       this.OntoInner = temp.data.txt;
       this.loading = false;
     },
+    async expandNode(node) {
+      node = await this.selectedOnto(node);
+      console.log("node.children:", node.children);
+      console.log("node.children.length:", node.children.length);
+      if (node.children && node.children.length) {
+        this.expandedKeys[node.key] = true;
+        console.log("I'm here");
+      }
+      this.expandedKeys = { ...this.expandedKeys };
+    },
+    // async expandNode(node) {
+    //   console.log("this.expandedKeys:", this.expandedKeys);
+    //   await this.selectedOnto(node);
+    //   if (node.children && node.children.length) {
+    //     this.expandedKeys[node.key] = true;
+
+    //     // for (let child of node.children) {
+    //     //   this.expandNode(child);
+    //     // }
+    //   }
+    // },
     async selectedOnto(node) {
       //this.selectedNode =node
       let _node = { ...node };
@@ -158,6 +184,7 @@ export default {
       var reqbody = {
         question: node.label,
         pkey: node.key,
+        id: this.$route.params.id,
       };
 
       // console.log(reqbody);
@@ -171,44 +198,32 @@ export default {
       console.log("_node:", _node);
       console.log("nodes:", this.nodes);
       this.findAndReplaceObject(this.nodes, _node.key, _node);
-      this.textController = _node.label
+      this.textController = _node.label;
+
       console.log("nodes after modification:", this.nodes);
       // this.nodes = _nodes;
       this.loading = false;
+      return _node;
+      // if (this.selectedNode) {
+      //   this.expandedKeys.push(selectedNode.key);
+      // }
     },
     // async DoSubmit(text){
     // }
   },
   async mounted() {
-    this.getJson(`${AHMET_API}/getontology/ask/`);
+    this.getJson();
     const self = this;
     this.loading = true;
     window.DoSubmit = async function (text) {
       self.loading = true;
-      // console.log(text);
       self.textController = text;
-      var reqbody = {
-        question: text,
-        pkey: 0,
-      };
-
-      // console.log(reqbody);
-      var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
-        headers: getHeader(),
-      });
-      // console.log(temp.data);
-      self.OntoInner = temp.data.txt;
       self.textController = text;
       self.loading = false;
     };
     this.loading = false;
-    // console.log(this.OntNames.length);
   },
   watch: {
-    // OntNames(newValue){
-    //     console.log(newValue[0])
-    // },
-
     OntoInner(newValue) {
       console.log(newValue);
     },
