@@ -157,8 +157,13 @@ export default {
             },
             {
               label: "Сөз синтезі",
-              icon: "pi pi-fw pi-list",
+              icon: "pi pi-forward",
               to: "/syntez",
+            },
+            {
+              label: "Корпус менеджер",
+              icon: "pi pi-folder-open",
+              to: "/corpusemanager",
             },
           ],
         },

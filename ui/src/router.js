@@ -42,11 +42,6 @@ const routes = [
         name: "childrenterminology",
         component: () => import("./pages/ChildrenTerminology"),
       },
-      // {
-      //   path: "/intelect/1",
-      //   name: "intelect1",
-      //   component: () => import("./pages/Intelect.vue"),
-      // },
       {
         path: "/syntez",
         name: "syntez",
@@ -183,6 +178,11 @@ const routes = [
         path: "/crud",
         name: "crud",
         component: () => import("./pages/CrudDemo.vue"),
+      },
+      {
+        path: "/corpusemanager",
+        name: "corpusemanager",
+        component: () => import("./pages/CorpusManagerView"),
       },
       {
         path: "/timeline",

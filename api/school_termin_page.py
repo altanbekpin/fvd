@@ -4,6 +4,7 @@ from flask import request
 import json
 from flask_jwt_extended import current_user, jwt_required
 
+
 @app.route("/getTermins", methods=['POST', "GET"])
 def getTermins():
     data = request.json['data']['data']
