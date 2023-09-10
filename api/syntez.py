@@ -108,8 +108,6 @@ def api_file_upload():
     filepath = request.form['path']
     folder = request.form['folder']
     myfile = request.files['file']
-    print()
-    print("folder:", folder)
     # Ensure folder exists within the upload directory
     folder_path = os.path.join(root_dir, folder)
     os.makedirs(folder_path, exist_ok=True)

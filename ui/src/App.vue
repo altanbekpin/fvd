@@ -164,6 +164,7 @@ export default {
               label: "Корпус менеджер",
               icon: "pi pi-folder-open",
               to: "/corpusemanager",
+              visible: this.isAdmin || this.isUserExpert,
             },
           ],
         },

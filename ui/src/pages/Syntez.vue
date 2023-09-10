@@ -9,7 +9,22 @@
         v-model="input_text"
       ></textarea>
       <div class="w-full m-4">
-        <Button class="btn btn-primary" @click="sendText">Synthesize</Button>
+        <!-- <Button
+          class="btn btn-primary"
+          icon="pi pi-search"
+          @click="sendText"
+          :loading="loading"
+          >Synthesize</Button
+        > -->
+
+        <Button
+          class="btn btn-primary"
+          type="button"
+          label="Синтездеу"
+          icon="pi pi-angle-double-right"
+          :loading="loading"
+          @click="sendText"
+        />
       </div>
       <div class="container-fluid" style="width: 100%">
         <audio
@@ -17,6 +32,7 @@
           class="container-fluid"
           style="width: 100%"
           ref="audioElement"
+          src="../assets/sample/wav"
         >
           <source id="myAudio" type="audio/wav" />
           Your browser does not support the audio element.
@@ -29,13 +45,14 @@
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
-
 const input_text = ref("Менің атым Аскар.");
 const audioElement = ref(null);
+const loading = ref(false);
 
 async function sendText() {
   if (input_text.value !== "") {
     try {
+      loading.value = true;
       const response = await axios.post(
         "http://localhost:5001/ttspeech",
         { text: input_text.value },
@@ -43,6 +60,7 @@ async function sendText() {
           responseType: "blob",
         }
       );
+      loading.value = false;
 
       const blob = new Blob([response.data], { type: "audio/wav" });
       const blobUrl = URL.createObjectURL(blob);

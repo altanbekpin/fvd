@@ -420,6 +420,10 @@ export default {
     },
   },
   created() {
+    console.log(
+      "this.$store.getters.isUserRegistered:",
+      this.$store.getters.isUserRegistered
+    );
     localStorage.setItem("lang", this.$i18n.locale);
     this.language = this.languages.filter(function (item) {
       return item.value === localStorage.getItem("lang");
