@@ -1,6 +1,7 @@
 <template>
   <div class="grid">
     <Toast></Toast>
+  <div class="col-12">
     <Card>
       <template #title> "Ахметтану" интеллектуалды жүйесі </template>
       <template #content>
@@ -126,21 +127,20 @@
         >
       </template>
     </Card>
-  </div>
-  <!-- #optiongroup="slotProps" -->
-  <Dialog
+    </div>
+    <Dialog
     v-model:visible="showDialog"
-    :style="{ width: '450px', maxHeight: '80vh' }"
+    :style="{ width: '80vw', maxHeight: '80vh' }"
     :header="selectedWord"
     :modal="true"
-    class="p-fluid"
+    class="p-0"
   >
     <div class="scrollable-content">
       <div v-for="data in repo" :key="data.id" class="card">
         <div class="row" style="justify-content: space-between">
           <div class="row">
             <i class="pi pi-file"></i>
-            <div style="margin-left: 15px">
+            <div class="ml-2">
               {{ data.label }}
             </div>
           </div>
@@ -154,6 +154,9 @@
       </div>
     </div>
   </Dialog>
+  </div>
+  <!-- #optiongroup="slotProps" -->
+  
 </template>
 
 <script>
