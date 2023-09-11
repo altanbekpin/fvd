@@ -155,17 +155,8 @@ export default {
               icon: "pi pi-fw pi-list",
               to: "/terminology/2",
             },
-            {
-              label: "Сөз синтезі",
-              icon: "pi pi-forward",
-              to: "/syntez",
-            },
-            {
-              label: "Корпус менеджер",
-              icon: "pi pi-folder-open",
-              to: "/corpusemanager",
-              visible: this.isAdmin || this.isUserExpert,
-            },
+         
+           
           ],
         },
         {
@@ -185,9 +176,24 @@ export default {
         },
         {
           label: "Интегралдық модел",
+          items: [
+            {
+              label: "Корпус менеджер",
+              icon: "pi pi-folder-open",
+              to: "/corpusemanager",
+              visible: this.isAdmin || this.isUserExpert,
+            },
+          ]
         },
         {
           label: "Мәтінді ойнату",
+          items: [
+            {
+              label: "Сөз синтезі",
+              icon: "pi pi-forward",
+              to: "/syntez",
+            },
+          ]
         },
         {
           label: "Ахметтану",
