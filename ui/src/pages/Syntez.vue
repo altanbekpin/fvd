@@ -44,32 +44,29 @@
 
 <script setup>
 import { ref } from "vue";
-import axios from "axios";
-const input_text = ref("Менің атым Аскар.");
+// import axios from "axios";
+const input_text = ref("Менің атым Қазақ.");
 const audioElement = ref(null);
 const loading = ref(false);
+import { AhmetService } from "@/service/AhmetService";
 
 async function sendText() {
   if (input_text.value !== "") {
-    try {
+    
       loading.value = true;
-      const response = await axios.post(
-        "http://localhost:5001/ttspeech",
-        { text: input_text.value },
-        {
-          responseType: "blob",
-        }
-      );
-      loading.value = false;
+      AhmetService.textToSpeech(input_text.value)
+        .then((response) => {
+          let blob = new Blob([response.data], { type: "audio/wav" });
+          let blobUrl = URL.createObjectURL(blob);
+          // Set the Blob URL as the source for the audio element
+          audioElement.value.src = blobUrl;
+          audioElement.value.play();
+          loading.value = false;
 
-      const blob = new Blob([response.data], { type: "audio/wav" });
-      const blobUrl = URL.createObjectURL(blob);
+          
+    })
 
-      // Set the Blob URL as the source for the audio element
-      audioElement.value.src = blobUrl;
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
+    
+}
 }
 </script>
