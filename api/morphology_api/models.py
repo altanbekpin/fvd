@@ -119,11 +119,14 @@ class MyOntology(models.Model):
         f.close()
         app.s = MyOwlReady()
         app.s.ReloadTurkOnto()
-    def GetJson(self,lang):
+    def GetJson(self,lang, is_new=True):
         res=''
         self.savetofile()
         g = rdflib.Graph()
-        g.parse('owl/Tilqural25082023.owl')
+        if is_new:
+            g.parse('owl/Tilqural25082023.owl')
+        else:
+            g.parse('owl/Tilqural25082023.owl')
         quest = 'SELECT ?label WHERE { ?subject rdfs:subClassOf ?object . ?subject rdfs:label ?label FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "' + lang + '")) } order by ?label '
         qres = g.query(quest)
         for row in qres:

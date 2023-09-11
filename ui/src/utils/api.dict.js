@@ -1,0 +1,16 @@
+export default {
+  BASE_URL: "http://localhost:5001/",
+  GET_CSRF_TOKEN: "/api/csrftoken/",
+  GET_JWT_TOKEN: "/api/token/",
+  REFRESH_JWT_TOKEN: "/api/token/refresh/",
+  GET_FOLDERS: "/folders",
+  GET_FOLDERS_FILES: "/api/folders/files/",
+  FILE_GET_TRANSCRIPT: "/api/file/get_transcript",
+  FILE_UPDATE_TRANSCRIPT: "/api/file/update_transcript",
+  FILE_DELETE: "/api/file/delete",
+  FILE_UPLOAD: "/api/file/upload",
+  AUTH_LOGIN: "/api/auth/login/",
+  AUTH_LOGOUT: "/api/auth/logout/",
+  AUTH_REGISTER: "/api/auth/register/",
+  GET_USERS: "/api/users/",
+};

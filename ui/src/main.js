@@ -1,15 +1,20 @@
+import "./assets/main.css";
 import "primevue/resources/primevue.min.css";
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
 import "prismjs/themes/prism-coy.css";
 import "./assets/styles/layout.scss";
 import "./assets/demo/flags/flags.css";
+// import { vuexstore } from "../stores/vuex-store";
 /* import the fontawesome core */
 import { library } from "@fortawesome/fontawesome-svg-core";
 /* import font awesome icon component */
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-//import Cookies from 'js-cookie'
 
+//import Cookies from 'js-cookie'
+import "bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 /* import specific icons */
 import {
   faUserSecret,
@@ -130,13 +135,19 @@ library.add(faUserSecret, faMicrophone, faFileAudio, faStop);
 
 const app = createApp(AppWrapper);
 const data = localStorage.getItem("myData");
+app.component("font-awesome-icon", FontAwesomeIcon);
+app.use(store);
+app.use(PrimeVue, { ripple: true, inputStyle: "outlined" });
+app.use(ConfirmationService);
+app.use(ToastService);
+app.use(router);
+// app.use(vuexstore);
+app.use(i18n);
 
-// console.log("local storage: ");
-// console.log(data);
 if (data) {
   store.commit("updateData", JSON.parse(data));
 }
-app.use(store);
+
 // if(false){
 //     console.log(Cookies.get('Theme'))
 //     store.commit('changeTheme', Cookies.get('Theme'))
@@ -158,12 +169,6 @@ app.config.globalProperties.$media = reactive({
     this.blobs.push(data);
   },
 });
-app.use(PrimeVue, { ripple: true, inputStyle: "outlined" });
-app.use(ConfirmationService);
-app.use(ToastService);
-app.use(router);
-app.use(i18n);
-
 app.directive("tooltip", Tooltip);
 app.directive("ripple", Ripple);
 app.directive("code", CodeHighlight);

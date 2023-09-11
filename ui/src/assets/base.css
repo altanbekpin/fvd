@@ -1,0 +1,53 @@
+html {
+  /* Default box-sizing settings */
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  /* Default box-sizing settings */
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+  /* Remove padding, margin*/
+
+}
+
+body {
+  /* Defaults for full page */
+  width: 100%;
+  min-height: 100vh; 
+  /* Default font settings */
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 100%; 
+  font-weight: normal;
+  color: #000000;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 2.2em;
+}
+
+h2 {
+  font-size: 2em;
+}
+
+h3 {
+  font-size: 1.8em;
+}
+
+h4 {
+  font-size: 1.6em;
+}
+
+h5 {
+  font-size: 1.4em;
+}
+
+p {
+  font-size: 1.2em;
+}
+

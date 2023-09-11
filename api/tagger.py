@@ -7,6 +7,9 @@ from tokenizers.trainers import BpeTrainer
 from tokenizers.models import BPE
 from tokenizers.pre_tokenizers import Whitespace
 
+from app import app
+
+
 existing_file = "structured.txt"
 target_file = "target.txt"
 app.last_tagget_sentence_id = DB.get_instance().get_last_sentence()
