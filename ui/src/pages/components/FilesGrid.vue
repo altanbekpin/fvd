@@ -284,7 +284,12 @@ export default {
   computed: {
     ...mapState(["rowData", "root_folder"]),
   },
-
+  beforeRouteLeave() {
+    location.reload(true); // The 'true' argument forces a hard reload
+  },
+  beforeUnmount() {
+    location.reload(true); // The 'true' argument forces a hard reload
+  },
   // COMPONENT HOOKS
   created() {
     for (let i = 0; i < 400; i++) {
@@ -529,5 +534,6 @@ export default {
 <style scoped>
 /* @import "bootstrap";
 @import "bootstrap/dist/css/bootstrap.css"; */
-@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~bootstrap/dist/css/bootstrap.min.css?v=2";
+/* @import "@/assets/bootstrap/bootstrap.min.css"; */
 </style>
