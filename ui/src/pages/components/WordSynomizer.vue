@@ -27,7 +27,6 @@
       <div>Ауыстырылған сөздер саны = {{ synomized_counter }}</div> -->
       <Button
         label="Өңдеу"
-        style="margin-left: 10%"
         @click="send_to_synomize"
       />
     </div>

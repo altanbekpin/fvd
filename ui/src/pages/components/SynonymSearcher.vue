@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div>Сөзді енгізіңіз</div>
-    <div style="position: relative; width: 100%">
+    <div style="position: relative; width: 100%" class="pb-2">
       <InputText
         type="text"
         v-model="word"

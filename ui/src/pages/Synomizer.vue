@@ -1,8 +1,8 @@
 <template>
   <div class="card bounder">
-    <div style="font-size: 20px; margin-right: 450px; margin-left: 50px">
+    <h1 class="title">
       Мәтін синомайзері
-    </div>
+    </h1>
     <Toast />
     <hr height="20px" />
     <div class="row">
@@ -279,7 +279,7 @@ const addWord = () => {
   }
   .bounder {
     height: 100%;
-    width: 500px;
+    
   }
   .temp-mobile {
     display: block;
@@ -300,5 +300,8 @@ const addWord = () => {
 }
 .bounder {
   height: 100%;
+}
+.title {
+  font-size: 20px;
 }
 </style>
