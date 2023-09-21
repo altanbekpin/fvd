@@ -11,6 +11,8 @@ jwt = JWTManager(app)
 
 @jwt.user_identity_loader
 def user_identity_lookup(user):
+    if type(user) is int:
+        return user
     return user.id
 
 @jwt.user_lookup_loader

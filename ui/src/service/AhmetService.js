@@ -20,6 +20,20 @@ export const AhmetService = {
       getHeader()
     );
   },
+  async getLegaciesByID(id) {
+    return await api.get(AHMET_API + `/get/legacies/${id}`, {
+      headers: getHeader(),
+    });
+  },
+  async deleteTagLag(data, access_token) {
+    await api.post(
+      AHMET_API + `/delete/tag/leg`,
+      {
+        data: data,
+      },
+      getHeader(access_token)
+    );
+  },
   async getTokenizerInfo() {
     return await api.get(AHMET_API + "/tokenizer/getinfo", {
       headers: getHeader(),

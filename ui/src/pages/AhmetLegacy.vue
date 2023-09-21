@@ -16,9 +16,7 @@
       <Column headerStyle="width:10rem">
         <template #body="slotProps">
           <div
-            v-if="
-              slotProps.node.is_file && store.state.user.roles.includes('admin')
-            "
+            v-if="(slotProps.node.is_file && isAdmin()) || isExpert()"
             class="flex flex-wrap gap-2"
           >
             <Button
@@ -28,7 +26,7 @@
               @click="getFile(slotProps.node.key)"
               rounded
             />
-            <div v-if="store.state.user.roles.includes('admin')">
+            <div v-if="isAdmin() || isExpert()">
               <Button
                 type="button"
                 icon="pi pi-trash"
@@ -56,7 +54,7 @@
             />
           </div>
           <Button
-            v-else-if="store.state.user.roles.includes('admin')"
+            v-else-if="isAdmin() || isExpert()"
             type="button"
             icon="pi pi-plus"
             @click="getFolder(slotProps.node)"
@@ -129,7 +127,8 @@
         <Button style="margin-right: 20px" @click="changeFileName"
           >Өзгерту</Button
         >
-        <Button @click="showTagsDialog">Тег қосу</Button>
+        <!-- <Button @click="showTagsDialog">Тег қосу</Button> -->
+        <Button @click="showLegacyDialog">Тегтерін көру</Button>
       </div>
       <Dialog
         v-model:visible="isDialogForTagsVisible"
@@ -159,6 +158,47 @@
         height="600px"
       ></object>
     </Dialog>
+    <Dialog
+      v-model:visible="showLegacies"
+      :style="{ width: '40vw', maxHeight: '80vh' }"
+      header="Тегтері"
+      :modal="true"
+      class="p-0"
+    >
+      <div class="scrollable-content">
+        <div v-for="data in repo" :key="data.id" class="card">
+          <div class="row" style="justify-content: space-between">
+            <div class="row">
+              <i class="pi pi-file"></i>
+              <div class="ml-2">
+                {{ data.name }}
+              </div>
+            </div>
+            <Button
+              type="button"
+              icon="pi pi-trash"
+              @click="removeTag(data)"
+              rounded
+            />
+            <!-- @click="searchBook(data.key)" -->
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <Button
+          label="Жабу"
+          icon="pi pi-times"
+          @click="showLegacies = false"
+          text
+        />
+        <Button
+          label="Қосу"
+          icon="pi pi-plus"
+          @click="showTagsDialog"
+          autofocus
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -170,11 +210,13 @@ import store from "../store.js";
 import { AHMET_API, getHeader } from "../config.js";
 import axios from "axios";
 import { useToast } from "primevue/usetoast";
+const repo = ref(null);
 const toast = useToast();
 const selectedTag = ref({ name: "", id: "" });
 const nodes = ref(null);
 const loading = ref(false);
 const visible = ref(false);
+const showLegacies = ref(false);
 const showDialog = ref(false);
 const isDialogForTagsVisible = ref(false);
 const FileName = ref("");
@@ -184,6 +226,13 @@ const fileID = ref("");
 const parent_id = ref("");
 const changeDialog = ref(false);
 const url = computed(() => AHMET_API + "/upload");
+const removeTag = async (data) => {
+  const access_token = store.getters.getAccessToken;
+  console.log("access_token:", access_token);
+  await AhmetService.deleteTagLag(data, access_token);
+  console.log("data:", data);
+  await showLegacyDialog();
+};
 const tagsToAdd = [
   { name: "АҒАРТУШЫ", id: "1" },
   { name: "ҰЛТ ҰСТАЗЫ", id: "2" },
@@ -207,6 +256,14 @@ const tagsToAdd = [
   { name: "ДЕМОГРАФ", id: "20" },
   { name: "ТАРИХШЫ", id: "21" },
 ];
+const isAdmin = () => {
+  console.log(store.state.user.roles);
+  // isAdmin() || isExpert()
+  return store.state.user.roles.includes("admin");
+};
+const isExpert = () => {
+  return store.state.user.roles.includes("expert");
+};
 const addTag = async () => {
   try {
     await axios.post(
@@ -220,6 +277,7 @@ const addTag = async () => {
         headers: getHeader(store.getters.getAccessToken),
       }
     );
+
     toast.add({
       severity: "success",
       summary: "Қосылды",
@@ -242,7 +300,11 @@ const hasAllowedExtension = (filename) => {
   const extension = filename.split(".").pop().toLowerCase();
   return allowedExtensions.includes(extension);
 };
-
+const showLegacyDialog = async () => {
+  const data = await AhmetService.getLegaciesByID(fileID.value);
+  repo.value = data.data;
+  showLegacies.value = true;
+};
 const handleFileUpload = (event) => {
   if (event.adam) {
     const formData = new FormData();
@@ -324,7 +386,6 @@ const init = () => {
       if (legacies[i].is_file === 0) {
         legacies[i].leaf = false;
       }
-      console.log("legacies:", legacies);
       nodes.value = legacies;
     }
   });
@@ -351,12 +412,7 @@ const path_to_download = ref("");
 const showFile = ref(false);
 const getFile = (fileID) => {
   path_to_download.value = `${AHMET_API}/legacy/download/` + fileID;
-  // console.log(fileID);
   showFile.value = true;
-  // axios
-  //   .post(`${AHMET_API}/legacy/${fileID}`)
-  //   .then((response) => console.log(response["data"]));
-  // AhmetService.getFile(fileID);
 };
 const deleteFile = () => {
   const formData = new FormData();

@@ -16,6 +16,10 @@ export default {
     model: Array,
   },
   methods: {
+    navigateToHome() {
+      // Use Vue Router to navigate to the "/" route
+      this.$router.push("/intagrationmodel");
+    },
     onMenuItemClick(event) {
       this.$emit("menuitem-click", event);
     },
@@ -39,6 +43,16 @@ export default {
   },
   components: {
     AppSubmenu: AppSubmenu,
+  },
+  mounted() {
+    // Find the element by its aria-label attribute
+    const element = document.querySelector('[aria-label="Интегралдық модел"]');
+
+    // Check if the element exists
+    if (element) {
+      // Attach a click event listener
+      element.addEventListener("click", this.navigateToHome);
+    }
   },
 };
 </script>

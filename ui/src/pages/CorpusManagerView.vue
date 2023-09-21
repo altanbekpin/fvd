@@ -77,6 +77,7 @@ export default {
         this.folderData = response.data;
       })
       .catch((err) => console.log(err));
+    this.onGetFiles();
   },
   computed: {
     ...mapState(["rowData", "root_folder"]),

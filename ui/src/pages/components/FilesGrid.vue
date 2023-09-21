@@ -5,15 +5,10 @@
         <th scope="col">No.</th>
         <th scope="col">
           <span class="w-50">Filename </span>
-          <!-- <span class="ml-auto w-50">
-            <a data-bs-toggle="modal" data-bs-target="#uploadModal">
-              <font-awesome-icon icon="file-circle-plus" />
-            </a>
-          </span> -->
           <i
             data-bs-toggle="modal"
             data-bs-target="#uploadModal"
-            class="pi pi-file"
+            class="pi pi-plus-circle"
           ></i>
         </th>
         <th scope="col">Size</th>
@@ -245,8 +240,8 @@
 </template>
 
 <script>
-// import "bootstrap";
-// import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { getHeader, AHMET_API } from "../../config";
 import { mapState, mapActions } from "vuex";
@@ -392,7 +387,7 @@ export default {
     },
 
     deleteFile(filename, id) {
-      console.log("id:", id);
+      console.log(id);
       let _this = this;
 
       let data = { path: filename };
@@ -534,6 +529,6 @@ export default {
 <style scoped>
 /* @import "bootstrap";
 @import "bootstrap/dist/css/bootstrap.css"; */
-@import "~bootstrap/dist/css/bootstrap.min.css?v=2";
+@import "~bootstrap/dist/css/bootstrap.min.css";
 /* @import "@/assets/bootstrap/bootstrap.min.css"; */
 </style>

@@ -6,7 +6,7 @@ from db import DB
 @app.route('/editPost/', methods = ['POST'])
 @jwt_required()
 def edit_post():
-    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user.id):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     data = request.json
     # print("data:", data)

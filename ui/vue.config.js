@@ -1,5 +1,3 @@
-//process.env.VUE_APP_AHMET_API = "AHMET_API";
-// process.env.HOST = "kazlangres.enu.kz";
 module.exports = {
   pluginOptions: {
     i18n: {
@@ -8,6 +6,15 @@ module.exports = {
       enableInSFC: false,
     },
   },
-
+  configureWebpack: {
+    module: {
+      rules: [
+        {
+          test: /\.cjs$/,
+          loader: "babel-loader", // You can use the appropriate loader for your use case
+        },
+      ],
+    },
+  },
   publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
 };

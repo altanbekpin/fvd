@@ -286,7 +286,15 @@ class DB(DatabaseOperations):
     def addTag(self, definition_id, file_id):
         self._insert_query("INSERT INTO tag_legacy (tag_id, legacy_id) VALUES (%s, %s);", (definition_id, file_id))
         self._close_db()
-        
+    
+    def deleteTag(self, tag_id, legacy_id):
+        # query= '''DELETE FROM tag t
+        #     INNER JOIN tag_legacy tl ON tl.tag_id = t.id
+        #     INNER JOIN legacy l ON tl.legacy_id = l.id
+        #     WHERE l.id = 1'''
+        query = '''DELETE FROM tag_legacy 
+        WHERE tag_id = %s AND legacy_id = %s'''
+        self._insert_query(query, (tag_id, legacy_id))
     
     
     def addTermin(self, termin, subject_id, definition, school_class):
@@ -679,6 +687,14 @@ class DB(DatabaseOperations):
             roles.append(DB.get_instance().get_role(i).name)
         print("roles:", roles)
         return 'expert' in roles
+    
+    def get_legacies(self, id):
+        query = '''SELECT t.name, l.id as legacy_id, t.id FROM tag t
+        INNER JOIN tag_legacy tl ON tl.tag_id = t.id
+        INNER JOIN legacy l ON tl.legacy_id = l.id
+        WHERE l.id =  %s'''
+        data = self._select_all_query(query, (id, ))
+        return data
 
     def get_onto(self):
         return app.s

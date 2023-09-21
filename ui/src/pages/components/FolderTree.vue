@@ -42,6 +42,9 @@ export default {
       isOpen: false,
     };
   },
+  mounted() {
+    // this.toggle();
+  },
   computed: {
     isFolder() {
       //return true
@@ -57,6 +60,7 @@ export default {
     toggle() {
       this.isOpen = !this.isOpen;
       console.log("clicked folder:", this.model.path);
+      console.log("toggel was clicked");
       this.setRootFolder(this.model.path);
     },
 

@@ -31,7 +31,7 @@ def countChildrenTermins():
 @app.route('/change/termin', methods=['POST'])
 @jwt_required()
 def changeTermin():
-    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user.id):
         return "don't have enough permission", 500
     data = request.json['data']
     termin = data['termin']
@@ -49,7 +49,7 @@ def changeTermin():
 @jwt_required()
 def addTermin():
     # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user.id):
         return "don't have enough permission", 500
     data = request.json['data']
     # print("data:", data)

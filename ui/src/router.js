@@ -28,6 +28,11 @@ const routes = [
         component: () => import("./pages/Dashboard.vue"),
       },
       {
+        path: "intagrationmodel",
+        name: "intagrationmodel",
+        component: () => import("./pages/IntegrationModel.vue"),
+      },
+      {
         path: "admin",
         name: "admin",
         component: () => import("./pages/Admin.vue"),

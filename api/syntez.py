@@ -5,7 +5,7 @@ from pathlib import Path
 import json
 import os
 import sys
-
+from flask import send_from_directory
 # Get the path to the current Python file
 # current_file_path = os.path.abspath(__file__)
 
@@ -147,3 +147,12 @@ def get_folders(root, path):
         d['children'] = dirs
 
     return d
+
+@app.route('/media/<path:subpath>', methods=['GET'])
+def serve_media(subpath):
+    media_folder = os.path.join(app.root_path, 'media')
+    requested_file = os.path.join(media_folder, subpath)
+    if os.path.exists(requested_file):
+        return send_from_directory(media_folder, subpath)
+    else:
+        return "File not found", 404

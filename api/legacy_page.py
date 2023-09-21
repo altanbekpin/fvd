@@ -70,7 +70,7 @@ def upload_file():
 @app.route('/delete/file', methods=['POST'])
 @jwt_required()
 def delete():
-    if not DB.get_instance().isUserAdmin(current_user):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user.id):
         return "don't have enough permission", 500
     fileID = request.form.get('fileID')
     try:
@@ -83,3 +83,8 @@ def delete():
             return 'failed', 404
     except Exception as e:
         return 'error', 400
+    
+@app.route('/get/legacies/<int:id>', methods=['GET'])
+def get_legacies(id):
+    legacies = DB.get_instance().get_legacies(id)
+    return legacies
