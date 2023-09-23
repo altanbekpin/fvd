@@ -141,20 +141,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { FilterMatchMode } from "primevue/api";
 import store from "../store.js";
 import { useToast } from "primevue/usetoast";
 import axios from "axios";
 import { AHMET_API, getHeader } from "../config";
+import { useRoute } from "vue-router";
 
 //import { reactive } from 'vue';
+const route = useRoute();
 const toast = useToast();
+watch(
+  () => route.fullPath,
+  (newRoute, oldRoute) => {
+    // Handle the route change here
+    console.log("Route changed from", oldRoute, "to", newRoute);
+    init();
+    // currentRoute.value = newRoute;
+    // You can perform any other actions you need here
+  }
+);
 onMounted(() => {
+  init();
+});
+const init = () => {
   loading.value = true;
   // console.log("roles:");
   // console.log(store.getters.getRoles);
-
   lazyParams.value = {
     first: 0,
     rows: 10,
@@ -164,7 +178,7 @@ onMounted(() => {
   };
 
   loadLazyData();
-});
+};
 const productDialog = ref(false);
 const openNew = () => {
   productDialog.value = true;
@@ -279,6 +293,7 @@ const filters = ref({
 });
 const submitted = ref(false);
 const loadLazyData = async () => {
+  lazyParams.value["param"] = route.params.id;
   var temp = await axios.post(
     `${AHMET_API}/classification/`,
     lazyParams.value,

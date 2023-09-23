@@ -4,13 +4,7 @@ from flask import request
 from pathlib import Path
 import json
 import os
-import sys
 from flask import send_from_directory
-# Get the path to the current Python file
-# current_file_path = os.path.abspath(__file__)
-
-# Calculate the root directory by going up one level from the current file
-# BASE_DIR = os.path.dirname(os.path.dirname(current_file_path))
 BASE_DIR="/app"
 UPLOAD_FOLDER = os.path.join(BASE_DIR, '')
 

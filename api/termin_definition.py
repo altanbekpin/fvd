@@ -30,7 +30,7 @@ def edit_post():
 @app.route('/classification/', methods=['POST'])
 def get_classification():
     data = request.json
-
+    param = int(data['param'])
     first = data.get("first")
     if data.get("page") != None:
         first = data.get("page")
@@ -38,8 +38,8 @@ def get_classification():
     offset = first * rows  # вычисляем смещение
     if data.get('filters').get("global").get("value") != None:
         search_text = data.get('filters').get("global").get("value")
-        rows = DB.get_instance().search_classification(search_text, rows,offset)
+        rows = DB.get_instance().search_classification(search_text, rows,offset, param)
     else:
-        rows = DB.get_instance().get_classification(rows,offset)
+        rows = DB.get_instance().get_classification(rows,offset, param)
     
     return rows

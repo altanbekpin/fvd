@@ -416,13 +416,13 @@ class DB(DatabaseOperations):
         self._insert_query("INSERT INTO termin (name, description, examples) VALUES (%s, %s, %s)", (name, descrpition, example))
         self._close_db()
 
-    def search_classification(self, search_text, rows,offset):
-        found = self._select_all_query("SELECT * FROM termin WHERE name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
-            ('%' + search_text + '%','%' + search_text + '%','%' + search_text + '%',rows,offset))
+    def search_classification(self, search_text, rows,offset, param):
+        found = self._select_all_query("SELECT * FROM termin WHERE is_new = %s AND name LIKE %s or description LIKE %s or examples LIKE %s LIMIT %s OFFSET %s",
+            (param == 2,'%' + search_text + '%','%' + search_text + '%','%' + search_text + '%',rows,offset))
         return found
     
-    def get_classification(self, rows,offset):
-        termins = self._select_all_query("SELECT * FROM termin LIMIT %s OFFSET %s",(rows,offset,))
+    def get_classification(self, rows,offset, param):
+        termins = self._select_all_query("SELECT * FROM termin WHERE is_new = %s LIMIT %s OFFSET %s",(param == 2, rows,offset,))
         return termins
     
     def isUserAdmin(self, current_user):
