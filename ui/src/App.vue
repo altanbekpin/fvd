@@ -155,11 +155,11 @@ export default {
               icon: "pi pi-fw pi-list",
               to: "/terminology/2",
             },
-            {
-              label: "Сөз синтезі",
-              icon: "pi pi-forward",
-              to: "/syntez",
-            },
+            // {
+            //   label: "Сөз синтезі",
+            //   icon: "pi pi-forward",
+            //   to: "/syntez",
+            // },
             //{
             // label: "Корпус менеджер",
             // icon: "pi pi-folder-open",

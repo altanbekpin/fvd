@@ -1,5 +1,5 @@
 name: kazlangres-github-actions
-run-name: ${{ github.actor }} is running GitHub Actions
+run-name: ${{ github.actor }} is testing ui
 on:
   push:
     paths:
