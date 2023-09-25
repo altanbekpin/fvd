@@ -1,6 +1,9 @@
 name: kazlangres-github-actions
 run-name: ${{ github.actor }} is running GitHub Actions
-on: [push]
+on:
+  push:
+    paths:
+      - "ui/**"
 jobs:
   check-bats-version:
     runs-on: ubuntu-latest
