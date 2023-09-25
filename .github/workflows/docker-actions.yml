@@ -1,0 +1,26 @@
+name: Docker Compose Build and Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Compose
+        run: docker-compose build
+
+      - name: Test Docker Compose
+        run: docker-compose up -d # Start the services in detached mode
+        # Add your testing commands here
+        # For example, if you have a script to test your services, you can run it here
+
+      - name: Cleanup
+        run: docker-compose down # Stop and remove the containers
+
