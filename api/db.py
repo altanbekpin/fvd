@@ -695,6 +695,19 @@ class DB(DatabaseOperations):
         WHERE l.id =  %s'''
         data = self._select_all_query(query, (id, ))
         return data
+    
+    def post_comment(self, termin_id, comment, username):
+        query = '''INSERT INTO comments(termin_id, comment, username) VALUES(%s, %s, %s)'''
+        self._insert_query(query, (termin_id, comment, username))
+
+    def deleteComment(self, termin_id):
+        query = '''DELETE FROM comments WHERE termin_id = %s'''
+        self._insert_query(query, (termin_id,))
+
+    def get_comments(self, termin_id):
+        query = '''SELECT * FROM comments WHERE termin_id = %s'''
+        comments = self._select_all_query(query, (termin_id,))
+        return comments
 
     def get_onto(self):
         return app.s

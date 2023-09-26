@@ -26,7 +26,7 @@
         <div class="flex justify-content-end">
           <Button
             class="headerbutton"
-            v-if="isUserAdmin"
+            v-if="isUserAdmin || isUserExpert"
             type="button"
             icon="pi pi-plus"
             label="Жаңа термин қосу"
@@ -42,6 +42,15 @@
             outlined
             @click="showChangeDialog()"
           ></Button>
+
+          <Button
+            type="button"
+            icon="pi pi-plus"
+            label="Жаңа оқулық қосу"
+            outlined
+            @click="showAddBook()"
+            style="margin-right: 4%"
+          />
           <span class="p-input-icon-left input-span">
             <i class="pi pi-search" />
             <InputText v-model="filters['global'].value" placeholder="Іздеу" />
@@ -110,8 +119,19 @@
           </Dropdown>
         </template>
       </Column>
+      <Column headerStyle="width: 3rem">
+        <template #body="{ data }">
+          <Button
+            icon="pi pi-comments"
+            aria-label="Submit"
+            style="width: 35px; height: 35px"
+            @click="showAddComment(data.id)"
+          />
+        </template>
+      </Column>
     </DataTable>
   </div>
+  <!-- add a new termin dialog -->
   <Dialog
     v-model:visible="showAddTerminDialog"
     :style="{ width: '450px' }"
@@ -152,7 +172,7 @@
     <template #footer>
       <div style="display: flex">
         <Button
-          label="Жаңа пән қосу"
+          label="Пән қосу"
           icon="pi pi-plus"
           text
           @click="activateSubjectDialog"
@@ -174,6 +194,7 @@
       </div>
     </template>
   </Dialog>
+  <!-- add a new subject dialog -->
   <Dialog
     v-model:visible="showAddSubjectDialog"
     :style="{ width: '450px' }"
@@ -189,6 +210,7 @@
       <Button label="Сақтау" icon="pi pi-check" text @click="saveSubject()" />
     </template>
   </Dialog>
+  <!-- change a termin dialog -->
   <Dialog
     v-model:visible="showChangeSubjectDialog"
     :style="{ width: '450px' }"
@@ -229,7 +251,7 @@
     <template #footer>
       <div style="display: flex">
         <Button
-          label="Жаңа пән қосу"
+          label="Пән қосу"
           icon="pi pi-plus"
           text
           @click="activateSubjectDialog"
@@ -251,6 +273,81 @@
       </div>
     </template>
   </Dialog>
+  <!-- Add a new book to a subject dialog -->
+  <Dialog
+    v-model:visible="showAddBookDialog"
+    :style="{ width: '450px' }"
+    header="Жаңа оқулық қосу"
+    :modal="true"
+    class="p-fluid"
+  ></Dialog>
+  <!-- Add a comment -->
+  <Dialog
+    v-model:visible="showAddCommentDialog"
+    :style="{ width: '450px' }"
+    header="Комментария жазу"
+    :modal="true"
+    class="p-fluid"
+  >
+    <span class="p-float-label" style="margin-top: 20px">
+      <InputText id="username" v-model="username" />
+      <label for="username">Аты-жөніңіз</label>
+    </span>
+
+    <form
+      @submit="onSubmit"
+      class="flex flex-column gap-2"
+      style="margin-top: 20px"
+    >
+      <span class="p-float-label">
+        <Textarea
+          id="value"
+          v-model="comment"
+          :class="{ 'p-invalid': errorMessage }"
+          rows="4"
+          cols="30"
+          aria-describedby="text-error"
+        />
+        <label for="value">Комментария</label>
+      </span>
+      <small id="text-error" class="p-error">{{
+        errorMessage || "&nbsp;"
+      }}</small>
+      <div style="display: flex; flex-direction: row">
+        <Button
+          v-if="isUserAdmin || isUserExpert"
+          icon="pi pi-eye"
+          aria-label="Submit"
+          style="margin-right: 10px"
+          @click="showComment"
+        />
+        <Button type="submit" label="Жіберу" @click="sendComment" />
+      </div>
+      <Toast />
+    </form>
+  </Dialog>
+  <!-- get comments dialog -->
+  <Dialog
+    v-model:visible="showCommentDialog"
+    :style="{ width: '450px' }"
+    header="Комментария көру"
+    :modal="true"
+    class="p-fluid"
+  >
+    <div v-for="comment in comments" :key="comment.id">
+      <span>{{ comment.username }}:</span>
+      <Message severity="info" icon="pi pi-send">{{ comment.comment }}</Message>
+    </div>
+    <template #footer>
+      <Button
+        label="Өшіру"
+        severity="danger"
+        icon="pi pi-trash"
+        text
+        @click="deleteComments"
+      ></Button>
+    </template>
+  </Dialog>
 </template>
 <script>
 import { AhmetService } from "@/service/AhmetService";
@@ -261,6 +358,10 @@ export default {
     return {
       selectedProduct: null,
       showChangeSubjectDialog: false,
+      showAddCommentDialog: false,
+      showAddBookDialog: false,
+      showCommentDialog: false,
+      comments: [],
       requestToChange: {
         definition: null,
         termin: null,
@@ -268,6 +369,8 @@ export default {
         school_class: null,
         id: null,
       },
+      comment: null,
+      username: null,
       lazyParams: {},
       customers: null,
       filters: {
@@ -291,6 +394,7 @@ export default {
       },
       subjects: [],
       store: null,
+      termin_id: null,
     };
   },
   async mounted() {
@@ -315,6 +419,54 @@ export default {
     },
   },
   methods: {
+    async deleteComments() {
+      const access_token = this.store.getters.getAccessToken;
+      await AhmetService.deleteComments(
+        { termin_id: this.termin_id },
+        access_token
+      );
+      this.showCommentDialog = false;
+    },
+    showComment() {
+      this.showCommentDialog = true;
+      this.getComments();
+    },
+    async getComments() {
+      const access_token = this.store.getters.getAccessToken;
+      this.comments = (
+        await AhmetService.getComments(this.termin_id, access_token)
+      ).data;
+    },
+    async sendComment() {
+      this.showAddCommentDialog = false;
+      try {
+        await AhmetService.sendComment({
+          comment: this.comment,
+          username: this.username,
+          termin_id: this.termin_id,
+        });
+        this.$toast.add({
+          severity: "success",
+          summary: "Жіберілді",
+          detail: "сәтті жіберілді",
+          life: 3000,
+        });
+      } catch (e) {
+        this.$toast.add({
+          severity: "error",
+          summary: "Жіберілмеді",
+          detail: "Қайта жіберіп көріңіз",
+          life: 3000,
+        });
+      }
+    },
+    showAddComment(termin_id) {
+      this.termin_id = termin_id;
+      this.showAddCommentDialog = true;
+    },
+    showAddBook() {
+      this.showAddBookDialog = true;
+    },
     async changeTermin() {
       const access_token = this.store.getters.getAccessToken;
       this.requestToChange.id = this.selectedProduct[0].id;

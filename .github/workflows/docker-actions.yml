@@ -1,4 +1,5 @@
 name: Docker Compose Build and Test
+run-name: ${{ github.actor }} is running docker
 
 on:
   push:

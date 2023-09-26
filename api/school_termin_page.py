@@ -62,6 +62,35 @@ def addTermin():
     except Exception as e:
         return 400, e
     return "success", 200
+@app.route("/sendcomment", methods=['POST'])
+def sendComment():
+    data = request.json['data']
+    comment = data['comment']
+    username = data['username']
+    termin_id = data['termin_id']
+    try:
+        DB.get_instance().post_comment(termin_id, comment, username)
+    except Exception as e:
+        return str(e)
+    return "success"
+
+@app.route("/deletecomment", methods=["POST"])
+@jwt_required()
+def deleteComment():
+    data = request.json['data']
+    termin_id = data['termin_id']
+    DB.get_instance().deleteComment(termin_id)
+    return 'success'
+@app.route('/getcomments/<int:id>', methods=['GET'])
+@jwt_required()
+def getComments(id):
+    if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user.id):
+        return "don't have enough permission", 500
+    try:
+        comments = DB.get_instance().get_comments(id)
+    except Exception as e:
+        print(e)
+    return comments
 
 @app.route("/get/class/subject", methods=['GET'])
 def get_subject_class():

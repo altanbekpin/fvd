@@ -39,6 +39,29 @@ export const AhmetService = {
       headers: getHeader(),
     });
   },
+  async sendComment(data) {
+    await api.post(
+      AHMET_API + "/sendcomment",
+      { data: data },
+      {
+        headers: getHeader(),
+      }
+    );
+  },
+  async getComments(termin_id, access_token) {
+    return await api.get(`${AHMET_API}/getcomments/${termin_id}`, {
+      headers: getHeader(access_token),
+    });
+  },
+  async deleteComments(data, access_token) {
+    await api.post(
+      AHMET_API + "/deletecomment",
+      { data: data },
+      {
+        headers: getHeader(access_token),
+      }
+    );
+  },
   async getNextSentenceForTagging() {
     return await api.get(AHMET_API + "/tokenizer/getnexttaggingline", {
       headers: getHeader(),

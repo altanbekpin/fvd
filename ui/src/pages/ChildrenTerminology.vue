@@ -22,6 +22,7 @@
 
     <hr height="20px" />
     <DataTable
+      class="p-datatable-sm"
       v-model:filters="filters"
       v-model:selection="selectedProduct"
       :value="customers"
@@ -79,7 +80,9 @@
       ></Column>
       <Column field="termin" header="Термин" style="min-width: 12rem">
         <template #body="{ data }">
-          {{ data.termin }}
+          <span style="font-weight: 500; font-size: 1000">{{
+            data.termin
+          }}</span>
         </template>
       </Column>
       <Column
@@ -88,7 +91,9 @@
         style="min-width: 12rem"
       >
         <template #body="{ data }">
-          <span>{{ data.definition }}</span>
+          <span style="font-weight: 500; font-size: 1000">{{
+            data.definition
+          }}</span>
         </template>
       </Column>
       <Column
@@ -99,7 +104,9 @@
         style="min-width: 14rem"
       >
         <template #body="{ data }">
-          <span>{{ data.subject }}</span>
+          <span style="font-weight: 500; font-size: 1000">{{
+            data.subject
+          }}</span>
         </template>
         <template #filter="{ filterModel, filterCallback }">
           <Dropdown
@@ -141,6 +148,16 @@
             outlined
             :loading="loading"
             @click="play(props)"
+          />
+        </template>
+      </Column>
+      <Column headerStyle="width: 3rem">
+        <template #body="{ data }">
+          <Button
+            icon="pi pi-comments"
+            aria-label="Submit"
+            style="width: 35px; height: 35px"
+            @click="showAddComment(data.id)"
           />
         </template>
       </Column>
@@ -285,6 +302,73 @@
       </div>
     </template>
   </Dialog>
+  <!-- Add a comment -->
+  <Dialog
+    v-model:visible="showAddCommentDialog"
+    :style="{ width: '450px' }"
+    header="Комментария жазу"
+    :modal="true"
+    class="p-fluid"
+  >
+    <span class="p-float-label" style="margin-top: 20px">
+      <InputText id="username" v-model="username" />
+      <label for="username">Аты-жөніңіз</label>
+    </span>
+
+    <form
+      @submit="onSubmit"
+      class="flex flex-column gap-2"
+      style="margin-top: 20px"
+    >
+      <span class="p-float-label">
+        <Textarea
+          id="value"
+          v-model="comment"
+          :class="{ 'p-invalid': errorMessage }"
+          rows="4"
+          cols="30"
+          aria-describedby="text-error"
+        />
+        <label for="value">Комментария</label>
+      </span>
+      <small id="text-error" class="p-error">{{
+        errorMessage || "&nbsp;"
+      }}</small>
+      <div style="display: flex; flex-direction: row">
+        <Button
+          v-if="isUserAdmin || isUserExpert"
+          icon="pi pi-eye"
+          aria-label="Submit"
+          style="margin-right: 10px"
+          @click="showComment"
+        />
+        <Button type="submit" label="Жіберу" @click="sendComment" />
+      </div>
+      <Toast />
+    </form>
+  </Dialog>
+  <!-- get comments dialog -->
+  <Dialog
+    v-model:visible="showCommentDialog"
+    :style="{ width: '450px' }"
+    header="Комментария көру"
+    :modal="true"
+    class="p-fluid"
+  >
+    <div v-for="comment in comments" :key="comment.id">
+      <span>{{ comment.username }}:</span>
+      <Message severity="info" icon="pi pi-send">{{ comment.comment }}</Message>
+    </div>
+    <template #footer>
+      <Button
+        label="Өшіру"
+        severity="danger"
+        icon="pi pi-trash"
+        text
+        @click="deleteComments"
+      ></Button>
+    </template>
+  </Dialog>
 </template>
 <script>
 import { AhmetService } from "@/service/AhmetService";
@@ -295,6 +379,8 @@ export default {
   components: { TalkingBoyAnimation },
   data() {
     return {
+      showCommentDialog: false,
+      showAddCommentDialog: false,
       showChangeSubjectDialog: false,
       selectedProduct: null,
       lazyParams: {},
@@ -306,6 +392,7 @@ export default {
         subject: { value: "" },
         class: { value: "" },
       },
+      comment: null,
       animationText: "",
       audio: null,
       classes: ["1", "2", "3", "4"],
@@ -323,6 +410,8 @@ export default {
         subject: null,
         school_class: null,
       },
+      termin_id: null,
+      username: null,
       requestToChange: {
         definition: null,
         termin: null,
@@ -358,6 +447,54 @@ export default {
     },
   },
   methods: {
+    async deleteComments() {
+      const access_token = this.store.getters.getAccessToken;
+      await AhmetService.deleteComments(
+        { termin_id: this.termin_id },
+        access_token
+      );
+      this.showCommentDialog = false;
+    },
+    showComment() {
+      this.showCommentDialog = true;
+      this.getComments();
+    },
+    showAddComment(termin_id) {
+      this.termin_id = termin_id;
+      this.showAddCommentDialog = true;
+    },
+    async getComments() {
+      const access_token = this.store.getters.getAccessToken;
+      this.comments = (
+        await AhmetService.getComments(this.termin_id, access_token)
+      ).data;
+    },
+    async sendComment() {
+      this.showAddCommentDialog = false;
+      this.comment = null;
+      this.termin_id = null;
+      this.username = null;
+      try {
+        await AhmetService.sendComment({
+          comment: this.comment,
+          username: this.username,
+          termin_id: this.termin_id,
+        });
+        this.$toast.add({
+          severity: "success",
+          summary: "Жіберілді",
+          detail: "сәтті жіберілді",
+          life: 3000,
+        });
+      } catch (e) {
+        this.$toast.add({
+          severity: "error",
+          summary: "Жіберілмеді",
+          detail: "Қайта жіберіп көріңіз",
+          life: 3000,
+        });
+      }
+    },
     showChangeDialog() {
       this.requestToChange.id = this.selectedProduct[0].id;
       this.requestToChange.definition = this.selectedProduct[0].definition;
