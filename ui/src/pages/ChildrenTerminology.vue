@@ -306,7 +306,7 @@
   <Dialog
     v-model:visible="showAddCommentDialog"
     :style="{ width: '450px' }"
-    header="Комментария жазу"
+    header="Комментарий жазу"
     :modal="true"
     class="p-fluid"
   >
@@ -329,7 +329,7 @@
           cols="30"
           aria-describedby="text-error"
         />
-        <label for="value">Комментария</label>
+        <label for="value">Комментарий</label>
       </span>
       <small id="text-error" class="p-error">{{
         errorMessage || "&nbsp;"
@@ -351,7 +351,7 @@
   <Dialog
     v-model:visible="showCommentDialog"
     :style="{ width: '450px' }"
-    header="Комментария көру"
+    header="Комментарий көру"
     :modal="true"
     class="p-fluid"
   >
