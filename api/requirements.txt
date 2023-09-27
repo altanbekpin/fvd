@@ -49,3 +49,4 @@ xlrd
 xlutils
 xlwt
 tokenizers
+redis

@@ -5,7 +5,7 @@
 -- Dumped from database version 15.1
 -- Dumped by pg_dump version 15.1
 
--- Started on 2023-09-26 10:36:01 +06
+-- Started on 2023-09-27 12:04:18 +06
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,7 +19,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 250 (class 1255 OID 19109)
+-- TOC entry 254 (class 1255 OID 19109)
 -- Name: create_offer_trigger(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -70,7 +70,7 @@ CREATE SEQUENCE public.activate_types_id_seq
 ALTER TABLE public.activate_types_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3792 (class 0 OID 0)
+-- TOC entry 3806 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: activate_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -141,7 +141,7 @@ CREATE SEQUENCE public.legacy_id_seq
 ALTER TABLE public.legacy_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3793 (class 0 OID 0)
+-- TOC entry 3807 (class 0 OID 0)
 -- Dependencies: 214
 -- Name: legacy_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -181,7 +181,7 @@ CREATE SEQUENCE public.morphemes_id_seq
 ALTER TABLE public.morphemes_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3794 (class 0 OID 0)
+-- TOC entry 3808 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: morphemes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -222,7 +222,7 @@ CREATE SEQUENCE public.my_serial
 ALTER TABLE public.my_serial OWNER TO postgres;
 
 --
--- TOC entry 3795 (class 0 OID 0)
+-- TOC entry 3809 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: my_serial; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -264,7 +264,7 @@ CREATE SEQUENCE public.offers_id_seq
 ALTER TABLE public.offers_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3796 (class 0 OID 0)
+-- TOC entry 3810 (class 0 OID 0)
 -- Dependencies: 246
 -- Name: offers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -306,7 +306,7 @@ CREATE SEQUENCE public.page_id_seq
 ALTER TABLE public.page_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3797 (class 0 OID 0)
+-- TOC entry 3811 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: page_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -357,7 +357,7 @@ CREATE SEQUENCE public.paraphrases_id_seq
 ALTER TABLE public.paraphrases_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3798 (class 0 OID 0)
+-- TOC entry 3812 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: paraphrases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -399,7 +399,7 @@ CREATE SEQUENCE public.quote_id_seq
 ALTER TABLE public.quote_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3799 (class 0 OID 0)
+-- TOC entry 3813 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: quote_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -420,6 +420,65 @@ CREATE TABLE public.role (
 
 
 ALTER TABLE public.role OWNER TO postgres;
+
+--
+-- TOC entry 252 (class 1259 OID 19621)
+-- Name: school_book_subject; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.school_book_subject (
+    id integer NOT NULL,
+    subject_id integer,
+    school_book_id integer,
+    class integer
+);
+
+
+ALTER TABLE public.school_book_subject OWNER TO postgres;
+
+--
+-- TOC entry 253 (class 1259 OID 19624)
+-- Name: school_book_subject_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.school_book_subject ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.school_book_subject_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 250 (class 1259 OID 19603)
+-- Name: school_books; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.school_books (
+    path text NOT NULL,
+    id integer NOT NULL,
+    name character varying(255)
+);
+
+
+ALTER TABLE public.school_books OWNER TO postgres;
+
+--
+-- TOC entry 251 (class 1259 OID 19608)
+-- Name: school_books_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.school_books ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.school_books_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
 
 --
 -- TOC entry 243 (class 1259 OID 19042)
@@ -454,7 +513,7 @@ CREATE SEQUENCE public.school_termins_id_seq
 ALTER TABLE public.school_termins_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3800 (class 0 OID 0)
+-- TOC entry 3814 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: school_termins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -492,7 +551,7 @@ CREATE SEQUENCE public.subjects_id_seq
 ALTER TABLE public.subjects_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3801 (class 0 OID 0)
+-- TOC entry 3815 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: subjects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -536,7 +595,7 @@ CREATE SEQUENCE public.synamizer_id_seq
 ALTER TABLE public.synamizer_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3802 (class 0 OID 0)
+-- TOC entry 3816 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: synamizer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -587,7 +646,7 @@ CREATE SEQUENCE public.synonyms_id_seq
 ALTER TABLE public.synonyms_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3803 (class 0 OID 0)
+-- TOC entry 3817 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: synonyms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -625,7 +684,7 @@ CREATE SEQUENCE public.tag_id_seq
 ALTER TABLE public.tag_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3804 (class 0 OID 0)
+-- TOC entry 3818 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: tag_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -677,7 +736,7 @@ CREATE SEQUENCE public.user_role_id_seq
 ALTER TABLE public.user_role_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3805 (class 0 OID 0)
+-- TOC entry 3819 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: user_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -720,7 +779,7 @@ CREATE SEQUENCE public.users_id_seq
 ALTER TABLE public.users_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3806 (class 0 OID 0)
+-- TOC entry 3820 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -729,7 +788,7 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- TOC entry 3570 (class 2604 OID 19092)
+-- TOC entry 3580 (class 2604 OID 19092)
 -- Name: activate_types id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -737,7 +796,7 @@ ALTER TABLE ONLY public.activate_types ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3553 (class 2604 OID 18111)
+-- TOC entry 3563 (class 2604 OID 18111)
 -- Name: legacy id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -745,7 +804,7 @@ ALTER TABLE ONLY public.legacy ALTER COLUMN id SET DEFAULT nextval('public.legac
 
 
 --
--- TOC entry 3567 (class 2604 OID 18351)
+-- TOC entry 3577 (class 2604 OID 18351)
 -- Name: morphemes id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -753,7 +812,7 @@ ALTER TABLE ONLY public.morphemes ALTER COLUMN id SET DEFAULT nextval('public.mo
 
 
 --
--- TOC entry 3571 (class 2604 OID 19101)
+-- TOC entry 3581 (class 2604 OID 19101)
 -- Name: offers id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -761,7 +820,7 @@ ALTER TABLE ONLY public.offers ALTER COLUMN id SET DEFAULT nextval('public.offer
 
 
 --
--- TOC entry 3554 (class 2604 OID 18120)
+-- TOC entry 3564 (class 2604 OID 18120)
 -- Name: page id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -769,7 +828,7 @@ ALTER TABLE ONLY public.page ALTER COLUMN id SET DEFAULT nextval('public.page_id
 
 
 --
--- TOC entry 3566 (class 2604 OID 18316)
+-- TOC entry 3576 (class 2604 OID 18316)
 -- Name: paraphrases id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -777,7 +836,7 @@ ALTER TABLE ONLY public.paraphrases ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- TOC entry 3555 (class 2604 OID 18129)
+-- TOC entry 3565 (class 2604 OID 18129)
 -- Name: quote id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -785,7 +844,7 @@ ALTER TABLE ONLY public.quote ALTER COLUMN id SET DEFAULT nextval('public.quote_
 
 
 --
--- TOC entry 3569 (class 2604 OID 19045)
+-- TOC entry 3579 (class 2604 OID 19045)
 -- Name: school_termins id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -793,7 +852,7 @@ ALTER TABLE ONLY public.school_termins ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3568 (class 2604 OID 19038)
+-- TOC entry 3578 (class 2604 OID 19038)
 -- Name: subjects id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -801,7 +860,7 @@ ALTER TABLE ONLY public.subjects ALTER COLUMN id SET DEFAULT nextval('public.sub
 
 
 --
--- TOC entry 3563 (class 2604 OID 18300)
+-- TOC entry 3573 (class 2604 OID 18300)
 -- Name: synamizer id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -809,7 +868,7 @@ ALTER TABLE ONLY public.synamizer ALTER COLUMN id SET DEFAULT nextval('public.sy
 
 
 --
--- TOC entry 3565 (class 2604 OID 18309)
+-- TOC entry 3575 (class 2604 OID 18309)
 -- Name: synonyms id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -817,7 +876,7 @@ ALTER TABLE ONLY public.synonyms ALTER COLUMN id SET DEFAULT nextval('public.syn
 
 
 --
--- TOC entry 3562 (class 2604 OID 18289)
+-- TOC entry 3572 (class 2604 OID 18289)
 -- Name: tag id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -825,7 +884,7 @@ ALTER TABLE ONLY public.tag ALTER COLUMN id SET DEFAULT nextval('public.tag_id_s
 
 
 --
--- TOC entry 3559 (class 2604 OID 18212)
+-- TOC entry 3569 (class 2604 OID 18212)
 -- Name: termin id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -833,7 +892,7 @@ ALTER TABLE ONLY public.termin ALTER COLUMN id SET DEFAULT nextval('public.my_se
 
 
 --
--- TOC entry 3561 (class 2604 OID 18199)
+-- TOC entry 3571 (class 2604 OID 18199)
 -- Name: user_role id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -841,7 +900,7 @@ ALTER TABLE ONLY public.user_role ALTER COLUMN id SET DEFAULT nextval('public.us
 
 
 --
--- TOC entry 3557 (class 2604 OID 18139)
+-- TOC entry 3567 (class 2604 OID 18139)
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -849,7 +908,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- TOC entry 3782 (class 0 OID 19089)
+-- TOC entry 3792 (class 0 OID 19089)
 -- Dependencies: 245
 -- Data for Name: activate_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -863,7 +922,7 @@ COPY public.activate_types (id, name) FROM stdin;
 
 
 --
--- TOC entry 3785 (class 0 OID 19591)
+-- TOC entry 3795 (class 0 OID 19591)
 -- Dependencies: 248
 -- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -873,7 +932,7 @@ COPY public.comments (comment, username, termin_id, id) FROM stdin;
 
 
 --
--- TOC entry 3752 (class 0 OID 18108)
+-- TOC entry 3762 (class 0 OID 18108)
 -- Dependencies: 215
 -- Data for Name: legacy; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -977,7 +1036,7 @@ COPY public.legacy (id, name, path, parent_id, is_file) FROM stdin;
 
 
 --
--- TOC entry 3776 (class 0 OID 18348)
+-- TOC entry 3786 (class 0 OID 18348)
 -- Dependencies: 239
 -- Data for Name: morphemes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -1165,7 +1224,7 @@ COPY public.morphemes (id, morphem, pos, ismoderated) FROM stdin;
 
 
 --
--- TOC entry 3784 (class 0 OID 19098)
+-- TOC entry 3794 (class 0 OID 19098)
 -- Dependencies: 247
 -- Data for Name: offers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -6696,7 +6755,7 @@ COPY public.offers (id, offer_id, user_id, activate_type, activated, created_at)
 
 
 --
--- TOC entry 3754 (class 0 OID 18117)
+-- TOC entry 3764 (class 0 OID 18117)
 -- Dependencies: 217
 -- Data for Name: page; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -6706,7 +6765,7 @@ COPY public.page (id, name, parent_id, content, is_deleted, is_hidden) FROM stdi
 
 
 --
--- TOC entry 3774 (class 0 OID 18322)
+-- TOC entry 3784 (class 0 OID 18322)
 -- Dependencies: 237
 -- Data for Name: paraphrase_word; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -7706,7 +7765,7 @@ COPY public.paraphrase_word (word_id, paraphrase_id) FROM stdin;
 
 
 --
--- TOC entry 3772 (class 0 OID 18313)
+-- TOC entry 3782 (class 0 OID 18313)
 -- Dependencies: 235
 -- Data for Name: paraphrases; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -8706,7 +8765,7 @@ COPY public.paraphrases (id, paraphrase) FROM stdin;
 
 
 --
--- TOC entry 3756 (class 0 OID 18126)
+-- TOC entry 3766 (class 0 OID 18126)
 -- Dependencies: 219
 -- Data for Name: quote; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -8718,7 +8777,7 @@ COPY public.quote (id, quote, quote_by, added_by, created, updated) FROM stdin;
 
 
 --
--- TOC entry 3760 (class 0 OID 18160)
+-- TOC entry 3770 (class 0 OID 18160)
 -- Dependencies: 223
 -- Data for Name: role; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -8731,7 +8790,27 @@ COPY public.role (role_id, name, description) FROM stdin;
 
 
 --
--- TOC entry 3780 (class 0 OID 19042)
+-- TOC entry 3799 (class 0 OID 19621)
+-- Dependencies: 252
+-- Data for Name: school_book_subject; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.school_book_subject (id, subject_id, school_book_id, class) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3797 (class 0 OID 19603)
+-- Dependencies: 250
+-- Data for Name: school_books; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.school_books (path, id, name) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3790 (class 0 OID 19042)
 -- Dependencies: 243
 -- Data for Name: school_termins; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -10549,7 +10628,7 @@ COPY public.school_termins (id, subject_id, termin, definition, class) FROM stdi
 
 
 --
--- TOC entry 3778 (class 0 OID 19035)
+-- TOC entry 3788 (class 0 OID 19035)
 -- Dependencies: 241
 -- Data for Name: subjects; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -10572,7 +10651,7 @@ COPY public.subjects (id, subject) FROM stdin;
 
 
 --
--- TOC entry 3768 (class 0 OID 18297)
+-- TOC entry 3778 (class 0 OID 18297)
 -- Dependencies: 231
 -- Data for Name: synamizer; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -11579,7 +11658,7 @@ COPY public.synamizer (id, words, words_family, status, meaning, pos, example, c
 
 
 --
--- TOC entry 3773 (class 0 OID 18319)
+-- TOC entry 3783 (class 0 OID 18319)
 -- Dependencies: 236
 -- Data for Name: synonym_word; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -15122,7 +15201,7 @@ COPY public.synonym_word (word_id, synonym_id) FROM stdin;
 
 
 --
--- TOC entry 3770 (class 0 OID 18306)
+-- TOC entry 3780 (class 0 OID 18306)
 -- Dependencies: 233
 -- Data for Name: synonyms; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -18665,7 +18744,7 @@ COPY public.synonyms (id, synonym) FROM stdin;
 
 
 --
--- TOC entry 3764 (class 0 OID 18285)
+-- TOC entry 3774 (class 0 OID 18285)
 -- Dependencies: 227
 -- Data for Name: tag; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -18696,7 +18775,7 @@ COPY public.tag (name, id) FROM stdin;
 
 
 --
--- TOC entry 3766 (class 0 OID 18293)
+-- TOC entry 3776 (class 0 OID 18293)
 -- Dependencies: 229
 -- Data for Name: tag_legacy; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -18710,7 +18789,7 @@ COPY public.tag_legacy (tag_id, legacy_id) FROM stdin;
 
 
 --
--- TOC entry 3759 (class 0 OID 18146)
+-- TOC entry 3769 (class 0 OID 18146)
 -- Dependencies: 222
 -- Data for Name: termin; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -19409,7 +19488,7 @@ COPY public.termin (id, name, description, examples, is_new) FROM stdin;
 
 
 --
--- TOC entry 3761 (class 0 OID 18185)
+-- TOC entry 3771 (class 0 OID 18185)
 -- Dependencies: 224
 -- Data for Name: user_role; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -19421,7 +19500,7 @@ COPY public.user_role (user_id, role_id, id) FROM stdin;
 
 
 --
--- TOC entry 3758 (class 0 OID 18136)
+-- TOC entry 3768 (class 0 OID 18136)
 -- Dependencies: 221
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -19432,7 +19511,7 @@ COPY public.users (id, email, password_hash, password_salt, is_verified, confirm
 
 
 --
--- TOC entry 3807 (class 0 OID 0)
+-- TOC entry 3821 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: activate_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19441,7 +19520,7 @@ SELECT pg_catalog.setval('public.activate_types_id_seq', 4, true);
 
 
 --
--- TOC entry 3808 (class 0 OID 0)
+-- TOC entry 3822 (class 0 OID 0)
 -- Dependencies: 249
 -- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19450,7 +19529,7 @@ SELECT pg_catalog.setval('public.comments_id_seq', 1, false);
 
 
 --
--- TOC entry 3809 (class 0 OID 0)
+-- TOC entry 3823 (class 0 OID 0)
 -- Dependencies: 214
 -- Name: legacy_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19459,7 +19538,7 @@ SELECT pg_catalog.setval('public.legacy_id_seq', 100, true);
 
 
 --
--- TOC entry 3810 (class 0 OID 0)
+-- TOC entry 3824 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: morphemes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19468,7 +19547,7 @@ SELECT pg_catalog.setval('public.morphemes_id_seq', 195, true);
 
 
 --
--- TOC entry 3811 (class 0 OID 0)
+-- TOC entry 3825 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: my_serial; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19477,7 +19556,7 @@ SELECT pg_catalog.setval('public.my_serial', 703, true);
 
 
 --
--- TOC entry 3812 (class 0 OID 0)
+-- TOC entry 3826 (class 0 OID 0)
 -- Dependencies: 246
 -- Name: offers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19486,7 +19565,7 @@ SELECT pg_catalog.setval('public.offers_id_seq', 6685, true);
 
 
 --
--- TOC entry 3813 (class 0 OID 0)
+-- TOC entry 3827 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: page_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19495,7 +19574,7 @@ SELECT pg_catalog.setval('public.page_id_seq', 1, false);
 
 
 --
--- TOC entry 3814 (class 0 OID 0)
+-- TOC entry 3828 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: paraphrases_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19504,7 +19583,7 @@ SELECT pg_catalog.setval('public.paraphrases_id_seq', 3203, true);
 
 
 --
--- TOC entry 3815 (class 0 OID 0)
+-- TOC entry 3829 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: quote_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19513,7 +19592,25 @@ SELECT pg_catalog.setval('public.quote_id_seq', 1, false);
 
 
 --
--- TOC entry 3816 (class 0 OID 0)
+-- TOC entry 3830 (class 0 OID 0)
+-- Dependencies: 253
+-- Name: school_book_subject_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.school_book_subject_id_seq', 1, true);
+
+
+--
+-- TOC entry 3831 (class 0 OID 0)
+-- Dependencies: 251
+-- Name: school_books_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.school_books_id_seq', 2, true);
+
+
+--
+-- TOC entry 3832 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: school_termins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19522,7 +19619,7 @@ SELECT pg_catalog.setval('public.school_termins_id_seq', 6348, true);
 
 
 --
--- TOC entry 3817 (class 0 OID 0)
+-- TOC entry 3833 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: subjects_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19531,7 +19628,7 @@ SELECT pg_catalog.setval('public.subjects_id_seq', 13, true);
 
 
 --
--- TOC entry 3818 (class 0 OID 0)
+-- TOC entry 3834 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: synamizer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19540,7 +19637,7 @@ SELECT pg_catalog.setval('public.synamizer_id_seq', 4885, true);
 
 
 --
--- TOC entry 3819 (class 0 OID 0)
+-- TOC entry 3835 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: synonyms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19549,7 +19646,7 @@ SELECT pg_catalog.setval('public.synonyms_id_seq', 11675, true);
 
 
 --
--- TOC entry 3820 (class 0 OID 0)
+-- TOC entry 3836 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: tag_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19558,7 +19655,7 @@ SELECT pg_catalog.setval('public.tag_id_seq', 1, false);
 
 
 --
--- TOC entry 3821 (class 0 OID 0)
+-- TOC entry 3837 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: user_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19567,7 +19664,7 @@ SELECT pg_catalog.setval('public.user_role_id_seq', 1, true);
 
 
 --
--- TOC entry 3822 (class 0 OID 0)
+-- TOC entry 3838 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -19576,7 +19673,7 @@ SELECT pg_catalog.setval('public.users_id_seq', 4, true);
 
 
 --
--- TOC entry 3601 (class 2606 OID 19096)
+-- TOC entry 3611 (class 2606 OID 19096)
 -- Name: activate_types activate_types_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19585,7 +19682,7 @@ ALTER TABLE ONLY public.activate_types
 
 
 --
--- TOC entry 3603 (class 2606 OID 19094)
+-- TOC entry 3613 (class 2606 OID 19094)
 -- Name: activate_types activate_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19594,7 +19691,7 @@ ALTER TABLE ONLY public.activate_types
 
 
 --
--- TOC entry 3575 (class 2606 OID 18115)
+-- TOC entry 3585 (class 2606 OID 18115)
 -- Name: legacy legacy_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19603,7 +19700,7 @@ ALTER TABLE ONLY public.legacy
 
 
 --
--- TOC entry 3595 (class 2606 OID 18355)
+-- TOC entry 3605 (class 2606 OID 18355)
 -- Name: morphemes morphemes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19612,7 +19709,7 @@ ALTER TABLE ONLY public.morphemes
 
 
 --
--- TOC entry 3605 (class 2606 OID 19104)
+-- TOC entry 3615 (class 2606 OID 19104)
 -- Name: offers offers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19621,7 +19718,7 @@ ALTER TABLE ONLY public.offers
 
 
 --
--- TOC entry 3577 (class 2606 OID 18124)
+-- TOC entry 3587 (class 2606 OID 18124)
 -- Name: page page_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19630,7 +19727,7 @@ ALTER TABLE ONLY public.page
 
 
 --
--- TOC entry 3593 (class 2606 OID 18318)
+-- TOC entry 3603 (class 2606 OID 18318)
 -- Name: paraphrases paraphrases_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19639,7 +19736,7 @@ ALTER TABLE ONLY public.paraphrases
 
 
 --
--- TOC entry 3579 (class 2606 OID 18134)
+-- TOC entry 3589 (class 2606 OID 18134)
 -- Name: quote quote_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19648,7 +19745,7 @@ ALTER TABLE ONLY public.quote
 
 
 --
--- TOC entry 3585 (class 2606 OID 18164)
+-- TOC entry 3595 (class 2606 OID 18164)
 -- Name: role role_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19657,7 +19754,7 @@ ALTER TABLE ONLY public.role
 
 
 --
--- TOC entry 3599 (class 2606 OID 19049)
+-- TOC entry 3609 (class 2606 OID 19049)
 -- Name: school_termins school_termins_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19666,7 +19763,7 @@ ALTER TABLE ONLY public.school_termins
 
 
 --
--- TOC entry 3597 (class 2606 OID 19040)
+-- TOC entry 3607 (class 2606 OID 19040)
 -- Name: subjects subjects_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19675,7 +19772,7 @@ ALTER TABLE ONLY public.subjects
 
 
 --
--- TOC entry 3589 (class 2606 OID 18304)
+-- TOC entry 3599 (class 2606 OID 18304)
 -- Name: synamizer synamizer_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19684,7 +19781,7 @@ ALTER TABLE ONLY public.synamizer
 
 
 --
--- TOC entry 3591 (class 2606 OID 18311)
+-- TOC entry 3601 (class 2606 OID 18311)
 -- Name: synonyms synonyms_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19693,7 +19790,7 @@ ALTER TABLE ONLY public.synonyms
 
 
 --
--- TOC entry 3583 (class 2606 OID 18152)
+-- TOC entry 3593 (class 2606 OID 18152)
 -- Name: termin termin_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19702,7 +19799,7 @@ ALTER TABLE ONLY public.termin
 
 
 --
--- TOC entry 3587 (class 2606 OID 18201)
+-- TOC entry 3597 (class 2606 OID 18201)
 -- Name: user_role user_role_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19711,7 +19808,7 @@ ALTER TABLE ONLY public.user_role
 
 
 --
--- TOC entry 3581 (class 2606 OID 18143)
+-- TOC entry 3591 (class 2606 OID 18143)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19720,7 +19817,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3608 (class 2620 OID 19110)
+-- TOC entry 3618 (class 2620 OID 19110)
 -- Name: users insert_offer_trigger; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -19728,7 +19825,7 @@ CREATE TRIGGER insert_offer_trigger AFTER INSERT ON public.users FOR EACH ROW EX
 
 
 --
--- TOC entry 3606 (class 2606 OID 18193)
+-- TOC entry 3616 (class 2606 OID 18193)
 -- Name: user_role user_role_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19737,7 +19834,7 @@ ALTER TABLE ONLY public.user_role
 
 
 --
--- TOC entry 3607 (class 2606 OID 18188)
+-- TOC entry 3617 (class 2606 OID 18188)
 -- Name: user_role user_role_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -19745,7 +19842,7 @@ ALTER TABLE ONLY public.user_role
     ADD CONSTRAINT user_role_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
--- Completed on 2023-09-26 10:36:01 +06
+-- Completed on 2023-09-27 12:04:19 +06
 
 --
 -- PostgreSQL database dump complete

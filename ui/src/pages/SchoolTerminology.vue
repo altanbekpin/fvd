@@ -273,14 +273,6 @@
       </div>
     </template>
   </Dialog>
-  <!-- Add a new book to a subject dialog -->
-  <Dialog
-    v-model:visible="showAddBookDialog"
-    :style="{ width: '450px' }"
-    header="Жаңа оқулық қосу"
-    :modal="true"
-    class="p-fluid"
-  ></Dialog>
   <!-- Add a comment -->
   <Dialog
     v-model:visible="showAddCommentDialog"
@@ -348,6 +340,31 @@
       ></Button>
     </template>
   </Dialog>
+  <!-- Add a new book to a subject dialog -->
+  <Dialog
+    v-model:visible="showAddBookDialog"
+    :style="{ width: '500px' }"
+    header="Жаңа оқулық қосу"
+    :modal="true"
+    class="p-fluid"
+  >
+    <DataTable
+      :value="customers"
+      lazy
+      :loading="loadingbook"
+      v-model:filters="filtersbook"
+      @page="onPageBook($event)"
+      ref="dt2"
+      dataKey="id2"
+      paginator
+      :totalRecords="totalRecordsBook"
+      :rows="5"
+      :rowsPerPageOptions="[5, 10, 20, 50]"
+    >
+      <Column field="subject" header="Пән" style="width: 25%"></Column>
+      <Column field="class" header="Сынып" style="width: 25%"></Column>
+    </DataTable>
+  </Dialog>
 </template>
 <script>
 import { AhmetService } from "@/service/AhmetService";
@@ -356,6 +373,10 @@ import { useStore } from "vuex";
 export default {
   data() {
     return {
+      totalRecordsBook: 100,
+      // books: [{ class: 3, subject: "Adasskdmakls" }],
+      loadingbook: false,
+      filtersbook: null,
       selectedProduct: null,
       showChangeSubjectDialog: false,
       showAddCommentDialog: false,
@@ -371,6 +392,7 @@ export default {
       },
       comment: null,
       username: null,
+      lazyParamsBook: {},
       lazyParams: {},
       customers: null,
       filters: {
@@ -431,12 +453,6 @@ export default {
       this.showCommentDialog = true;
       this.getComments();
     },
-    async getComments() {
-      const access_token = this.store.getters.getAccessToken;
-      this.comments = (
-        await AhmetService.getComments(this.termin_id, access_token)
-      ).data;
-    },
     async sendComment() {
       this.showAddCommentDialog = false;
       try {
@@ -465,7 +481,25 @@ export default {
       this.showAddCommentDialog = true;
     },
     showAddBook() {
+      this.loadBooks();
       this.showAddBookDialog = true;
+    },
+    async loadBooks() {
+      this.lazyParamsBook = {
+        first: this.$refs.dt2.first,
+        rows: this.$refs.dt2.rows,
+        sortField: null,
+        sortOrder: null,
+        filters: this.filters,
+      };
+      console.log("this.lazyParamsBook:", this.lazyParamsBook);
+      // const response = await AhmetService.loadBooks(this.filtersbook);
+      // console.log("response:", response);
+    },
+    onPageBook(event) {
+      this.lazyParamsBook = event;
+      console.log("this.lazyParamsBook:", this.lazyParamsBook);
+      // this.loadLazyData();
     },
     async changeTermin() {
       const access_token = this.store.getters.getAccessToken;
@@ -530,7 +564,7 @@ export default {
         data: this.lazyParams,
       });
       this.customers = object.data;
-      // console.log("this.customers:", this.customers);
+      console.log("this.customers:", this.customers);
       this.loading = false;
     },
     onPage(event) {

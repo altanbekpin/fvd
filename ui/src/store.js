@@ -135,6 +135,7 @@ const store = createStore({
         access_token: "",
       };
       state.user = data;
+      localStorage.clear();
     },
     // Define your state mutations here
   },
@@ -147,19 +148,19 @@ const store = createStore({
       }
     },
     isUserRegistered: (state) => {
-      if (state.user.access_token != "") {
+      if (state.user && state.user.access_token != "") {
         return true;
       }
       return false;
     },
     isUserAdmin: (state) => {
-      if (state.user.roles.includes("admin")) {
+      if (state.user && state.user.roles.includes("admin")) {
         return true;
       }
       return false;
     },
     isUserExpert: (state) => {
-      if (state.user.roles.includes("expert")) {
+      if (state.user && state.user.roles.includes("expert")) {
         return true;
       }
       return false;

@@ -20,6 +20,9 @@ export const AhmetService = {
       getHeader()
     );
   },
+  async loadBooks() {
+    // return await api.get(`${AHMET_API}/get/school/books`, {headers: getHeader()})
+  },
   async getLegaciesByID(id) {
     return await api.get(AHMET_API + `/get/legacies/${id}`, {
       headers: getHeader(),
@@ -119,6 +122,11 @@ export const AhmetService = {
       },
       { headers: getHeader() }
     );
+  },
+  async logout(access_token) {
+    await api.delete(`${AHMET_API}/logout`, {
+      headers: getHeader(access_token),
+    });
   },
   async getTokenAndRoles(email, password) {
     var response;

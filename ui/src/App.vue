@@ -27,6 +27,7 @@ import AppTopBar from "./AppTopbar.vue";
 import AppMenu from "./AppMenu.vue";
 import AppConfig from "./AppConfig.vue";
 import AppFooter from "./AppFooter.vue";
+import store from "./store";
 import { useStore } from "vuex";
 
 export default {
@@ -44,6 +45,10 @@ export default {
       this.menuActive = false;
       this.$toast.removeAllGroups();
     },
+  },
+  mounted() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    store.commit("updateUser", user);
   },
   methods: {
     onWrapperClick() {

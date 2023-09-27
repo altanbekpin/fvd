@@ -60,6 +60,7 @@
 
 <script>
 // import { useStore } from "vuex";
+import { AhmetService } from "./service/AhmetService";
 import store from "./store";
 export default {
   data() {
@@ -90,6 +91,7 @@ export default {
         acceptIcon: "pi pi-check",
         rejectIcon: "pi pi-times",
         accept: () => {
+          AhmetService.logout(store.getters.getAccessToken);
           store.commit("unLogUser");
           this.$toast.add({
             severity: "success",

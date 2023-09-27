@@ -1,3 +1,4 @@
+from datetime import timedelta
 # -*- coding: utf-8 -*-
 from flask import Flask
 from flask_cors import CORS, cross_origin
@@ -36,6 +37,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'enu201309@gmail.com'
 app.config['MAIL_PASSWORD'] = 'zbtjzkncpdtbiczn'
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
 mail = Mail(app)
 CORS(app, origins=['http://localhost:8080', 'http://kazlangres.enu.kz', "http://localhost:5173", "http://127.0.0.1:5173"])
 CORS(app)
