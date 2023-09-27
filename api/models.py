@@ -30,13 +30,16 @@ class MyOwlReady:
     __instance = None
     _onto = None
     _turkOnto = None
+    _tilQural = None
     _dw = None
     _owl = None
     def __init__(self):
         if not MyOwlReady.__instance:
             print(" __init__ method called..")
             _turkOnto = rdflib.Graph()
-            _turkOnto.parse ('owl/Tilqural25082023.owl')
+            _tilQural = rdflib.Graph()
+            _turkOnto.parse ('owl/Akhmettanu.owl')
+            _tilQural.parse ('owl/Tilqural25082023.owl')
         else:
             print("Instance already created:", self.getInstance())
             print(self.Onto)
@@ -50,7 +53,9 @@ class MyOwlReady:
             cls.__instance = MyOwlReady()
         print("TurkOntology loading...")
         cls._turkOnto = rdflib.Graph()
-        cls._turkOnto.parse('owl/Tilqural25082023.owl')
+        cls._turkOnto.parse('owl/Akhmettanu.owl')
+        cls._tilQural = rdflib.Graph()
+        cls._tilQural.parse ('owl/Tilqural25082023.owl')
     def SyncReasoner(cls):
         if not cls.__instance:
             cls.__instance = MyOwlReady()
@@ -83,14 +88,18 @@ class MyOwlReady:
             owlclasses.append(owl)
             #print(row)
         return owlclasses
-    @property
-    def TurkOnto(cls):
+    @classmethod
+    def TurkOnto(cls, id):
         if cls._turkOnto == None:
             print("TurkOntology loading...")
             cls._turkOnto = rdflib.Graph()
-            cls._turkOnto.parse('owl/Tilqural25082023.owl')
-
-        return cls._turkOnto
+            cls._turkOnto.parse('owl/Akhmettanu.owl')
+            cls._tilQural = rdflib.Graph()
+            cls._tilQural.parse ('owl/Tilqural25082023.owl')
+        if id == '1':
+            return cls._turkOnto
+        else:
+            return cls._tilQural
     @property
     def DefWorld(cls):
         if cls._onto == None:

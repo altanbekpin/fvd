@@ -70,11 +70,18 @@
   </div>
 </template>
 <script>
+
 import axios from "axios";
 import { AHMET_API, getHeader } from "../config";
 
+
 export default {
   name: "Intelect",
+  watch: {
+    $route() {
+      this.getJson();
+      }
+  },
   data() {
     return {
       OntNames: [],
@@ -86,6 +93,7 @@ export default {
       expandedKeys: {},
     };
   },
+
   methods: {
     countDashes(str) {
       return str.split("-").length - 1;
@@ -128,7 +136,7 @@ export default {
       // console.log("AHMET_API:", `${AHMET_API}/getontology/kz/`);
       this.loading = true;
       var reqbody = {
-        question: "Тіл құрал",
+        question: "Тіл-құрал",
         pkey: 0,
         id: this.$route.params.id,
       };
@@ -140,13 +148,13 @@ export default {
       this.loading = false;
     },
     async searchFunc() {
+
       this.loading = true;
       var reqbody = {
         question: this.textController,
         pkey: 0,
         id: this.$route.params.id,
       };
-      console.log(reqbody);
       var temp = await axios.post(`${AHMET_API}/getontology/ask/`, reqbody, {
         headers: getHeader(),
       });
@@ -220,14 +228,11 @@ export default {
       self.textController = text;
       self.textController = text;
       self.loading = false;
+      self.searchFunc();
     };
     this.loading = false;
   },
-  watch: {
-    OntoInner(newValue) {
-      console.log(newValue);
-    },
-  },
+  
 };
 </script>
 <style scoped>
@@ -253,7 +258,6 @@ export default {
   padding-right: 0;
   padding-left: 0;
   display: block;
-  max-width: 400px;
   margin-left: 15px;
   padding-top: 0;
 }

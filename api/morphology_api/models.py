@@ -53,7 +53,7 @@ class MyOwlReady:
             cls.__instance = MyOwlReady()
         print("TurkOntology loading...")
         cls._turkOnto = rdflib.Graph()
-        cls._turkOnto.parse('owl/Tilqural25082023.owl')
+        cls._turkOnto.parse('owl/Ak.owl')
     @classmethod
     def SyncReasoner(cls):
         if not cls.__instance:
@@ -74,7 +74,7 @@ class MyOwlReady:
     @classproperty
     def TurkOnto(cls):
         if cls._turkOnto == None:
-            print("TurkOntology loading...")
+            print("TurkOntology loading...1111")
             cls._turkOnto = rdflib.Graph()
             cls._turkOnto.parse('owl/Tilqural25082023.owl')
 
