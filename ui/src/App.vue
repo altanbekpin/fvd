@@ -144,7 +144,7 @@ export default {
         {
           label: "Анықтамалық",
           items: [
-            { label: "Тіл-құрал", icon: "pi pi-fw pi-file", to: "/intelect/1" },
+            { label: "Қазіргі қазақ тілінің грамматикасы", icon: "pi pi-fw pi-file", to: "/intelect/1" },
             {
               label: "Сұрақ-жауап жүйесі",
               icon: "pi pi-fw pi-star",
