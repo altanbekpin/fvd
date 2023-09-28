@@ -45,10 +45,10 @@
 
           <Button
             type="button"
-            icon="pi pi-plus"
-            label="Жаңа оқулық қосу"
+            icon="pi pi-book"
+            label="Оқулықтар"
             outlined
-            @click="showAddBook()"
+            @click="showBooks()"
             style="margin-right: 4%"
           />
           <span class="p-input-icon-left input-span">
@@ -57,7 +57,7 @@
           </span>
         </div>
       </template>
-      <template #empty> No customers found. </template>
+      <template #empty> Ешнарсе табылмады. </template>
       <template #loading> Loading customers data. Please wait. </template>
       <Column
         v-if="isUserAdmin || isUserExpert"
@@ -340,16 +340,16 @@
       ></Button>
     </template>
   </Dialog>
-  <!-- Add a new book to a subject dialog -->
+  <!-- show all books dialog -->
   <Dialog
-    v-model:visible="showAddBookDialog"
+    v-model:visible="showBooksDialog"
     :style="{ width: '500px' }"
-    header="Жаңа оқулық қосу"
+    header="Оқулықтар"
     :modal="true"
     class="p-fluid"
   >
     <DataTable
-      :value="customers"
+      :value="bookSubjects"
       lazy
       :loading="loadingbook"
       v-model:filters="filtersbook"
@@ -359,28 +359,139 @@
       paginator
       :totalRecords="totalRecordsBook"
       :rows="5"
-      :rowsPerPageOptions="[5, 10, 20, 50]"
     >
       <Column field="subject" header="Пән" style="width: 25%"></Column>
-      <Column field="class" header="Сынып" style="width: 25%"></Column>
+      <Column
+        field="class"
+        header="Сынып"
+        :showFilterMenu="false"
+        :filterMenuStyle="{ width: '14rem' }"
+        style="min-width: 25%"
+      >
+        <template #filter="{ filterModel, filterCallback }">
+          <Dropdown
+            @change="filterCallback()"
+            v-model="filterModel.value"
+            :options="classes"
+            placeholder="Сынып таңдаңыз"
+          >
+          </Dropdown> </template
+      ></Column>
+      <Column field="class" header="Кітап">
+        <template #body="{ data }">
+          <a :href="`http://localhost:5001/book/download/${data.id}`">{{
+            data.name
+          }}</a>
+        </template>
+      </Column>
+      <Column>
+        <template #body="{ data }">
+          <Button
+            style="width: 35px; height: 35px"
+            icon="pi pi-pencil"
+            aria-label="Submit"
+            @click="showEditBook(data)"
+          />
+        </template>
+      </Column>
     </DataTable>
+    <Button
+      v-if="isUserAdmin || isUserExpert"
+      label="Жаңа оқулық қосу"
+      icon="pi pi-plus"
+      @click="showAddBook"
+    />
+  </Dialog>
+  <!-- add a new book dialog -->
+  <Dialog
+    v-model:visible="showAddBookDialog"
+    :style="{ width: '500px' }"
+    header="Жаңа оқулық қосу"
+    :modal="true"
+    class="p-fluid"
+  >
+    <Dropdown
+      v-model="selectedSubjectForAddBook"
+      :options="subjects"
+      optionLabel="subject"
+      placeholder="Пән тандаңыз"
+      style="margin-bottom: 20px"
+    />
+    <Dropdown
+      v-model="selectedClassForAddBook"
+      :options="classes"
+      placeholder="Сынып тандаңыз"
+    />
+
+    <span class="p-float-label" style="margin-top: 20px; margin-bottom: 20px">
+      <InputText id="filename" v-model="FileName" />
+      <label for="filename">Кітаптың аты</label>
+    </span>
+    <FileUpload
+      :name="FileName"
+      :url="url"
+      :formData="form_Data"
+      @upload="handleFileUpload"
+    ></FileUpload>
+  </Dialog>
+  <!-- edit a book dialog -->
+  <Dialog
+    v-model:visible="showEditBookDialog"
+    modal
+    header="Оқулықты өзгерту"
+    :style="{ width: '40dvh' }"
+  >
+    <Dropdown
+      v-model="subjectToEdit"
+      :options="subjects"
+      optionLabel="subject"
+      placeholder="Пән тандаңыз"
+      style="margin-bottom: 20px"
+    />
+    <Dropdown
+      v-model="classToEdit"
+      :options="classes"
+      placeholder="Сынып тандаңыз"
+      style="margin-bottom: 20px"
+    />
+    <InputText
+      v-model="bookNameToEdit"
+      type="text"
+      placeholder="Кітаптың аты"
+    />
+    <template #footer>
+      <Button
+        label="Жабу"
+        icon="pi pi-times"
+        @click="showEditBookDialog = false"
+        text
+      />
+      <Button label="Жіберу" icon="pi pi-check" @click="sendToEdit" autofocus />
+    </template>
   </Dialog>
 </template>
 <script>
 import { AhmetService } from "@/service/AhmetService";
+import { AHMET_API } from "@/config";
 import { useStore } from "vuex";
 
 export default {
   data() {
     return {
       totalRecordsBook: 100,
+      bookNameToEdit: null,
+      url: `${AHMET_API}/upload/school/book`,
+      showEditBookDialog: false,
       // books: [{ class: 3, subject: "Adasskdmakls" }],
       loadingbook: false,
       filtersbook: null,
+      FileName: "",
+      form_Data: new FormData(),
+      showAddBookDialog: false,
       selectedProduct: null,
       showChangeSubjectDialog: false,
       showAddCommentDialog: false,
-      showAddBookDialog: false,
+      showBooksDialog: false,
       showCommentDialog: false,
       comments: [],
       requestToChange: {
@@ -390,6 +501,8 @@ export default {
         school_class: null,
         id: null,
       },
+      subjectToEdit: null,
+      classToEdit: null,
       comment: null,
       username: null,
       lazyParamsBook: {},
@@ -414,9 +527,12 @@ export default {
         subject: null,
         school_class: null,
       },
+      bookSubjects: null,
       subjects: [],
       store: null,
       termin_id: null,
+      selectedClassForAddBook: null,
+      selectedSubjectForAddBook: null,
     };
   },
   async mounted() {
@@ -441,6 +557,57 @@ export default {
     },
   },
   methods: {
+    showEditBook(data) {
+      this.subjectToEdit = data.subject;
+      this.classToEdit = data.class;
+      this.showEditBookDialog = true;
+    },
+    sendToEdit() {
+      console.log("this.subjectToEdit:", this.subjectToEdit);
+      console.log("this.classToEdit:", this.classToEdit);
+    },
+    handleFileUpload(event) {
+      const formData = new FormData();
+      console.log("url:", this.url);
+      console.log("FileName:", this.FileName);
+      console.log("subject_id:", this.selectedSubjectForAddBook.id);
+      console.log("selectedClassForAddBook:", this.selectedClassForAddBook);
+      const file = event.files[0];
+      formData.append(this.FileName, file);
+      formData.append("class", this.selectedClassForAddBook);
+      formData.append("subject_id", this.selectedSubjectForAddBook.id);
+      console.log("form_data:", this.form_Data);
+      fetch(`${AHMET_API}/upload/school/book`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.store.getters.getAccessToken}`,
+        },
+        body: formData,
+      })
+        .then(() => {
+          // console.log("response: ", response);
+          this.$toast.add({
+            severity: "success",
+            summary: "Қосылды",
+            detail: "Жаңа файл сәтті қосылды",
+            life: 3000,
+          });
+        })
+        .catch((error) => {
+          // console.log('There"s a issue:', error);
+          this.$toast.add({
+            severity: "error",
+            summary: "Ақау",
+            detail: error,
+            life: 3000,
+          });
+        });
+      // .finally(() => init());
+      this.FileName = "";
+    },
+    showAddBook() {
+      this.showAddBookDialog = true;
+    },
     async deleteComments() {
       const access_token = this.store.getters.getAccessToken;
       await AhmetService.deleteComments(
@@ -452,6 +619,12 @@ export default {
     showComment() {
       this.showCommentDialog = true;
       this.getComments();
+    },
+    async getComments() {
+      const access_token = this.store.getters.getAccessToken;
+      this.comments = (
+        await AhmetService.getComments(this.termin_id, access_token)
+      ).data;
     },
     async sendComment() {
       this.showAddCommentDialog = false;
@@ -480,21 +653,30 @@ export default {
       this.termin_id = termin_id;
       this.showAddCommentDialog = true;
     },
-    showAddBook() {
+    async showBooks() {
+      this.totalRecordsBook = (
+        await AhmetService.countSchoolBooks()
+      ).data.count;
+      this.showBooksDialog = true;
       this.loadBooks();
-      this.showAddBookDialog = true;
     },
     async loadBooks() {
-      this.lazyParamsBook = {
-        first: this.$refs.dt2.first,
-        rows: this.$refs.dt2.rows,
-        sortField: null,
-        sortOrder: null,
-        filters: this.filters,
-      };
+      if (this.$refs.dt2) {
+        this.lazyParamsBook = {
+          first: this.$refs.dt2.first,
+          rows: this.$refs.dt2.rows,
+          sortField: null,
+          sortOrder: null,
+          filters: this.filters,
+        };
+      }
+
       console.log("this.lazyParamsBook:", this.lazyParamsBook);
-      // const response = await AhmetService.loadBooks(this.filtersbook);
-      // console.log("response:", response);
+      this.lazyLoadBooks();
+    },
+    async lazyLoadBooks() {
+      const response = await AhmetService.loadBooks();
+      this.bookSubjects = response.data;
     },
     onPageBook(event) {
       this.lazyParamsBook = event;

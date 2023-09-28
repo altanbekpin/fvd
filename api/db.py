@@ -708,7 +708,30 @@ class DB(DatabaseOperations):
         query = '''SELECT * FROM comments WHERE termin_id = %s'''
         comments = self._select_all_query(query, (termin_id,))
         return comments
-
+    
+    def get_subjects_with_books(self):
+        query = '''SELECT sbs.*, s.subject, sb.name, sb.path FROM school_books sb
+        INNER JOIN school_book_subject sbs ON sbs.school_book_id = sb.id
+        INNER JOIN subjects s ON s.id = sbs.subject_id;'''
+        result = self._select_all_query(query)
+        return result
+    
+    def addSchoolBook(self, path_to_save, name, subject_id, school_class):
+        query = '''INSERT INTO school_books(path, name) VALUES(%s, %s) RETURNING id'''
+        self._insert_query(query, (path_to_save, name))
+        school_book_id = self.fetchone()['id']
+        query = '''INSERT INTO school_book_subject(subject_id, school_book_id, class) VALUES(%s, %s, %s)'''
+        self._insert_query(query, (subject_id, school_book_id, school_class))
+        self._commit_db()
+    def get_school_book_path(self, id):
+        query = '''SELECT sb.path FROM school_book_subject sbs 
+        INNER JOIN school_books sb ON sbs.school_book_id = sb.id
+        WHERE sbs.id = %s'''
+        return self._select_all_query(query, (id, ))
+    
+    def get_amount_school_books(self):
+        query = '''SELECT COUNT(*) FROM school_book_subject'''
+        return self._select_one_query(query)
     def get_onto(self):
         return app.s
     def counter(self):
