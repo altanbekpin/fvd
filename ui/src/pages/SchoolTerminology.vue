@@ -387,6 +387,7 @@
       <Column>
         <template #body="{ data }">
           <Button
+            v-if="isUserAdmin || isUserExpert"
             style="width: 35px; height: 35px"
             icon="pi pi-pencil"
             aria-label="Submit"

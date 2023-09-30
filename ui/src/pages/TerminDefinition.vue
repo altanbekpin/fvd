@@ -1,6 +1,11 @@
 <template>
   <div class="card" v-if="products" style="min-width: 55rem">
-    <div v-if="store.getters.getRoles.includes('admin')">
+    <div
+      v-if="
+        store.getters.getRoles.includes('admin') ||
+        store.getters.getRoles.includes('expert')
+      "
+    >
       <Toolbar
         class="mb-4"
         style="border-color: white; background-color: white; min-width: 50rem"
@@ -73,7 +78,12 @@
       </template>
       <template #empty> Ешнәрсе табылмады. </template>
       <template #loading> Күте тұрыңыз. </template>
-      <div v-if="store.getters.getRoles.includes('admin')">
+      <div
+        v-if="
+          store.getters.getRoles.includes('admin') ||
+          store.getters.getRoles.includes('expert')
+        "
+      >
         <Column
           selectionMode="multiple"
           style="width: 3rem"
@@ -329,6 +339,7 @@ const initFilters = () => {
 initFilters();
 const clearFilter = () => {
   initFilters();
+  init();
 };
 </script>
 <style setup>
