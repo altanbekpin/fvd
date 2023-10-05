@@ -7,11 +7,13 @@ from tokenizers import Tokenizer
 from models import MyOwlReady
 from views import TextToSpeech
 from flask_restful import Api
+import threading
 
 class MyExtendedFlaskApp(Flask):
     def __init__(self, *args, **kwargs):
         super(MyExtendedFlaskApp, self).__init__(*args, **kwargs)
         self.s = MyOwlReady()
+        self.graph_lock = threading.Lock()
         self.tokenizer = Tokenizer.from_file("kazakh-bpe.tokenizer.json")
         self.vocabulary = self.tokenizer.get_vocab()
         
@@ -28,8 +30,8 @@ app = MyExtendedFlaskApp(__name__)
 # app.s = MyOwlReady()
 app.config['DB_PASSWORD'] = "magzhan2005"
 password = app.config['DB_PASSWORD']
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@db/userdb'
-# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@localhost:5435/userdb'
+# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@db/userdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:{password}@localhost:5435/userdb'
 # app.config['JSON_AS_ASCII'] = False
 app.config["JWT_SECRET_KEY"] = "@Remote2022" 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'

@@ -398,6 +398,23 @@ export const AhmetService = {
       }
     );
   },
+  getQuestions(question, id) {
+    return api.post(
+      `${AHMET_API}/getontology/questions/`,
+      {
+        question: question,
+        id:  id,
+      },
+      {
+        headers: {
+          // Authorization: `Bearer ${access_token}`,
+          "Access-Control-Allow-Credentials": "true",
+          "Content-Type": "application/json",
+          Accept: "*/*",
+        },
+      }
+    );
+  },
   async changeOrder(value, oldSynonyms) {
     return await api.put(
       `${AHMET_API}/change/order`,

@@ -153,10 +153,10 @@ export default {
             {
               label: "Сұрақ-жауап жүйесі",
               icon: "pi pi-fw pi-star",
-              to: "/answer/question/2",
+              to: "/answer/question/1",
             },
             {
-              label: "Терминдері мен анықтамалары",
+              label: "Терминдер мен анықтамалар",
               icon: "pi pi-fw pi-list",
               to: "/terminology/2",
             },
@@ -224,7 +224,7 @@ export default {
             {
               label: "Интеллектуалды жүйе",
               icon: "pi pi-fw pi-star",
-              to: "/answer/question/1",
+              to: "/answer/question/2",
             },
             {
               label: "Терминдері мен анықтамалары",

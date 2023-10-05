@@ -12,14 +12,14 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    # def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
-    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
+    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
+    # def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            # port = 5435,
+            port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -711,6 +711,8 @@ class DB(DatabaseOperations):
 
     def get_onto(self):
         return app.s
+    def get_onto_lock(self):
+        return app.graph_lock
     def counter(self):
         app.counter+=1
         return app.counter

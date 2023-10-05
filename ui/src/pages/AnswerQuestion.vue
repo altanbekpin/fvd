@@ -1,121 +1,35 @@
 <template>
-  <div
-    class="card"
-    style="
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 40rem;
-      align-self: center;
-      align-items: center;
-    "
-  >
-    <span style="font-size: 170%; font-weight: 500">Сұрақ-жауап жүйесі</span>
-    <span
-      class="text-blue-600"
-      style="width: 70%; margin-top: 1%; font-weight: 700; font-size: 110%"
-      >Қойылған сұраққа жауап Грамматика бойынша жаңа білім жүйесінен құралған
-      онтологиялық модель негізінде орындалады</span
-    >
-    <div
-      style="
-        display: flex;
-        flex-direction: row;
-        height: 100%;
-        width: 100%;
-        align-items: center;
-        align-self: center;
-        margin-bottom: 0;
-      "
-    >
-      <div
-        style="display: flex; flex-direction: column; height: 45%; width: 50%"
-      >
-        <div
-          class="card"
-          style="
-            height: 100%;
-            width: 100%;
-            padding: 0;
-            margin-bottom: 0%;
-            /* margin-top: 19%; */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-bottom: grey;
-          "
-        >
-          <!-- Header for the first card -->
-          <div
-            class="card"
-            style="
-              background-color: #3498db;
-              color: #fff;
-              padding: 1rem;
-              border-end-start-radius: 0;
-              border-end-end-radius: 0;
-              align-items: start;
-              margin-bottom: 0;
-            "
-          >
-            <span style="font-weight: bold; font-size: 100%">Сұрақ</span>
-          </div>
-          <Textarea
-            v-model="question"
-            class="custom-textarea"
-            filled
-            style="border: none; height: 80%; width: 100%; resize: none"
-          />
-        </div>
-      </div>
-      <div
-        class="card"
-        style="
-          height: 45%;
-          width: 50%;
-          padding: 0;
-          margin-left: 5%;
-          margin-bottom: 0;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          border-bottom: grey;
-        "
-      >
-        <!-- Header for the second card -->
-        <div
-          class="card"
-          style="
-            background-color: #e74c3c;
-            color: #fff;
-            padding: 1rem;
-            border-end-start-radius: 0;
-            border-end-end-radius: 0;
-            align-items: start;
-            margin-bottom: 0;
-          "
-        >
-          <span style="font-weight: bold; font-size: 100%">Жауап</span>
-        </div>
-        <Textarea
-          v-model="answer"
-          class="custom-textarea"
-          filled
-          style="
-            border: none;
-            height: 80%;
-            width: 100%;
-            resize: none;
-            color: blue;
-            font-weight: 700;
-          "
-          disabled
-        />
+  <div class="card bounder">
+    <h4>
+      Сұрақ-жауап жүйесі
+    </h4>
+    <Toast />
+    <hr height="20px" />
+    <div class="row">
+      <div>
+        <span style="font-size: 14px">
+          Қойылған сұраққа жауап Грамматика бойынша жаңа білім жүйесінен құралған онтологиялық модель негізінде орындалады
+        </span>
       </div>
     </div>
-
-    <Button
-      label="Сұрау"
-      icon="pi pi-send"
-      style="height: 10%; width: 10%; min-width: 7rem; font-size: 90%"
-      @click="ask"
-    ></Button>
+    <div class="row">
+      <div class="mt-3 w-full">
+        <span class="p-input-icon-left w-full p-inputtext p-1 shadow">
+          <i class="pi pi-search" />
+          <AutoComplete  @item-select="selectQuestion" completeOnFocus="true" inputClass="w-full pi pi-search ml-5 border-none pl-0 noshadow" class="w-full" v-model="question" :suggestions="items" @complete="search">
+          </AutoComplete>
+        </span>
+      </div>
+    </div>
+    
+    <div v-if="answers.length>0" class="row">
+      <div class="table">
+        <h5 class="pt-3 row">Нәтижелер:</h5>
+      <p class="row pl-2" v-for="answer in answers" :key="answer">
+         {{ answer.answer}}</p>
+      
+    </div>
+    </div>
   </div>
 </template>
 
@@ -126,7 +40,10 @@ export default {
   data() {
     return {
       question: "",
-      answer: "",
+      answers: [],
+      questions: null,
+      selectedItem: null,
+      items: [],
     };
   },
   methods: {
@@ -135,7 +52,49 @@ export default {
       console.log(response);
       this.answer = response.data;
     },
+    search(event) {
+      let temp = this.items
+      if (event.query === '') {
+        console.log(temp);
+        let data = [];
+          temp.forEach(element => {
+          data.push(element + "");
+        });        
+        this.items =data;
+      }
+      else if (event.query.length>2) {
+
+        this.answer = [];
+        AhmetService.getQuestions(event.query, this.$route.params.id).then(response =>{
+        let data = [];
+        response.data.data.forEach(element => {
+          data.push(element.question);
+        });
+        this.items = data;
+        this.questions = response.data.data;
+      });
+    }
+    },
+    selectQuestion() {
+      let index = -1;
+      index = this.items.indexOf(this.question);
+      if (index >= 0) {
+        this.answers = this.questions[index].answers;
+      }
+    }
   },
 };
 </script>
-<style></style>
+<style scoped>
+.noshadow {
+  border: none;
+}
+::v-deep(.noshadow:enabled:focus) {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 1px #93cbf9;
+  border-color: #64B5F6;
+  
+}
+
+</style>

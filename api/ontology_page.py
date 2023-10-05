@@ -1,5 +1,8 @@
+import string
 from app import app
+import random
 from flask import jsonify, request
+import concurrent.futures
 import json
 from db import DB
 @app.route('/getontology/<lang>/', methods=['GET'])
@@ -143,3 +146,135 @@ def send_question():
                 for row in def_qres:
                     s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
     return jsonify({"txt": s, "childs": childs})
+def get_question(lock, graph, kazont, query, question, answer, aslist):
+    prefix = '''
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        PREFIX kazont: <'''+kazont+'>'
+    answers = []
+    with lock:
+        rows = graph.query(prefix + query)
+        if aslist:
+            l = []
+            for row in rows:
+                l.append(row[0].replace(kazont,""))
+            if len(l)>0: 
+                answers.append({'answer': answer.format("" + ", ".join(l))})
+        else:
+            for row in rows:
+                answers.append({'answer': answer.format(row[0].replace(kazont,""))})
+        if len(answers)>0:
+            return {'question': question, 'answers': answers}
+
+@app.route('/getontology/questions/', methods=['POST'])
+def get_questions():
+    temp = json.loads(request.data.decode('utf-8'))
+    question = temp['question'].strip()
+    g = DB.get_instance().get_onto().TurkOnto(temp['id'])
+    lock = DB.get_instance().get_onto_lock()
+    results = []
+    kazont = 'http://www.semanticweb.org/til_qural_baitursyn#'
+    source = "Ахмет Байтұрсынұлы"
+    if temp['id']=='1':
+        kazont = 'http://www.semanticweb.org/Til-qural_A.Baitursynuly#'
+        source = "қазіргі қазақ тілінің грамматикасы"    
+  
+    
+    
+    
+    questions = [
+        # Дегеніміз не деген сұрақтар формасы
+        {  
+            'question': random.choice(["{} дегеніміз не?", "{} деген не? "]).format(question),
+            'query': '''
+                SELECT ?olabel
+                    WHERE { ?subject rdfs:subClassOf ?object .
+                ?subject rdfs:label ?label .
+                ?object rdfs:label ?olabel
+                FILTER(STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''") 
+
+                }
+            ''',
+            'answer': question + " дегеніміз - {}",
+            'aslist': False
+        },
+
+        {
+            'question': random.choice([source +" бойынша {} анықтамасы", "{} анықтамасы ", "{} ұғымының анықтамасын айт"]).format(question),
+            'query': '''
+                SELECT ?object
+                    WHERE { ?subject kazont:definition ?object .
+                ?subject rdfs:label ?label .
+                FILTER(
+                    (STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''")
+                    && (LANG(?object) = "" || LANG(?object) = "kz" )) 
+
+                }
+            ''',
+            'answer': question + " анықтамасы: {}",
+            'aslist': False
+        },
+         {
+            'question': random.choice(["{} үшін мысал келтір", source + " бойынша {} үшін қандай мысалдар келтірілген"]).format(question),
+            'query': '''
+            SELECT ?subject
+            WHERE 
+            { 
+                {
+                    ?subject rdf:type ?object .
+                    ?object rdfs:label ?label .
+                    FILTER(
+                    (STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''")
+                        && (LANG(?label) = "" || LANG(?label) = "kz" )
+                    ) 
+                }
+                union 
+                {
+                    ?object kazont:example ?subject . 
+                    ?object rdfs:label ?label .
+                    FILTER(
+                    (STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''")
+                    && (LANG(?label) = "" || LANG(?label) = "kz" )
+                    ) 
+
+                }
+            }
+            ''',
+            'answer': question + " үшін мысалдар: {}",
+            'aslist': True
+        },
+
+        {
+            'question': random.choice([question + " түрлері қандай?", "{} " + source + " бойынша қандай түрлерге бөлінеді"]).format(question),
+            'query': '''
+                SELECT ?slabel
+                    WHERE { ?subject rdfs:subClassOf ?object .
+                ?object rdfs:label ?label .
+                ?subject rdfs:label ?slabel .
+                FILTER((STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''") && (LANG(?slabel) = "" || LANG(?slabel) = "kz" ) ) 
+                }
+            ''',
+            'answer': question + " түрлері: {}",
+            'aslist': True
+        }
+        
+    ]
+    
+    
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_to_question = {executor.submit(get_question, lock, g, kazont, q['query'], q['question'], q['answer'], q['aslist']): q for q in questions}
+        for future in concurrent.futures.as_completed(future_to_question):
+            question_data = future_to_question[future]
+            try:
+                result = future.result()
+                if result is not None:
+                    results.append(result)
+            except Exception as e:
+                print(f'Error processing question: {question_data}', str(e))
+
+    response = jsonify({'data': results})
+    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    response.direct_passthrough = False
+    return response

@@ -2,7 +2,7 @@
   <div class="flex justify-center">
     <div class="card items-start mainbox">
       <div class="card-header">
-        <p1>Тезарус</p1>
+        <p1>{{$route.params.id == "2" ? 'Тіл-құрал' : 'Грамматика'}}</p1>
       </div>
       <!-- <Listbox
         v-if="OntNames.length != 0"
