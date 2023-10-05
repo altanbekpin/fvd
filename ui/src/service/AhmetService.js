@@ -21,10 +21,17 @@ export const AhmetService = {
     );
   },
   async loadBooks() {
-    // return await api.get(`${AHMET_API}/get/school/books`, {headers: getHeader()})
+    return await api.get(`${AHMET_API}/get/school/books`, {
+      headers: getHeader(),
+    });
   },
   async getLegaciesByID(id) {
     return await api.get(AHMET_API + `/get/legacies/${id}`, {
+      headers: getHeader(),
+    });
+  },
+  async countSchoolBooks() {
+    return await api.get(AHMET_API + `/get/amount/school/books`, {
       headers: getHeader(),
     });
   },
