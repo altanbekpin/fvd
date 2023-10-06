@@ -1,6 +1,8 @@
 import { AHMET_API, getHeader } from "@/config";
 import store from "../store";
 import api from "./api";
+import axios from "axios";
+
 export const AhmetService = {
   getTreeTableNodes(parentID) {
     let param = parentID ? String(parentID) : "";
@@ -405,22 +407,27 @@ export const AhmetService = {
       }
     );
   },
+
   getQuestions(question, id) {
-    return api.post(
-      `${AHMET_API}/getontology/questions/`,
-      {
-        question: question,
-        id:  id,
-      },
-      {
-        headers: {
-          // Authorization: `Bearer ${access_token}`,
-          "Access-Control-Allow-Credentials": "true",
-          "Content-Type": "application/json",
-          Accept: "*/*",
+    const cancelToken = axios.CancelToken.source(); // Создаем объект отмены запроса
+    return {
+      request: api.post(
+        `${AHMET_API}/getontology/questions/`,
+        {
+          question: question,
+          id: id,
         },
-      }
-    );
+        {
+          headers: {
+            "Access-Control-Allow-Credentials": "true",
+            "Content-Type": "application/json",
+            Accept: "*/*",
+          },
+          cancelToken: cancelToken.token, // Используем token объекта отмены запроса
+        }
+      ),
+      cancel: cancelToken.cancel, // Функция для отмены запроса
+    };
   },
   async changeOrder(value, oldSynonyms) {
     return await api.put(

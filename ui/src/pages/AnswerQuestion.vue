@@ -8,7 +8,7 @@
     <div class="row">
       <div>
         <span style="font-size: 14px">
-          Қойылған сұраққа жауап Грамматика бойынша жаңа білім жүйесінен құралған онтологиялық модель негізінде орындалады
+          Қойылған сұраққа жауап Грамматика бойынша жаңа білім жүйесінен құралған онтологиялық модель негізінде орындалады. Сұрақ қою үшін кілт сөзді енгізіңіз.
         </span>
       </div>
     </div>
@@ -44,6 +44,7 @@ export default {
       questions: null,
       selectedItem: null,
       items: [],
+      currentRequest: null,
     };
   },
   methods: {
@@ -52,7 +53,8 @@ export default {
       console.log(response);
       this.answer = response.data;
     },
-    search(event) {
+    async search(event) {
+
       let temp = this.items
       if (event.query === '') {
         console.log(temp);
@@ -63,16 +65,24 @@ export default {
         this.items =data;
       }
       else if (event.query.length>2) {
-
+        if (this.currentRequest) {
+          this.currentRequest.cancel();
+        }
         this.answer = [];
-        AhmetService.getQuestions(event.query, this.$route.params.id).then(response =>{
+        this.currentRequest = AhmetService.getQuestions(this.question, this.$route.params.id); 
+        try {
+        const response = await this.currentRequest.request;
+        
         let data = [];
         response.data.data.forEach(element => {
           data.push(element.question);
         });
         this.items = data;
         this.questions = response.data.data;
-      });
+        }
+        catch (error) {
+          console.log(error)
+        }
     }
     },
     selectQuestion() {
