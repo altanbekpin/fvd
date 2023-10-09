@@ -153,20 +153,24 @@ def get_question(lock, graph, kazont, query, question, answer, aslist):
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX kazont: <'''+kazont+'>'
-    answers = []
+    result = []
+    thing = ""
+    
     with lock:
         rows = graph.query(prefix + query)
-        if aslist:
-            l = []
-            for row in rows:
-                l.append(row[0].replace(kazont,""))
-            if len(l)>0: 
-                answers.append({'answer': answer.format("" + ", ".join(l))})
-        else:
-            for row in rows:
-                answers.append({'answer': answer.format(row[0].replace(kazont,""))})
-        if len(answers)>0:
-            return {'question': question, 'answers': answers}
+        
+        l = []
+        for row in rows:
+            val = ""+ row[1]
+            if val != thing:
+                if len(l)>0:
+                    result.append({'question': question.format(thing), 'answers':  [{'answer' : answer.format(thing,", ".join(l))} ]})
+                l = []
+                thing = val
+            val0 = "" + row[0]
+            l.append(val0.split("#")[-1])
+        if len(result)>0:
+            return result   
 
 @app.route('/getontology/questions/', methods=['POST'])
 def get_questions():
@@ -187,46 +191,49 @@ def get_questions():
     questions = [
         # Дегеніміз не деген сұрақтар формасы
         {  
-            'question': random.choice(["{} дегеніміз не?", "{} деген не? "]).format(question),
+            'question': random.choice(["{} дегеніміз не?", "{} деген не? "]),
             'query': '''
-                SELECT ?olabel
+                SELECT ?olabel ?label
                     WHERE { ?subject rdfs:subClassOf ?object .
                 ?subject rdfs:label ?label .
                 ?object rdfs:label ?olabel
-                FILTER(STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''") 
+                FILTER(
+                    (REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label), "' + question.capitalize() + '''")) 
+                    && (LANG(?object) = "" || LANG(?object) = "kz" ) 
+                    ) 
 
                 }
             ''',
-            'answer': question + " дегеніміз - {}",
+            'answer': "{} дегеніміз - {}",
             'aslist': False
         },
 
         {
-            'question': random.choice([source +" бойынша {} анықтамасы", "{} анықтамасы ", "{} ұғымының анықтамасын айт"]).format(question),
+            'question': random.choice([source +" бойынша {} анықтамасы", "{} анықтамасы ", "{} ұғымының анықтамасын айт"]),
             'query': '''
-                SELECT ?object
+                SELECT ?object ?label
                     WHERE { ?subject kazont:definition ?object .
                 ?subject rdfs:label ?label .
                 FILTER(
-                    (STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''")
+                    (REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label) ,"' + question.capitalize() + '''"))
                     && (LANG(?object) = "" || LANG(?object) = "kz" )) 
 
                 }
             ''',
-            'answer': question + " анықтамасы: {}",
+            'answer': "{} анықтамасы: {}",
             'aslist': False
         },
          {
-            'question': random.choice(["{} үшін мысал келтір", source + " бойынша {} үшін қандай мысалдар келтірілген"]).format(question),
+            'question': random.choice(["{} үшін мысал келтір", source + " бойынша {} үшін қандай мысалдар келтірілген"]),
             'query': '''
-            SELECT ?subject
+            SELECT ?subject ?label
             WHERE 
             { 
                 {
                     ?subject rdf:type ?object .
                     ?object rdfs:label ?label .
                     FILTER(
-                    (STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''")
+                    (REGEX(STR(?label) ,"''' + question + '") || REGEX(STR(?label), "' + question.capitalize() + '''"))
                         && (LANG(?label) = "" || LANG(?label) = "kz" )
                     ) 
                 }
@@ -235,28 +242,28 @@ def get_questions():
                     ?object kazont:example ?subject . 
                     ?object rdfs:label ?label .
                     FILTER(
-                    (STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''")
+                    (REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label), "' + question.capitalize() + '''"))
                     && (LANG(?label) = "" || LANG(?label) = "kz" )
                     ) 
 
                 }
             }
             ''',
-            'answer': question + " үшін мысалдар: {}",
+            'answer': "{} үшін мысалдар: {}",
             'aslist': True
         },
 
         {
-            'question': random.choice([question + " түрлері қандай?", "{} " + source + " бойынша қандай түрлерге бөлінеді"]).format(question),
+            'question': random.choice(["{} түрлері қандай?", "{} " + source + " бойынша қандай түрлерге бөлінеді"]),
             'query': '''
-                SELECT ?slabel
+                SELECT ?slabel ?label
                     WHERE { ?subject rdfs:subClassOf ?object .
                 ?object rdfs:label ?label .
                 ?subject rdfs:label ?slabel .
-                FILTER((STR(?label) = "''' + question + '" || STR(?label) = "' + question.capitalize() + '''") && (LANG(?slabel) = "" || LANG(?slabel) = "kz" ) ) 
+                FILTER((REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label), "' + question.capitalize() + '''")) && (LANG(?slabel) = "" || LANG(?slabel) = "kz" ) ) 
                 }
             ''',
-            'answer': question + " түрлері: {}",
+            'answer': "{} түрлері: {}",
             'aslist': True
         }
         
@@ -270,7 +277,7 @@ def get_questions():
             try:
                 result = future.result()
                 if result is not None:
-                    results.append(result)
+                    results.extend(result)
             except Exception as e:
                 print(f'Error processing question: {question_data}', str(e))
 

@@ -24,10 +24,22 @@
     
     <div v-if="answers.length>0" class="row">
       <div class="table">
-        <h5 class="pt-3 row">Нәтижелер:</h5>
+      <h5 class="pt-3 row">Жауабы:</h5>
+
       <p class="row pl-2" v-for="answer in answers" :key="answer">
          {{ answer.answer}}</p>
       
+      <h5 class="pt-3 row">Бұдан өзге:</h5>
+
+      <DataView :value="questions" paginator :rows="4">
+        <template #list="slotProps">
+          <div class="col-12">
+            <h5><a href="#" @click.prevent="selectQuestion(slotProps.data.question)">{{slotProps.data.question}}</a></h5>
+            <p class="truncate-text">{{ slotProps.data.answers[0].answer }}</p>
+          </div>
+        </template>
+        
+      </DataView>
     </div>
     </div>
   </div>
@@ -57,7 +69,6 @@ export default {
 
       let temp = this.items
       if (event.query === '') {
-        console.log(temp);
         let data = [];
           temp.forEach(element => {
           data.push(element + "");
@@ -71,21 +82,24 @@ export default {
         this.answer = [];
         this.currentRequest = AhmetService.getQuestions(this.question, this.$route.params.id); 
         try {
-        const response = await this.currentRequest.request;
-        
-        let data = [];
-        response.data.data.forEach(element => {
-          data.push(element.question);
-        });
-        this.items = data;
-        this.questions = response.data.data;
+          const response = await this.currentRequest.request;
+          let data = [];
+          response.data.data.forEach(element => {
+            data.push(element.question);
+          });
+          this.items = data;
+          this.questions = response.data.data;
         }
         catch (error) {
           console.log(error)
         }
     }
     },
-    selectQuestion() {
+    selectQuestion(question) {
+      
+      if (question.value == undefined) {
+        this.question = question;
+      }
       let index = -1;
       index = this.items.indexOf(this.question);
       if (index >= 0) {
@@ -105,6 +119,12 @@ export default {
   box-shadow: 0 0 0 1px #93cbf9;
   border-color: #64B5F6;
   
+}
+.truncate-text {
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  overflow: hidden;
 }
 
 </style>
