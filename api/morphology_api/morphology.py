@@ -21,13 +21,23 @@ import re
 from .word import Word
 from db import *
 
+from enum import Enum
+
 def clear_word(input_string):
     pattern = r'\*(.*?)<'
     matches = re.findall(pattern, input_string)
     new_array = [input_string.split('+')[0]]+matches
     return new_array
 
-
+class Septik(Enum):
+    Undefined = 0
+    Atau = 1
+    Ilik = 2
+    Barys = 3
+    Tabys = 4
+    Zhatys = 5
+    Shygys = 6
+    Komektes = 7 
 class Morphology:
     def change_conjunction(preceding_word, conjuction):
         """
@@ -41,6 +51,25 @@ class Morphology:
             elif Phonetic.is_strict_consonant(preceding_word[-1]):
                 return "пен"
         return conjuction
+    def ToIlik(word):
+            end = "д"
+            if word[-1] in Phonetic.strict_consonants:
+                end = "т"
+            if word[-1] in ["з", "ж", "м", "н", "ң"] or word[-1] in Phonetic.is_vowel:
+                end= "н"
+            if Phonetic.is_soft(word):
+                return word + end + "ің"
+            return word + end + "ың"
+  
+    def Septeu(word,septik):
+        septik_enum_value = Septik(int(septik)) 
+        match septik_enum_value:
+            case Septik.Atau:
+                return word
+            case Septik.Ilik:
+                return Morphology.ToIlik(word)
+        return word
+
 class Lemms:
     instance = None
     @classmethod

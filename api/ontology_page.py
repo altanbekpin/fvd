@@ -5,6 +5,8 @@ from flask import jsonify, request
 import concurrent.futures
 import json
 from db import DB
+from morphology_api.morphology import Septik
+from morphology_api.morphology import Morphology
 @app.route('/getontology/<lang>/', methods=['GET'])
 def getontology(lang):
     owls = DB.get_instance().get_onto().GetJson(lang=lang)
@@ -146,7 +148,7 @@ def send_question():
                 for row in def_qres:
                     s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
     return jsonify({"txt": s, "childs": childs})
-def get_question(lock, graph, kazont, query, question, answer, aslist):
+def get_question(lock, graph, kazont, query, question, answer):
     prefix = '''
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -160,15 +162,26 @@ def get_question(lock, graph, kazont, query, question, answer, aslist):
         rows = graph.query(prefix + query)
         
         l = []
+        val = ""
+        val0 = ""
+        quest = question.split("#")
+        ans = answer.split("#")
         for row in rows:
-            val = ""+ row[1]
+            val = ""+ row[1].split("#")[-1]
+            if thing == "":
+                thing = val
             if val != thing:
-                if len(l)>0:
-                    result.append({'question': question.format(thing), 'answers':  [{'answer' : answer.format(thing,", ".join(l))} ]})
+          
+                result.append({'question': quest[0].format(Morphology.Septeu(thing, quest[-1])), 'answers':  [{'answer' : ans[0].format(Morphology.Septeu(thing, ans[-1]),", ".join(l))} ]})
+                print("thing=", thing)
                 l = []
                 thing = val
             val0 = "" + row[0]
             l.append(val0.split("#")[-1])
+        if (val != ""):
+            result.append({'question': quest[0].format(Morphology.Septeu(thing, quest[-1])), 'answers':  [{'answer' : ans[0].format(Morphology.Septeu(thing, ans[-1]),", ".join(l))} ]})
+        for res in result:
+            DB.get_instance().update_question(res)
         if len(result)>0:
             return result   
 
@@ -191,40 +204,37 @@ def get_questions():
     questions = [
         # Дегеніміз не деген сұрақтар формасы
         {  
-            'question': random.choice(["{} дегеніміз не?", "{} деген не? "]),
+            'question': random.choice(["{} дегеніміз не?#0", "{} деген не?#0"]),
             'query': '''
                 SELECT ?olabel ?label
                     WHERE { ?subject rdfs:subClassOf ?object .
                 ?subject rdfs:label ?label .
                 ?object rdfs:label ?olabel
                 FILTER(
-                    (REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label), "' + question.capitalize() + '''")) 
-                    && (LANG(?object) = "" || LANG(?object) = "kz" ) 
+                    (REGEX(STR(?label), "''' + question.lower() + '") || REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label), "' + question.capitalize() + '''")) 
                     ) 
-
                 }
+                order by   ?label
             ''',
-            'answer': "{} дегеніміз - {}",
-            'aslist': False
+            'answer': "{} дегеніміз - {}#0",
         },
 
         {
-            'question': random.choice([source +" бойынша {} анықтамасы", "{} анықтамасы ", "{} ұғымының анықтамасын айт"]),
+            'question': random.choice([source +" бойынша {} анықтамасы#2", "{} анықтамасы#2", "{} анықтамасын айт#2"]),
             'query': '''
                 SELECT ?object ?label
                     WHERE { ?subject kazont:definition ?object .
                 ?subject rdfs:label ?label .
                 FILTER(
-                    (REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label) ,"' + question.capitalize() + '''"))
-                    && (LANG(?object) = "" || LANG(?object) = "kz" )) 
+                    (REGEX(STR(?label), "''' + question.lower() + '") || REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label) ,"' + question.capitalize() + '''"))
+                   ) 
 
                 }
             ''',
-            'answer': "{} анықтамасы: {}",
-            'aslist': False
-        },
+            'answer': random.choice(["{} анықтамасы: {}#2", "{} дегеніміз: {}#0"]),
+         },
          {
-            'question': random.choice(["{} үшін мысал келтір", source + " бойынша {} үшін қандай мысалдар келтірілген"]),
+            'question': random.choice(["{} үшін мысал келтір#2", source + " бойынша {} үшін қандай мысалдар келтірілген#2", "{} мысалдары#2"]),
             'query': '''
             SELECT ?subject ?label
             WHERE 
@@ -249,12 +259,12 @@ def get_questions():
                 }
             }
             ''',
-            'answer': "{} үшін мысалдар: {}",
-            'aslist': True
+            'answer': random.choice(["{} үшін мысалдар: {}#0", "{} мысалдары: {}#2"]),
+
         },
 
         {
-            'question': random.choice(["{} түрлері қандай?", "{} " + source + " бойынша қандай түрлерге бөлінеді"]),
+            'question': random.choice(["{} түрлері қандай?#2", "{} " + source + " бойынша қандай түрлерге бөлінеді#0"]),
             'query': '''
                 SELECT ?slabel ?label
                     WHERE { ?subject rdfs:subClassOf ?object .
@@ -263,24 +273,25 @@ def get_questions():
                 FILTER((REGEX(STR(?label), "''' + question + '") || REGEX(STR(?label), "' + question.capitalize() + '''")) && (LANG(?slabel) = "" || LANG(?slabel) = "kz" ) ) 
                 }
             ''',
-            'answer': "{} түрлері: {}",
-            'aslist': True
+            'answer': random.choice(["{} түрлері: {}#2", "{} келесідей бөлінеді: {}#0"]),
         }
         
     ]
     
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_question = {executor.submit(get_question, lock, g, kazont, q['query'], q['question'], q['answer'], q['aslist']): q for q in questions}
+        future_to_question = {executor.submit(get_question, lock, g, kazont, q['query'], q['question'], q['answer']): q for q in questions}
         for future in concurrent.futures.as_completed(future_to_question):
             question_data = future_to_question[future]
             try:
                 result = future.result()
                 if result is not None:
                     results.extend(result)
+                
             except Exception as e:
                 print(f'Error processing question: {question_data}', str(e))
-
+    if len(results)==0:
+         results = DB.get_instance().get_question_similarity(question)
     response = jsonify({'data': results})
     response.headers['Content-Type'] = 'application/json; charset=utf-8'
     response.direct_passthrough = False

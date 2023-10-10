@@ -117,7 +117,76 @@ class DB(DatabaseOperations):
         self._insert_query('''INSERT INTO offers (offer_id, user_id, activate_type) VALUES(%s, %s, 1)''', (row_id, user_id))
         self._close_db()
         return row_id
-    
+    def update_question(self, question):
+        try:
+        # Установите соединение с базой данных
+            if self.cursor.closed:
+                self._delete_instance()
+                self = self.get_instance()
+            cursor = self.cursor
+            # Проверьте, существует ли вопрос в базе данных
+            cursor.execute("SELECT id FROM public.question WHERE question = %s", (question['question'],))
+            question_id = cursor.fetchone()
+
+            if not question_id:
+                # Если вопроса нет, вставьте его в таблицу 'question'
+                print(cursor.execute("INSERT INTO public.question (question) VALUES (%s) RETURNING id", (question['question'],)))
+                question_id = cursor.fetchone()['id']
+
+            # Вставьте связанные с вопросом ответы в таблицу 'answer'
+            for answer_data in question['answers']:
+                cursor.execute("INSERT INTO public.answer (answer, question_id) VALUES (%s, %s)", (answer_data['answer'], question_id))
+
+            # Примените изменения
+            self.connection.commit()
+            # Закройте курсор
+            cursor.close()
+            return True  # Успешно вставлено
+        except Exception as e:
+            print(f"Ошибка при вставке в базу данных: {str(e)}")
+            self.connection.rollback()  # Откатите транзакцию в случае ошибки
+            return False  # Произошла ошибка при вставке
+    def get_question_similarity(self, question):
+        try:
+            # Установите соединение с базой данных
+            if self.cursor.closed:
+                self._delete_instance()
+                self = self.get_instance()
+            cursor = self.cursor
+
+            # Выполните запрос для получения вопроса по его ID
+            cursor.execute('''
+            SELECT id, question FROM 
+                (SELECT id, question, similarity(question, %s) AS sim 
+            FROM 
+                question
+            WHERE 
+                similarity(question, %s) > 0.3) AS quest 
+            ORDER BY 
+                sim DESC 
+            LIMIT 10''', (question,question))
+            question_datas = cursor.fetchall()
+            result = []
+            for question_data in question_datas:
+                question_id = question_data['id']
+                # Выполните запрос для получения связанных с вопросом ответов
+                cursor.execute("SELECT * FROM public.answer WHERE question_id = %s", (question_id,))
+                answers_data = cursor.fetchall()
+
+                # Сформируйте словарь на основе полученных данных
+                question_dict = {
+                    'question': question_data['question'],
+                    'answers': [{'answer': answer_data['answer']} for answer_data in answers_data]
+                }
+                result.append(question_dict)
+
+            # Закройте курсор
+            cursor.close()
+
+            return result
+        except Exception as e:
+            print(f"Ошибка при получении данных из базы данных: {str(e)}")
+            return None
     def add_Synonyms(self, synonym, word_id, user_id):
         insert_synonyms = "INSERT INTO synonyms (synonym) VALUES (%s) RETURNING id"
         self._insert_query(insert_synonyms, (synonym, ))

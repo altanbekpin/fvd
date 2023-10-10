@@ -5,6 +5,7 @@ class Phonetic:
     thin_vowels = ["ә", "е", "ө", "ө", "і", "ү"]
     # дауыстылар
     vowels = thin_vowels + thick_vowels
+   
     def is_soft(word) : 
         """
         Сөздің жіңішкелігін анықтайды
@@ -46,3 +47,4 @@ class Phonetic:
         Дауыссыз дыбыстың үнді екенін анықтайды
         """
         return sound in Phonetic.sonorat_consonants
+ 
