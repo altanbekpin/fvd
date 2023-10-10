@@ -20,7 +20,6 @@
             class="flex flex-wrap gap-2"
           >
             <Button
-              v-if="hasAllowedExtension(slotProps.node.data)"
               type="button"
               icon="pi pi-download"
               @click="getFile(slotProps.node.key)"
@@ -295,11 +294,12 @@ const addTag = async () => {
     isDialogForTagsVisible.value = false;
   }
 };
-const hasAllowedExtension = (filename) => {
-  const allowedExtensions = ["pdf", "json", "txt"]; // Add more extensions as needed
-  const extension = filename.split(".").pop().toLowerCase();
-  return allowedExtensions.includes(extension);
-};
+// const hasAllowedExtension = (filename) => {
+//   return
+//   const allowedExtensions = ["pdf", "json", "txt"]; // Add more extensions as needed
+//   const extension = filename.split(".").pop().toLowerCase();
+//   return allowedExtensions.includes(extension);
+// };
 const showLegacyDialog = async () => {
   const data = await AhmetService.getLegaciesByID(fileID.value);
   repo.value = data.data;
