@@ -7,7 +7,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:test": "vue-cli-service build --mode development",
     "lint": "vue-cli-service lint",
