@@ -4,6 +4,8 @@ from app import app
 import os, hashlib
 from sqlalchemy import func
 from datetime import datetime
+
+from models import MyOwlReady
 # from middleware import Middleware
 
 db = SQLAlchemy(app)
@@ -12,14 +14,14 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    # def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
-    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
+    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
+    # def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            # port = 5435,
+            port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
@@ -105,11 +107,15 @@ class StaticOperatioins:
     @staticmethod
     def hash_code(code):
         return hashlib.sha256(str(code).encode()).hexdigest()
-
+    
 class DB(DatabaseOperations):
     def __init__(self, password):
         # self._onto = MyOwlReady()
         super().__init__(password)
+        self.load_ontologies()
+    def load_ontologies(self):
+        ontologies = self._select_all_query("SELECT id, content, name, prefix FROM ontology ORDER BY id DESC")
+        app.s = MyOwlReady(ontologies)
     def addWord(self, word, family, meaning, pos, example, user_id):
         self._insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, example, status)
         VALUES (%s, %s, %s, %s, %s,'бірмағыналы') RETURNING id""", (word, family, meaning, pos, example))

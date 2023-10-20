@@ -62,7 +62,8 @@ def send_question():
     parent_key = temp['pkey']
     lang = 'kz'
   
-    g = DB.get_instance().get_onto().TurkOnto(temp['id'])
+    g = DB.get_instance().get_onto().Onto(DB)
+
     s= ''
     kazont = 'http://www.semanticweb.org/til_qural_baitursyn#'
     if temp['id']=='1':
