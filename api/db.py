@@ -28,7 +28,7 @@ class DBConfig:
 
 class DatabaseOperations(DBConfig):
         instance = None
-git        def __init__(self, password) -> None:
+        def __init__(self, password) -> None:
             super().__init__(password)
 
         def _insert_query(self, query, data=None):
