@@ -136,7 +136,7 @@ export default {
       // console.log("AHMET_API:", `${AHMET_API}/getontology/kz/`);
       this.loading = true;
       var reqbody = {
-        question: "Тіл-құрал",
+        question: "",
         pkey: 0,
         id: this.$route.params.id,
       };

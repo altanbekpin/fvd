@@ -100,7 +100,6 @@ def user_table():
     if not DB.get_instance().isUserAdmin(current_user) and not DB.get_instance().isUserExpert(current_user):
         return jsonify({"message":"Сізде құқық жеткіліксіз"})
     users_results = DB.get_instance().user_table()
-    print("users_results:", users_results)
     return users_results
 
 

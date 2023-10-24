@@ -18,16 +18,13 @@ def register():
         data = {'message': 'Registration successful! Please check your email for verification'}
         return jsonify(data), 200
     except Exception as e:
-        print(e)
         data =  {'message': 'Registration failed', 'error': str(e)}
         return jsonify(data), 400
 
 
 @app.route('/confirm', methods=['POST'])
 def confirm():
-    print("request.json:", request.json)
     data = request.json['data']
-    print("data:", data)
     email = data['email']
     code = data['code']
     confirmation_code = DB.get_instance().get_conf_code(email)

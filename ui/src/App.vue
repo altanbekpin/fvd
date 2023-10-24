@@ -222,7 +222,7 @@ export default {
             { label: "Мұрасы", icon: "pi pi-fw pi-briefcase", to: "/legacy" },
             { label: "Тіл-құрал", icon: "pi pi-fw pi-file", to: "/intelect/2" },
             {
-              label: "Интеллектуалды жүйе",
+              label: "Сұрақ-жауап жүйесі",
               icon: "pi pi-fw pi-star",
               to: "/answer/question/2",
             },

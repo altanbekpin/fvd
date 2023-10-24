@@ -38,13 +38,10 @@ def upload_file():
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         }
         return ('', 204, headers)
-    print("AKSMALMSLKAMSAMSLAS")
     path_to_save = request.form.get('path_to_save')
     parent_id = request.form.get('parent_id')
     try:
         filename = request.form.get('filename')
-        print(filename)
-        print("###########################")
         # file_storage.save(f'./{path_to_save}/' + filename + '.' + content_type) 
         with open(f'./{path_to_save}/' + filename, 'w') as file:
             file.write("")

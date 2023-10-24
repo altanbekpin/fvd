@@ -33,16 +33,23 @@ class MyOwlReady:
     _tilQural = None
     _dw = None
     _owl = None
-    def __init__(self):
+    def __init__(self, ontologies = None):
+        if ontologies is not None: 
+            for ontology in ontologies:
+                ontology["graph"] = rdflib.Graph()
+                ontology["graph"].parse(data = ontology["content"], format='xml')
+                self._onto = ontologies
         if not MyOwlReady.__instance:
+
             print(" __init__ method called..")
             _turkOnto = rdflib.Graph()
             _tilQural = rdflib.Graph()
             _turkOnto.parse ('owl/Akhmettanu.owl')
             _tilQural.parse ('owl/Tilqural25082023.owl')
+            
+
         else:
             print("Instance already created:", self.getInstance())
-            print(self.Onto)
     @classmethod
     def getInstance(cls):
         if not cls.__instance:
@@ -61,15 +68,8 @@ class MyOwlReady:
             cls.__instance = MyOwlReady()
         print("Sync reasoner...")
         cls._onto.sync_reasoner()
+    @classmethod
     def Onto(cls):
-        if cls._onto == None:
-            print("Ontology loading...")
-            ont = Ontotext.objects.get(name="taxexpert")
-            ont.savetofile()
-            cls._onto = rdflib.Graph()
-            cls._onto.parse ('taxexpert.owl')
-            #cls._onto = get_ontology("file:taxextpert.owl").load()
-
         return cls._onto
     @classmethod
     def GetJson(cls, lang):
@@ -89,13 +89,13 @@ class MyOwlReady:
             #print(row)
         return owlclasses
     @classmethod
-    def TurkOnto(cls, id):
+    def TurkOnto(cls,id):
         if cls._turkOnto == None:
             print("TurkOntology loading...")
-            cls._turkOnto = rdflib.Graph()
-            cls._turkOnto.parse('owl/Akhmettanu.owl')
-            cls._tilQural = rdflib.Graph()
-            cls._tilQural.parse ('owl/Tilqural25082023.owl')
+            # cls._turkOnto = rdflib.Graph()
+            # cls._turkOnto.parse('owl/Akhmettanu.owl')
+            # cls._tilQural = rdflib.Graph()
+            # cls._tilQural.parse ('owl/Tilqural25082023.owl')
         if id == '1':
             return cls._turkOnto
         else:
@@ -108,15 +108,8 @@ class MyOwlReady:
             ont.savetofile()
             onto_path.append(os.getcwd())
             cls._onto = get_ontology("taxexpert.owl").load()
-
-            print(cls._onto)
-
         return cls._onto
     
-
-
-    
-
 class MyOntology():
     name = fields.Str()
     language = fields.Str()

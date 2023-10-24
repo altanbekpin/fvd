@@ -1,6 +1,7 @@
 import string
 from app import app
 import random
+import helper
 from flask import jsonify, request
 import concurrent.futures
 import json
@@ -62,18 +63,20 @@ def send_question():
     parent_key = temp['pkey']
     lang = 'kz'
   
-    g = DB.get_instance().get_onto().TurkOnto(temp['id'])
-    s= ''
-    kazont = 'http://www.semanticweb.org/til_qural_baitursyn#'
-    if temp['id']=='1':
-        kazont = 'http://www.semanticweb.org/Til-qural_A.Baitursynuly#'
-        if question == "Тіл-құрал":
-            question = "Грамматика"
+    g1 = helper.getElementByAttibute(DB.get_instance().get_onto()._onto, "id", int(temp['id']))
+    if g1 == None:
+        return jsonify({'error': 'Онтолония таьбылмады'}), 404
+    g = g1["graph"]
+    kazont = g1["prefix"]
+    
+    if question == "":
+        question = g1["name"]
     quest = '''
         PREFIX kazont: <''' + kazont + '''>
         SELECT ?subject ?label WHERE {{ ?subject rdfs:label "''' + question + '"@' + lang + ''' . ?subject rdfs:label  ?label
         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))} union { ?subject rdfs:label "''' + question.capitalize() + '"@' + lang + ''' . ?subject rdfs:label  ?label
         FILTER(LANG(?label) = "" || LANGMATCHES(LANG(?label), "''' + lang + '"))}}'
+    print(quest)
     qres = g.query(quest)
     childs = []
     for row in qres:
@@ -173,7 +176,6 @@ def get_question(lock, graph, kazont, query, question, answer):
             if val != thing:
           
                 result.append({'question': quest[0].format(Morphology.Septeu(thing, quest[-1])), 'answers':  [{'answer' : ans[0].format(Morphology.Septeu(thing, ans[-1]),", ".join(l))} ]})
-                print("thing=", thing)
                 l = []
                 thing = val
             val0 = "" + row[0]
@@ -189,14 +191,15 @@ def get_question(lock, graph, kazont, query, question, answer):
 def get_questions():
     temp = json.loads(request.data.decode('utf-8'))
     question = temp['question'].strip()
-    g = DB.get_instance().get_onto().TurkOnto(temp['id'])
     lock = DB.get_instance().get_onto_lock()
     results = []
-    kazont = 'http://www.semanticweb.org/til_qural_baitursyn#'
-    source = "Ахмет Байтұрсынұлы"
-    if temp['id']=='1':
-        kazont = 'http://www.semanticweb.org/Til-qural_A.Baitursynuly#'
-        source = "қазіргі қазақ тілінің грамматикасы"    
+    question = temp['question']
+    g1 = helper.getElementByAttibute(DB.get_instance().get_onto()._onto, "id", int(temp['id']))
+    if g1 == None:
+        return jsonify({'error': 'Онтолония таьбылмады'}), 404
+    g = g1["graph"]
+    kazont = g1["prefix"] 
+    source = g1["description"]
   
     
     
@@ -234,7 +237,7 @@ def get_questions():
             'answer': random.choice(["{} анықтамасы: {}#2", "{} дегеніміз: {}#0"]),
          },
          {
-            'question': random.choice(["{} үшін мысал келтір#2", source + " бойынша {} үшін қандай мысалдар келтірілген#2", "{} мысалдары#2"]),
+            'question': random.choice(["{} үшін мысал келтір#2", g1["description"] + " бойынша {} үшін қандай мысалдар келтірілген#2", "{} мысалдары#2"]),
             'query': '''
             SELECT ?subject ?label
             WHERE 

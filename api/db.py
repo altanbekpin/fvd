@@ -4,6 +4,8 @@ from app import app
 import os, hashlib
 from sqlalchemy import func
 from datetime import datetime
+
+from models import MyOwlReady
 # from middleware import Middleware
 
 db = SQLAlchemy(app)
@@ -105,11 +107,16 @@ class StaticOperatioins:
     @staticmethod
     def hash_code(code):
         return hashlib.sha256(str(code).encode()).hexdigest()
-
+    
 class DB(DatabaseOperations):
     def __init__(self, password):
-        # self._onto = MyOwlReady()
         super().__init__(password)
+        self.load_ontologies()
+    
+    def load_ontologies(cls):
+        if app.s._onto == None:
+            ontologies = cls._select_all_query("SELECT id, content, name, prefix, description FROM ontology ORDER BY id DESC")
+            app.s = MyOwlReady(ontologies)
     def addWord(self, word, family, meaning, pos, example, user_id):
         self._insert_query("""INSERT INTO synamizer (words, words_family, meaning, pos, example, status)
         VALUES (%s, %s, %s, %s, %s,'бірмағыналы') RETURNING id""", (word, family, meaning, pos, example))
@@ -130,12 +137,15 @@ class DB(DatabaseOperations):
 
             if not question_id:
                 # Если вопроса нет, вставьте его в таблицу 'question'
-                print(cursor.execute("INSERT INTO public.question (question) VALUES (%s) RETURNING id", (question['question'],)))
+                cursor.execute("INSERT INTO public.question (question) VALUES (%s) RETURNING id", (question['question'],))
                 question_id = cursor.fetchone()['id']
 
             # Вставьте связанные с вопросом ответы в таблицу 'answer'
             for answer_data in question['answers']:
-                cursor.execute("INSERT INTO public.answer (answer, question_id) VALUES (%s, %s)", (answer_data['answer'], question_id))
+                cursor.execute("SELECT id FROM public.answer WHERE answer = %s", (answer_data['answer'],))
+                answer_id = cursor.fetchone()
+                if not answer_id:
+                    cursor.execute("INSERT INTO public.answer (answer, question_id) VALUES (%s, %s)", (answer_data['answer'], question_id))
 
             # Примените изменения
             self.connection.commit()
@@ -257,8 +267,6 @@ class DB(DatabaseOperations):
 
     
     def findsyn_with_family(self, word, family):
-        print("word:", word)
-        print("family:", family)
         if family != '':
             query = '''SELECT s.synonym, z.words, s.id
             FROM synonyms s 
@@ -280,12 +288,10 @@ class DB(DatabaseOperations):
             AND o.activated = true;'''
             data = (word,)
         synonyms = self._select_all_query(query, data)
-        print("synonyms:", synonyms)
         return synonyms
 
     def is_syn(self, word):
         ref = self._select_all_query('SELECT * FROM synamizer WHERE words = %s', (word,))
-        print("ref:", ref)
         return not(ref is not None and len(ref) > 0 )
 
     def getSchoolTermins(self, first, filters, word,isChildren=False):
@@ -685,13 +691,11 @@ class DB(DatabaseOperations):
         self._close_db()
     
     def up_user_role(self, id):
-        print("self.isUserExpert(current_user):", self.isUserExpert(id))
         max_id = db.session.query(func.max(UserRole.id)).scalar() or 0
         if not self.isUserExpert(id):
             query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 3, %s)'''
         else:
             query = '''INSERT INTO user_role(user_id, role_id, id) VALUES(%s, 2, %s)'''
-        print("query:", query)
         self._insert_query(query, (id,max_id+1))
         self._close_db()
     def get_last_sentence(self):
@@ -754,7 +758,6 @@ class DB(DatabaseOperations):
         roles = []
         for i in role_ids:
             roles.append(DB.get_instance().get_role(i).name)
-        print("roles:", roles)
         return 'expert' in roles
     
     def get_legacies(self, id):

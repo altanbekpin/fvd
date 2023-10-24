@@ -1,14 +1,14 @@
 <template>
   <div class="card bounder">
     <h4>
-      Сұрақ-жауап жүйесі
+      {{$t("qas.title")}}
     </h4>
     <Toast />
     <hr height="20px" />
     <div class="row">
       <div>
         <span style="font-size: 14px">
-          Қойылған сұраққа жауап Грамматика бойынша жаңа білім жүйесінен құралған онтологиялық модель негізінде орындалады. Сұрақ қою үшін кілт сөзді енгізіңіз.
+          {{ $t('qas.description') }}
         </span>
       </div>
     </div>
@@ -24,12 +24,12 @@
     
     <div v-if="answers.length>0" class="row">
       <div class="table">
-      <h5 class="pt-3 row">Жауабы:</h5>
+      <h5 class="pt-3 row">{{$t('qas.answer')}}:</h5>
 
       <p class="row pl-2" v-for="answer in answers" :key="answer">
          {{ answer.answer}}</p>
       <div v-if="questions">
-      <h5 class="pt-3 row">Бұдан өзге:</h5>
+      <h5 class="pt-3 row">{{$t('qas.other')}}:</h5>
 
       <DataView :value="questions" paginator :rows="4">
         <template #list="slotProps">

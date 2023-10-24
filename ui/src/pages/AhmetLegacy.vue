@@ -256,12 +256,11 @@ const tagsToAdd = [
   { name: "ТАРИХШЫ", id: "21" },
 ];
 const isAdmin = () => {
-  console.log(store.state.user.roles);
   // isAdmin() || isExpert()
-  return store.state.user.roles.includes("admin");
+  return store.state.user && store.state.user.roles.includes("admin");
 };
 const isExpert = () => {
-  return store.state.user.roles.includes("expert");
+  return store.state.user && store.state.user.roles.includes("expert");
 };
 const addTag = async () => {
   try {

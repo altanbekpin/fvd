@@ -56,7 +56,6 @@ def send_question_test():
     instatnce = Word(ending, 0, [])
     # instatnce.look_for_synonym()
     ending = instatnce.get_first_part()
-    print("ending:", ending)
     if ending in ['дескриптор', 'гипоним', 'uniturk', 'гипероним', 'индивид']:
         question = " ".join(question.split(' ')[:-1]).capitalize()
     lang = 'kz'
@@ -128,9 +127,6 @@ def send_question_test():
             for row in def_qres:
                 s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
     try:
-        print("#####################")
-        print("result:", data)
-        print("#####################")
         result = data[ending]
     except:
         result = tempq + ' ' + 'табылмады'
@@ -253,6 +249,4 @@ def send_question2():
             def_qres = g.query(quest)
             for row in def_qres:
                 s =s + '<p class="m-0">&emsp;<i>'+ key+ '</i>: ' + "<a href=\"javascript:DoSubmit('" + row[0] +"', '"+ value +"');\">" + row[0] + '</a></p>'
-    print("parents:", parents)
-    print("children:", children)
     return jsonify({"parent":parents, "items":children})

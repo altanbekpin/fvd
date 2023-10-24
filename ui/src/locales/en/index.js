@@ -6,5 +6,12 @@ export default {
         sponsor: "The project was developed on the basis of a grant from the Ministry of Education and Science of the Republic of Kazakhstan (BR11765535)",
         text: "Text",
         translateText: "Translation text",
-    }
+    },
+    qas:{
+        title: "Question-answering system",
+        description: "The answer to the question asked is formed on the basis of an ontology built on the knowledge base of the selected section",
+        answer: "Answer",
+        other: "Also",
+    },
+  
 }

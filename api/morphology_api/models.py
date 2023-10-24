@@ -21,7 +21,6 @@ OT_NamedPrefix = 'PREFIX qaztax: <http://www.semanticweb.org/enu/qaztaxexpert#>'
 OT_CleanPrefix = "http://www.semanticweb.org/enu/qaztaxexpert#"
 # Create your models here.
 class MyOwlReady:
-
     __instance = None
     _onto = None
     _turkOnto = None

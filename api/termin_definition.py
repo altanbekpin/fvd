@@ -29,7 +29,9 @@ def edit_post():
 
 @app.route('/classification/', methods=['POST'])
 def get_classification():
+        
     data = request.json
+    print(data)
     param = int(data['param'])
     first = data.get("first")
     if data.get("page") != None:

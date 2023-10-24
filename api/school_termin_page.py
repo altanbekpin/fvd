@@ -106,7 +106,6 @@ def download_book_file(id):
     # print("path:", path)
     # return send_file(path, mimetype='application/pdf')
     result = DB.get_instance().get_school_book_path(id)
-    print(result[0])
     return send_file(result[0].get('path'))
 
 @app.route("/upload/school/book", methods=['POST'])
