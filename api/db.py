@@ -14,21 +14,21 @@ class DBConfig:
     def __init__(self, password) -> None:
         self.password = password
         self.connection = self.get_db_connection()
-    def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
-    # def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
+    # def get_db_connection(self, dbname='userdb', host='localhost', user="postgres"):  
+    def get_db_connection(self, dbname='userdb', host='db', user="postgres"):  
         conn = psycopg2.connect(
             host=host,
             dbname=dbname,
             user=user,
             password=self.password,
-            port = 5435,
+            # port = 5435,
             )
         self.cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn
 
 class DatabaseOperations(DBConfig):
         instance = None
-        def __init__(self, password) -> None:
+git        def __init__(self, password) -> None:
             super().__init__(password)
 
         def _insert_query(self, query, data=None):
