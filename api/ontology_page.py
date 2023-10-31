@@ -79,6 +79,7 @@ def send_question():
     print(quest)
     qres = g.query(quest)
     childs = []
+    s="Онтологияға сұраныс бойынша жауап табылмады"
     for row in qres:
         words = row[0].split('#')
         s = '<b>' + descriptor_to_lang[lang]+': </b>' + row[1]

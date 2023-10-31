@@ -256,6 +256,11 @@ const routes = [
     name: "register",
     component: () => import("./pages/RegisterPage.vue"),
   },
+  {
+    path: "/privacy",
+    name: "privacy",
+    component: () => import("./pages/Privacy.vue"),
+  },
 ];
 
 const router = createRouter({
